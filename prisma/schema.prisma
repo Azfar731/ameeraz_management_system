@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Payment {
+  Cash
+  Bank_Transfer
+  Card
+}
+
+enum TransactionType{
+  SOLD
+  BOUGHT
+  RETURNED
+}
+
+model Client {
+  client_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  client_name String
+  client_mobile_num String @unique
+  client_area String
+  points Int @default(0)
+  services Service_Sale_Record[]   
+  products Product_Sale_Record[]
+  created_at    DateTime @default(now())
+
+}
+
+model Employee {
+  emp_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  emp_name String
+  emp_mobile_num String @unique
+  base_salary Int
+  percentage  Int
+  records Employee_Record_JT[]
+} 
+
+model Service {
+  serv_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  serv_name String
+  serv_price Int
+  serv_category String 
+
+  category   Category @relation(fields: [serv_category], references: [cat_name]) 
+  deals Deal[] @relation("Services_In_Deals")
+}
+
+model Category{
+  cat_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  cat_name String @unique
+  services Service[]
+}
+
+model Deal{
+  deal_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  deal_name String @unique
+  deal_price Int  
+  activate_from DateTime  
+  activate_till DateTime
+  created_at    DateTime @default(now())
+  modified_at   DateTime @updatedAt
+  auto_generated Boolean @default(false)
+  
+  services Service[] @relation("Services_In_Deals")
+  records Service_Sale_Record[] @relation("Deal_Record")
+}
+
+model Product {
+  prod_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  prod_name String
+  quantity Int @default(0)
+
+  records Product_Record_JT[] 
+}
+
+model Vendor {
+  vendor_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  vendor_name String
+  vendor_mobile_num String @unique
+
+  records Product_Sale_Record[]
+}
+
+model Service_Sale_Record {
+  service_record_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  total_amount Int 
+  created_at DateTime @default(now())
+  modified_at DateTime @updatedAt
+  payment_cleared Boolean
+  client_id String @db.Uuid
+  
+  deals Deal[] @relation("Deal_Record")
+  employees Employee_Record_JT[]
+  transactions Client_Transaction[]
+  client Client @relation(fields: [client_id],references: [client_id])
+}
+
+model Employee_Record_JT {
+  @@id([emp_id, record_id]) 
+  record_id String @db.Uuid
+  emp_id String @db.Uuid
+  work_share Int
+
+  record  Service_Sale_Record @relation(fields: [record_id],references: [service_record_id])
+  employee Employee @relation(fields: [emp_id], references: [emp_id])
+
+}
+
+model Client_Transaction {
+  client_transaction_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  record_id String @db.Uuid
+  amount_paid Int
+  mode_of_payment Payment @default(Cash)
+  created_at DateTime @default(now())
+  modified_at DateTime @updatedAt
+
+  record Service_Sale_Record @relation(fields: [record_id],references: [service_record_id])
+}
+
+model Product_Sale_Record {
+  product_record_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  client_id String? @db.Uuid
+  vendor_id String? @db.Uuid
+  status  TransactionType 
+  payment_cleared Boolean
+  total_amount Int
+
+  client Client? @relation(fields: [client_id], references: [client_id])
+  vendor Vendor? @relation(fields: [vendor_id], references: [vendor_id])
+  products Product_Record_JT[]
+  transactions Product_Transaction[]
+}
+
+model Product_Record_JT {
+  record_id String @db.Uuid
+  prod_id String @db.Uuid
+  quantity Int 
+
+  record Product_Sale_Record @relation(fields: [record_id], references: [product_record_id])
+  product Product @relation(fields: [prod_id], references: [prod_id])
+  @@id([record_id,prod_id])
+
+}
+
+model Product_Transaction {
+  product_trans_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  record_id String @db.Uuid
+  amount_paid Int
+  mode_of_payment Payment 
+
+  record Product_Sale_Record @relation(fields: [record_id], references: [product_record_id])
+}
+
+model Operational_Expenses {
+  expense_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  amount_paid Int
+  description String
+  created_at DateTime @default(now())
+  modified_at DateTime @updatedAt
+}
+
+
+
+
+
+
+
+

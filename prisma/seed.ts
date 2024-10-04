@@ -1,5 +1,5 @@
 
-import { Deal, PrismaClient, Service } from "@prisma/client";
+import {  PrismaClient, Service } from "@prisma/client";
 
 const prisma_client = new PrismaClient()
 
@@ -68,6 +68,7 @@ async function create_deals(){
         {
             deal_name: "Solo deal 1",
             deal_price: 1600,
+            auto_generated: true,
             activate_from: new Date(),
             activate_till: new Date(new Date().setMonth(new Date().getMonth() + 1)),
             services: {
@@ -77,6 +78,7 @@ async function create_deals(){
         {
             deal_name: "Solo deal 2",
             deal_price: 1700,
+            auto_generated: true,
             activate_from: new Date(),
             activate_till: new Date(new Date().setMonth(new Date().getMonth() + 1)),
             services: {
@@ -86,6 +88,7 @@ async function create_deals(){
         {
             deal_name: "Solo deal 3",
             deal_price: 1800,
+            auto_generated: true,
             activate_from: new Date(),
             activate_till: new Date(new Date().setMonth(new Date().getMonth() + 1)),
             services: {
@@ -110,7 +113,7 @@ async function main(){
    const services = await create_services()
    const deals = await create_deals()
 
-   console.log(employees,categories,services,deals)
+   console.log(clients,employees,categories,services,deals)
    prisma_client.$disconnect()
 
 }

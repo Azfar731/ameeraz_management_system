@@ -1,5 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
-import { Link,Form } from "@remix-run/react";
+import { Link, Form } from "@remix-run/react";
 export const meta: MetaFunction = () => {
   return [
     { title: "Ameera Management" },
@@ -11,7 +11,7 @@ export default function Index() {
   return (
     <div>
       <h1 className="text-red-500">This is the index page</h1>
-      <Link to="/salerecord">Create a new record</Link>
+      <Link to="/salerecord/create">Create a new record</Link>
     </div>
   );
 }

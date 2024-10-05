@@ -8,15 +8,15 @@ datasource db {
 }
 
 enum Payment {
-  Cash
-  Bank_Transfer
-  Card
+  cash
+  bank_transfer
+  card
 }
 
 enum TransactionType{
-  SOLD
-  BOUGHT
-  RETURNED
+  sold
+  bought
+  returned
 }
 
 model Client {
@@ -115,7 +115,7 @@ model Client_Transaction {
   client_transaction_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   record_id String @db.Uuid
   amount_paid Int
-  mode_of_payment Payment @default(Cash)
+  mode_of_payment Payment @default(cash)
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
 

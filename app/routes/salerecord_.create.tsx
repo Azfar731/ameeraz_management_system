@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Outlet } from "@remix-run/react";
 import { MetaFunction } from "@remix-run/node";
+import { FormType
+
+ } from "~/utils/types";
 export const meta: MetaFunction = () => {
   return [
     { title: "Form part1" },
@@ -8,25 +11,17 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-type FormType = {
-  total_amount: number | undefined
-  amount_paid: number | undefined
-  mobile_num: string | undefined
-  deals: string[] 
-  employees: {id: string, work_share: number}[] 
-  mode_of_payment: "Cash" | "Bank Transfer" | "Card"
-
-}
 
 
 export default function SaleRecord() {
   const [formData,setFormData] = useState<FormType>({
-    total_amount: undefined,
-    amount_paid: undefined,
-    mobile_num: undefined,
+    amount_charged: 0,
+    amount_paid: 0,
+    mobile_num: "",
     deals: [],
+    services: [],
     employees: [],
-    mode_of_payment: "Cash"
+    mode_of_payment: {value: "cash", label: "Cash"}
   })
 
   return (

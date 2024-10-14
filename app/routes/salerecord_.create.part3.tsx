@@ -10,13 +10,16 @@ import {
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import { FormType } from "~/utils/types";
+import { create_service_record, validate_data } from ".server/utitlityFunctions";
+import { ActionFunctionArgs } from "@remix-run/node";
+
 
 export async function loader() {
   const employees = await prisma_client.employee.findMany();
   return { employees };
 }
 
-export async function action({request}) {
+export async function action({request}: ActionFunctionArgs) {
   const formData: FormType = await request.json()
   const employees = formData.employees
   const amount_charged = formData.amount_charged
@@ -27,8 +30,15 @@ export async function action({request}) {
     return {msg: "Amount charged must match Employees total Work share"}
   }
 
-    
-  return null;
+  //validate data, returns null if successfull
+  const isNotValid = validate_data(formData)   
+  if(!isNotValid){
+    const record = await create_service_record(formData)
+    return record
+  }else{
+    return isNotValid
+  }
+
 }
 
 export default function Part3() {
@@ -45,7 +55,7 @@ export default function Part3() {
           id: emp.id,
           name:
             employees.find((employee) => employee.emp_id === emp.id)
-              ?.emp_name || "Employee doesn't exist",
+              ?.emp_fname || "Employee doesn't exist",
         };
       });
       return empList;
@@ -65,7 +75,7 @@ export default function Part3() {
   const formRef = useRef<HTMLFormElement>(null);
 
   const employee_options = employees.map((employee) => {
-    return { value: employee.emp_id, label: employee.emp_name };
+    return { value: employee.emp_id, label: employee.emp_fname };
   });
 
   const navigate = useNavigate();

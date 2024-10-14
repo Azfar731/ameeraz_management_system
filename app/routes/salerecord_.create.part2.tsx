@@ -8,7 +8,7 @@ import {
   redirect,
 } from "@remix-run/react";
 import { prisma_client } from ".server/db";
-import { Client, Deal, Service } from "@prisma/client";
+import { Client, Deal } from "@prisma/client";
 import Select, { OnChangeValue } from "react-select";
 import { FormType, PaymentModes } from "~/utils/types";
 
@@ -68,8 +68,8 @@ export default function Part2() {
 
   
 
-  const servicesRef = useRef<{ value: string; label: string }[]>([]);
-  const dealsRef = useRef<{ value: string; label: string }[]>([]);
+  const servicesRef = useRef<{ value: string; label: string }[]>(formData.services);
+  const dealsRef = useRef<{ value: string; label: string }[]>(formData.deals);
   //Parent Context
 
   // Map the deals recieved from the action function to pass to react-select

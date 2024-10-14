@@ -1,15 +1,14 @@
 import { FormType } from "~/utils/types";
 import { prisma_client } from "./db";
 const validate_data = (formData: FormType): string | null => {
-    
     // 1. Type checks, success returns null
-    const types_response = validate_types(formData)
-    if(types_response){ return types_response}
+    const types_response = validate_types(formData);
+    if (types_response) return types_response;
 
     // 2. Validate numerical values greater than 0, success returns null
-    const cond_response = validate_conditions(formData)
-    if(cond_response){return cond_response}
-    
+    const cond_response = validate_conditions(formData);
+    if (cond_response) return cond_response;
+
     // If all validations pass, return null (indicating no errors)
     return null;
 };
@@ -34,7 +33,8 @@ const validate_types = (formData: FormType): string | null => {
     }
 
     if (
-        !Array.isArray(deals) || !deals.every((deal) =>
+        !Array.isArray(deals) ||
+        !deals.every((deal) =>
             typeof deal.value === "string" && typeof deal.label === "string"
         )
     ) {
@@ -42,7 +42,8 @@ const validate_types = (formData: FormType): string | null => {
     }
 
     if (
-        !Array.isArray(services) || !services.every((service) =>
+        !Array.isArray(services) ||
+        !services.every((service) =>
             typeof service.value === "string" &&
             typeof service.label === "string"
         )
@@ -51,7 +52,8 @@ const validate_types = (formData: FormType): string | null => {
     }
 
     if (
-        !Array.isArray(employees) || !employees.every((employee) =>
+        !Array.isArray(employees) ||
+        !employees.every((employee) =>
             typeof employee.id === "string" &&
             typeof employee.work_share === "number"
         )
@@ -67,17 +69,15 @@ const validate_types = (formData: FormType): string | null => {
         return "Mode of payment must be an object with value as a string and label as a string.";
     }
 
-    return null
+    return null;
 };
 
 const validate_conditions = (formData: FormType): string | null => {
-    
     const {
         amount_charged,
         amount_paid,
         employees,
     } = formData;
-
 
     if (amount_charged <= 0 || amount_paid <= 0) {
         return "Amount charged and paid must be greater than 0.";
@@ -101,11 +101,47 @@ const validate_conditions = (formData: FormType): string | null => {
         return "Amount charged must equal the total of employees' work share.";
     }
 
-    return null
+    return null;
 };
 
-const create_service_record = (formData: FormType)=> {
-    
-}
+const create_service_record = async (formData: FormType) => {
+    const {
+        amount_charged,
+        amount_paid,
+        mobile_num,
+        deals,
+        services,
+        employees,
+        mode_of_payment,
+    } = formData;
 
-export { validate_data };
+    const all_deals = [...deals, ...services];
+
+    const record = await prisma_client.service_Sale_Record.create({
+        data: {
+            total_amount: amount_charged,
+            payment_cleared: amount_charged === amount_paid,
+            client: {
+                connect: { client_mobile_num: mobile_num },
+            },
+            deals: {
+                connect: all_deals.map((deal) => ({ deal_id: deal.value })),
+            },
+            transactions: {
+                create: [{
+                    amount_paid,
+                    mode_of_payment: mode_of_payment.value,
+                }],
+            },
+            employees: {
+                create: employees.map((employee) => ({
+                    emp_id: employee.id,
+                    work_share: employee.work_share,
+                })),
+            },
+        },
+    });
+    return record;
+};
+
+export { create_service_record, validate_data };

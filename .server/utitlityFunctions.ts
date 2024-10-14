@@ -88,8 +88,8 @@ const validate_conditions = (formData: FormType): string | null => {
     }
 
     // 3. Validate amount_charged is smaller than or equal to amount_paid
-    if (amount_charged > amount_paid) {
-        return "Amount charged cannot be greater than amount paid.";
+    if (amount_paid > amount_charged) {
+        return "Amount paid cannot be greater than amount charged.";
     }
 
     // 4. Validate amount_charged equals the sum of employees' work_share

@@ -6,6 +6,7 @@ import {
   useOutletContext,
   useSubmit,
   redirect,
+  useNavigate,
 } from "@remix-run/react";
 import { prisma_client } from ".server/db";
 import { Client, Deal } from "@prisma/client";
@@ -33,6 +34,8 @@ export default function Part2() {
     formData: FormType;
     setFormData: React.Dispatch<React.SetStateAction<FormType>>;
   }>();
+
+  const navigate = useNavigate()
 
   //loader Data
   const { deals } = useLoaderData<{
@@ -70,6 +73,7 @@ export default function Part2() {
 
   const servicesRef = useRef<{ value: string; label: string }[]>(formData.services);
   const dealsRef = useRef<{ value: string; label: string }[]>(formData.deals);
+  const formRef = useRef<HTMLFormElement>(null)
   //Parent Context
 
   // Map the deals recieved from the action function to pass to react-select
@@ -127,6 +131,37 @@ export default function Part2() {
     );
   };
 
+  const GoToPrevPage = ()=>{
+    const form = formRef.current
+    if (!form)
+      return
+    const pageFormData = new FormData(form)
+    const services = servicesRef.current;
+    const deals = dealsRef.current;
+    const amount_charged = Number(pageFormData.get("amount_charged"));
+    const amount_paid = Number(pageFormData.get("amount_paid"));
+    const payment_mode = pageFormData.get("mode_of_payment")?.toString() || "";
+    let mode_of_payment = payment_options[0]; //default value is {value: cash, label: Cash}
+     
+    if (["cash", "bank_transfer", "card"].includes(payment_mode)) {
+      const option = payment_options.find((opt) => opt.value === payment_mode);
+      if (option) {
+        mode_of_payment = option;
+      }
+    }
+
+    const formDataObj = {
+      deals,
+      services,
+      amount_charged,
+      amount_paid,
+      mode_of_payment,
+    };
+
+    setFormData((prev) => ({ ...prev, ...formDataObj }));
+    navigate('../')
+
+  }
   const onServicesChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
@@ -169,11 +204,13 @@ export default function Part2() {
     dealsRef.current = [...tmp_array];
   };
 
+
   return (
     <div className="flex justify-center items-center h-screen">
       <Form
         method="post"
         onSubmit={handleSubmit}
+        ref = {formRef}
         className="bg-white p-6 rounded shadow-md w-80"
       >
         <h1 className="text-2xl font-bold mb-4 text-center">
@@ -258,12 +295,21 @@ export default function Part2() {
           id="payment_mode"
           defaultValue={formData.mode_of_payment}
         />
-        <button
-          type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Next
-        </button>
+        <div className="flex justify-apart items-center">
+          <button
+            type="button"
+            onClick={GoToPrevPage}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Previous
+          </button>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Next
+          </button>
+        </div>
       </Form>
     </div>
   );

@@ -6,42 +6,49 @@ import {
   useOutletContext,
   useSubmit,
   useNavigate,
+  useActionData,
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import { FormType } from "~/utils/types";
-import { create_service_record, validate_data } from ".server/utitlityFunctions";
+import {
+  create_service_record,
+  validate_data,
+} from ".server/utitlityFunctions";
 import { ActionFunctionArgs } from "@remix-run/node";
-
 
 export async function loader() {
   const employees = await prisma_client.employee.findMany();
   return { employees };
 }
 
-export async function action({request}: ActionFunctionArgs) {
-  const formData: FormType = await request.json()
-  const employees = formData.employees
-  const amount_charged = formData.amount_charged
-  let total_work_share = 0 
+export async function action({ request }: ActionFunctionArgs) {
+  const formData: FormType = await request.json();
+  const employees = formData.employees;
+  const amount_charged = formData.amount_charged;
+  let total_work_share = 0;
   //calculate total_work_share
-  employees.forEach(emp => total_work_share += emp.work_share)
-  if(amount_charged !== total_work_share){
-    return {msg: "Amount charged must match Employees total Work share"}
+  employees.forEach((emp) => (total_work_share += emp.work_share));
+  if (amount_charged !== total_work_share) {
+    return { msg: "Amount charged must match Employees total Work share" };
   }
 
   //validate data, returns null if successfull
-  const isNotValid = validate_data(formData)   
-  if(!isNotValid){
-    const record = await create_service_record(formData)
-    return record
-  }else{
-    return isNotValid
+  const isNotValid = validate_data(formData);
+  if (!isNotValid) {
+    const record = await create_service_record(formData);
+    return record;
+  } else {
+    return isNotValid;
   }
-
 }
 
 export default function Part3() {
+  //action data
+  const actionData = useActionData();
+  if (actionData) {
+    console.log(actionData);
+  }
   //context data
   const { formData, setFormData } = useOutletContext<{
     formData: FormType;
@@ -81,24 +88,24 @@ export default function Part3() {
   const navigate = useNavigate();
   const submit = useSubmit();
 
-  const getDefaultValue = ()=> {
-    return selectedEmpList.map(emp => {
-      return {value: emp.id, label: emp.name}
-    })
-  }
+  const getDefaultValue = () => {
+    return selectedEmpList.map((emp) => {
+      return { value: emp.id, label: emp.name };
+    });
+  };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const pageForm = event.currentTarget;
     const pageFormData = new FormData(pageForm);
-
     const employees = selectedEmpList.map((emp, index) => {
       const work_share: number =
         Number(pageFormData.get(`Emp-${index}-share`)) || 0;
       return { id: emp.id, work_share };
     });
     setFormData((prev) => ({ ...prev, employees }));
+    const formDatalocal = {...formData,employees}
     console.log("Final form data: ", formData);
-    submit(formData, { method: "post", encType: "application/json" });
+    submit(formDatalocal, { method: "post", encType: "application/json" });
   };
 
   const empWorkShareList = selectedEmpList.map((emp, index) => {
@@ -115,7 +122,10 @@ export default function Part3() {
           id={`Emp-${index}`}
           name={`Emp-${index}-share`}
           min={0}
-          defaultValue={formData.employees.find(employee => employee.id === emp.id)?.work_share || undefined}
+          defaultValue={
+            formData.employees.find((employee) => employee.id === emp.id)
+              ?.work_share || undefined
+          }
           placeholder="1234"
           className="px-3 py-2 border border-gray-300 rounded-md mb-4"
         />

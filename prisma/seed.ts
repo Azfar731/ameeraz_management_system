@@ -42,10 +42,11 @@ async function create_categories(){
 
 
 async function create_services(){
+    const categories = await prisma_client.category.findMany()
     const serv = [
-        {serv_name: "hair cut", serv_price: 1170, serv_category: "hair"},
-        {serv_name: "facial", serv_price: 570, serv_category: "skin"},
-        {serv_name: "pedicure", serv_price: 850, serv_category: "skin"}
+        {serv_name: "hair cut", serv_price: 1170, category: { connect: categories.find(cat => cat.cat_name === "hair")}},
+        {serv_name: "facial", serv_price: 570, category: { connect: categories.find(cat => cat.cat_name === "skin")}},
+        {serv_name: "pedicure", serv_price: 850, category: { connect: categories.find(cat => cat.cat_name === "nails")}}
     ]
     const serv_records = await Promise.all(serv.map(elem => prisma_client.service.create({data: elem})))
     return serv_records

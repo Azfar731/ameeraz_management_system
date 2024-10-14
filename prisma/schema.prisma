@@ -46,7 +46,7 @@ model Service {
   serv_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   serv_name String
   serv_price Int
-  serv_category String 
+  serv_category String @db.Uuid
 
   category   Category @relation(fields: [serv_category], references: [cat_id]) 
   deals Deal[] @relation("Services_In_Deals")

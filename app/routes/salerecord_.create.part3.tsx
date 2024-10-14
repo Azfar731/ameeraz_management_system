@@ -16,25 +16,53 @@ export async function loader() {
   return { employees };
 }
 
-export async function action() {
+export async function action({request}) {
+  const formData: FormType = await request.json()
+  const employees = formData.employees
+  const amount_charged = formData.amount_charged
+  let total_work_share = 0 
+  //calculate total_work_share
+  employees.forEach(emp => total_work_share += emp.work_share)
+  if(amount_charged !== total_work_share){
+    return {msg: "Amount charged must match Employees total Work share"}
+  }
+
+    
   return null;
 }
 
 export default function Part3() {
+  //context data
+  const { formData, setFormData } = useOutletContext<{
+    formData: FormType;
+    setFormData: React.Dispatch<React.SetStateAction<FormType>>;
+  }>();
+
+  const getEmpList = () => {
+    if (formData.employees) {
+      const empList = formData.employees.map((emp) => {
+        return {
+          id: emp.id,
+          name:
+            employees.find((employee) => employee.emp_id === emp.id)
+              ?.emp_name || "Employee doesn't exist",
+        };
+      });
+      return empList;
+    } else {
+      return [];
+    }
+  };
+
   const { employees } = useLoaderData<{ employees: Employee[] }>();
   const [selectedEmpList, setSelectedEmpList] = useState<
     {
       id: string;
       name: string;
     }[]
-  >([]);
-  const { formData, setFormData } = useOutletContext<{
-    formData: FormType;
-    setFormData: React.Dispatch<React.SetStateAction<FormType>>;
-  }>();
-  console.log("Inital Form Data: ",formData)
-  const formRef = useRef<HTMLFormElement | undefined>(undefined)
-  
+  >(getEmpList());
+
+  const formRef = useRef<HTMLFormElement>(null);
 
   const employee_options = employees.map((employee) => {
     return { value: employee.emp_id, label: employee.emp_name };
@@ -43,6 +71,11 @@ export default function Part3() {
   const navigate = useNavigate();
   const submit = useSubmit();
 
+  const getDefaultValue = ()=> {
+    return selectedEmpList.map(emp => {
+      return {value: emp.id, label: emp.name}
+    })
+  }
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const pageForm = event.currentTarget;
@@ -54,7 +87,7 @@ export default function Part3() {
       return { id: emp.id, work_share };
     });
     setFormData((prev) => ({ ...prev, employees }));
-    console.log("Final form data: ",formData);
+    console.log("Final form data: ", formData);
     submit(formData, { method: "post", encType: "application/json" });
   };
 
@@ -72,6 +105,7 @@ export default function Part3() {
           id={`Emp-${index}`}
           name={`Emp-${index}-share`}
           min={0}
+          defaultValue={formData.employees.find(employee => employee.id === emp.id)?.work_share || undefined}
           placeholder="1234"
           className="px-3 py-2 border border-gray-300 rounded-md mb-4"
         />
@@ -126,6 +160,7 @@ export default function Part3() {
           name="employees"
           onChange={onEmployeeChange}
           options={employee_options}
+          defaultValue={getDefaultValue()}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
         />

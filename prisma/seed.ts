@@ -7,9 +7,9 @@ const prisma_client = new PrismaClient()
 async function create_clients(){
 
     const clients = [
-        { client_name: "Azfar", client_area: "Lahore",client_mobile_num: "03134549126" },
-        { client_name: "Lailma", client_area: "Lahore",client_mobile_num: "03334549126" },
-        { client_name: "Irha", client_area: "Lahore",client_mobile_num: "03334349963" },
+        { client_fname: "Azfar", client_lname: "Razzaq", client_area: "Lahore",client_mobile_num: "03134549126" },
+        { client_fname: "Lailma", client_lname: "Razzaq", client_area: "Lahore",client_mobile_num: "03334549126" },
+        { client_fname: "Irha", client_lname: "Razzaq", client_area: "Lahore",client_mobile_num: "03334349963" },
     ];
 
     const client_record = await Promise.all(clients.map(client =>  prisma_client.client.create({data: client})));
@@ -19,9 +19,9 @@ async function create_clients(){
 
 async function create_employees(){
     const emp = [
-        {emp_name: "Amna",emp_mobile_num: "04134549126",base_salary:20000 ,percentage: 5 },
-        {emp_name: "Razia",emp_mobile_num: "05134549126",base_salary:30000 ,percentage: 10 },
-        {emp_name: "Hax",emp_mobile_num: "06134549126",base_salary:15000 ,percentage: 3 }  
+        {emp_fname: "Amna", emp_lname: "Batool",emp_mobile_num: "04134549126",base_salary:20000 ,percentage: 5 },
+        {emp_fname: "Razia", emp_lname: "Batool",emp_mobile_num: "05134549126",base_salary:30000 ,percentage: 10 },
+        {emp_fname: "Hax", emp_lname: "Batool",emp_mobile_num: "06134549126",base_salary:15000 ,percentage: 3 }  
     ]
 
     const emp_records = await Promise.all(emp.map(emp=> prisma_client.employee.create({data: emp})))

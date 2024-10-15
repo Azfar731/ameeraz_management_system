@@ -1,9 +1,4 @@
-Edit the form styling
 
-Implement form saving functionality on prev button on form part2
-Create entries in db in form part3 action function
-After creating the entry redirect to sales_record/:id
-In form part2, edit react-select to contain deals and services ids as the value
 
-In form part3:
-edit selectedEmpList to contain the list from formData. This will enable part3 to load data from formData.
+Add validation in form part2
+Show action function error messages

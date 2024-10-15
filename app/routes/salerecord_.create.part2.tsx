@@ -230,6 +230,7 @@ export default function Part2() {
           defaultValue={formData.services}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
+          
         />
 
         <label
@@ -247,6 +248,7 @@ export default function Part2() {
           defaultValue={formData.deals}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
+          
         />
 
         <div className="text-gray-700 mb-4">
@@ -269,6 +271,7 @@ export default function Part2() {
           onChange={(e) =>
             setAmount((prev) => ({ ...prev, charged: Number(e.target.value) }))
           }
+          required
         />
 
         <label
@@ -287,6 +290,7 @@ export default function Part2() {
           onChange={(e) =>
             setAmount((prev) => ({ ...prev, paid: Number(e.target.value) }))
           }
+          required
         />
         <label htmlFor="payment_mode">Mode of Payment</label>
         <Select
@@ -295,7 +299,7 @@ export default function Part2() {
           id="payment_mode"
           defaultValue={formData.mode_of_payment}
         />
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-6">
           <button
             type="button"
             onClick={GoToPrevPage}

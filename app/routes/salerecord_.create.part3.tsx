@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const isNotValid = validate_data(formData);
   if (!isNotValid) {
     const record = await create_service_record(formData);
-    return redirect(`/salerecord/${record.service_record_id}`)
+    return redirect(`/salerecord/${record.service_record_id}`);
   } else {
     return isNotValid;
   }
@@ -104,7 +104,7 @@ export default function Part3() {
       return { id: emp.id, work_share };
     });
     setFormData((prev) => ({ ...prev, employees }));
-    const formDatalocal = {...formData,employees}
+    const formDatalocal = { ...formData, employees };
     console.log("Final form data: ", formData);
     submit(formDatalocal, { method: "post", encType: "application/json" });
   };
@@ -173,20 +173,18 @@ export default function Part3() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded shadow-md w-80"
       >
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          Select Employees
-        </h1>
+        <h1 className="text-2xl font-bold text-center">Select Employees</h1>
         <Select
           isMulti
           name="employees"
           onChange={onEmployeeChange}
           options={employee_options}
           defaultValue={getDefaultValue()}
-          className="basic-multi-select mb-4"
+          className="basic-multi-select mt-4"
           classNamePrefix="select"
         />
         {empWorkShareList}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-6">
           <button
             type="button"
             onClick={GoToPrevPage}

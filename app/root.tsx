@@ -6,7 +6,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
-import Header from "./components/Header.tsx";
+import Header from "./components/Header";
 
 import "./tailwind.css";
 
@@ -37,7 +37,7 @@ export default function App() {
   return (
     <>
       <Header />
-      <Outlet />;
+      <Outlet />
     </>
   );
 }

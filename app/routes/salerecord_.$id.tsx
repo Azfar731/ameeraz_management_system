@@ -53,24 +53,22 @@ export default function Record() {
   }
   const generate_heading = (title: string,subHeading1: string, subHeading2: string)=> {
     return([
-      <h2 key={title} className={title_style}>{title}</h2>,
+      <h2 key={title} className={"col-span-2"}>{title}</h2>,
       <h3 key={`${title} SubHeading 1`}>{subHeading1}</h3>,
       <h3 key={`${title} SubHeading 2`}>{subHeading2}</h3>
     ])
   }
   
-  const grid_container_style = "w-1/2 h-full grid grid-cols-1 gap-4";
-  const title_style = "col-span-2";
   
   return (
-    <div className="container mx-auto">
-      
+    <div className="flex flex-col justify-center items-center h-screen">
         <h1>Service Record Details</h1>
-        <div className="w-2/3 bg-grey-500 grid grid-cols-2 gap4">
+        <div className="bg-white p-6 rounded shadow-md w-1/2 bg-grey-500 grid grid-cols-2 gap4">
         <h3>Client Name</h3>
         <h3>{`${client.client_fname} ${client.client_lname}`}</h3>
         <h3>Client Mobile Number</h3>
         <h3>{client.client_mobile_num}</h3>
+        <h3>Total Amount Charged</h3>
         <h3>{record.total_amount}</h3>
         {generate_heading("Deals/Services Taken","Name","Price")}
         {renderered_deals}
@@ -78,7 +76,6 @@ export default function Record() {
         {renderered_emp}
         {generate_heading("Transactions","Date","Amount Paid")}
         {render_transactions()}
-        
       </div>
     </div>
   )

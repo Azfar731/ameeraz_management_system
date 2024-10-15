@@ -295,7 +295,7 @@ export default function Part2() {
           id="payment_mode"
           defaultValue={formData.mode_of_payment}
         />
-        <div className="flex justify-apart items-center">
+        <div className="flex justify-between items-center">
           <button
             type="button"
             onClick={GoToPrevPage}

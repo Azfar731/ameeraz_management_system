@@ -8,18 +8,18 @@
 
 ### Create
 
-- /salesrecords/create => salesrecords.create
-- /salesrecords/create => salesrecords.create.\_index
-- /salesrecords/create/part2 => salesrecords.create.part2
-- /salesrecords/create/part3 => salesrecords.create.part3
+- /salerecord/create => salerecord.create
+- /salerecord/create => salerecord.create.\_index
+- /salerecord/create/part2 => salerecord.create.part2
+- /salerecord/create/part3 => salerecord.create.part3
 
 ### View a single record
 
-- salesrecords/:id => salesrecords.$id
+- salerecord/:id => salerecord.$id
 
 ### Update
 
-- salesrecords/:id/update => salesrecords.$id.update
+- salerecord/:id/update => salerecord.$id.update
 
 ## Produdct Sale Recordsd:
 

@@ -7,6 +7,7 @@ import {
   useSubmit,
   useNavigate,
   useActionData,
+  redirect,
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
@@ -37,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const isNotValid = validate_data(formData);
   if (!isNotValid) {
     const record = await create_service_record(formData);
-    return record;
+    return redirect(`/salerecord/${record.service_record_id}`)
   } else {
     return isNotValid;
   }
@@ -185,7 +186,7 @@ export default function Part3() {
           classNamePrefix="select"
         />
         {empWorkShareList}
-        <div className="flex justify-apart items-center">
+        <div className="flex justify-between items-center">
           <button
             type="button"
             onClick={GoToPrevPage}

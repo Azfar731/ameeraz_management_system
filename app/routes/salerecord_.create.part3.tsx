@@ -46,10 +46,8 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Part3() {
   //action data
-  const actionData = useActionData();
-  if (actionData) {
-    console.log(actionData);
-  }
+  const actionData = useActionData<{msg: string}| undefined>();
+  
   //context data
   const { formData, setFormData } = useOutletContext<{
     formData: FormType;
@@ -123,10 +121,12 @@ export default function Part3() {
           id={`Emp-${index}`}
           name={`Emp-${index}-share`}
           min={0}
+
           defaultValue={
             formData.employees.find((employee) => employee.id === emp.id)
               ?.work_share || undefined
           }
+          required
           placeholder="1234"
           className="px-3 py-2 border border-gray-300 rounded-md mb-4"
         />
@@ -182,8 +182,10 @@ export default function Part3() {
           defaultValue={getDefaultValue()}
           className="basic-multi-select mt-4"
           classNamePrefix="select"
+          required
         />
         {empWorkShareList}
+        {actionData?.msg && <h2 className="text-red-500 font-semibold">{actionData.msg}</h2>}
         <div className="flex justify-between items-center mt-6">
           <button
             type="button"

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { ActionFunctionArgs } from "@remix-run/node";
 import {
   useLoaderData,
+  useActionData,
   Form,
   useOutletContext,
   useSubmit,
@@ -19,12 +20,16 @@ export async function loader() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const json = await request.json();
+  const json: Omit<FormType, 'employees' | 'mobile_num'> = await request.json();
   const amount_paid: number = json.amount_paid;
   const amount_charged: number = json.amount_charged;
   if (amount_paid > amount_charged) {
-    return { msg: "Amount Paid can not be greater than Amount Charged" };
+    return { amount_paid_msg: "Amount Paid can not be greater than Amount Charged" };
   }
+  if((json.deals.length < 1)  && (json.services.length < 1)){
+    return {deals_msg: "Atleast one service or deal must be selected"}
+  }
+  
   throw redirect("../part3");
 }
 
@@ -43,6 +48,13 @@ export default function Part2() {
     deals: Deal[];
   }>();
 
+  //Action Data
+  const actionData = useActionData< { amount_paid_msg: string }
+  | { deals_msg: string }
+  | undefined // In case there's no validation error
+>();
+
+  
   //states
   const calc_services_amount = () => {
     let tmp_amount = 0;
@@ -123,10 +135,11 @@ export default function Part2() {
       mode_of_payment,
     };
 
+    
     setFormData((prev) => ({ ...prev, ...formDataObj }));
 
     submit(
-      { amount_charged, amount_paid },
+      formDataObj,
       { method: "post", encType: "application/json" }
     );
   };
@@ -211,7 +224,7 @@ export default function Part2() {
         method="post"
         onSubmit={handleSubmit}
         ref = {formRef}
-        className="bg-white p-6 rounded shadow-md w-80"
+        className="bg-white mt-14 p-6 rounded shadow-md w-80 "
       >
         <h1 className="text-2xl font-bold mb-4 text-center">
           This is form part 2
@@ -250,7 +263,7 @@ export default function Part2() {
           classNamePrefix="select"
           
         />
-
+        {actionData && 'deals_msg' in actionData && <h2 className="text-red-500 font-semibold">{actionData.deals_msg}</h2> }
         <div className="text-gray-700 mb-4">
           Expected Total Amount: {amount.services + amount.deals}
         </div>
@@ -292,6 +305,7 @@ export default function Part2() {
           }
           required
         />
+        {actionData && 'amount_paid_msg' in actionData && <h2 className="text-red-700">{actionData.amount_paid_msg}</h2> }
         <label htmlFor="payment_mode">Mode of Payment</label>
         <Select
           options={payment_options}

@@ -12,8 +12,7 @@ const validate_data = (formData: FormType): string | null => {
     // If all validations pass, return null (indicating no errors)
     return null;
 };
-
-const validate_types = (formData: FormType): string | null => {
+const validate_types = (formData: FormType): { msg: string } | null => {
     const {
         amount_charged,
         amount_paid,
@@ -25,11 +24,11 @@ const validate_types = (formData: FormType): string | null => {
     } = formData;
 
     if (typeof amount_charged !== "number" || typeof amount_paid !== "number") {
-        return "Amount charged and paid must be numbers.";
+        return { msg: "Amount charged and paid must be numbers." };
     }
 
     if (typeof mobile_num !== "string") {
-        return "Mobile number must be a string.";
+        return { msg: "Mobile number must be a string." };
     }
 
     if (
@@ -38,27 +37,35 @@ const validate_types = (formData: FormType): string | null => {
             typeof deal.value === "string" && typeof deal.label === "string"
         )
     ) {
-        return "Deals must be an array of objects with value and label as strings.";
+        return {
+            msg: "Deals must be an array of objects with value and label as strings.",
+        };
     }
 
     if (
         !Array.isArray(services) ||
-        !services.every((service) =>
-            typeof service.value === "string" &&
-            typeof service.label === "string"
+        !services.every(
+            (service) =>
+                typeof service.value === "string" &&
+                typeof service.label === "string"
         )
     ) {
-        return "Services must be an array of objects with value and label as strings.";
+        return {
+            msg: "Services must be an array of objects with value and label as strings.",
+        };
     }
 
     if (
         !Array.isArray(employees) ||
-        !employees.every((employee) =>
-            typeof employee.id === "string" &&
-            typeof employee.work_share === "number"
+        !employees.every(
+            (employee) =>
+                typeof employee.id === "string" &&
+                typeof employee.work_share === "number"
         )
     ) {
-        return "Employees must be an array of objects with id as string and work_share as a number.";
+        return {
+            msg: "Employees must be an array of objects with id as string and work_share as a number.",
+        };
     }
 
     if (
@@ -66,39 +73,37 @@ const validate_types = (formData: FormType): string | null => {
         typeof mode_of_payment.value !== "string" ||
         typeof mode_of_payment.label !== "string"
     ) {
-        return "Mode of payment must be an object with value as a string and label as a string.";
+        return {
+            msg: "Mode of payment must be an object with value as a string and label as a string.",
+        };
     }
 
     return null;
 };
 
-const validate_conditions = (formData: FormType): string | null => {
-    const {
-        amount_charged,
-        amount_paid,
-        employees,
-    } = formData;
+const validate_conditions = (formData: FormType): { msg: string } | null => {
+    const { amount_charged, amount_paid, employees } = formData;
 
-    if (amount_charged <= 0 || amount_paid <= 0) {
-        return "Amount charged and paid must be greater than 0.";
+    if (amount_charged <= 0) {
+        return { msg: "Amount charged must be greater than 0." };
     }
 
     if (!employees.every((employee) => employee.work_share > 0)) {
-        return "Each employee's work share must be greater than 0.";
+        return { msg: "Each employee's work share must be greater than 0." };
     }
 
-    // 3. Validate amount_charged is smaller than or equal to amount_paid
     if (amount_paid > amount_charged) {
-        return "Amount paid cannot be greater than amount charged.";
+        return { msg: "Amount paid cannot be greater than amount charged." };
     }
 
-    // 4. Validate amount_charged equals the sum of employees' work_share
     const totalWorkShare = employees.reduce(
         (sum, employee) => sum + employee.work_share,
-        0,
+        0
     );
     if (amount_charged !== totalWorkShare) {
-        return "Amount charged must equal the total of employees' work share.";
+        return {
+            msg: "Amount charged must equal the total of employees' work share.",
+        };
     }
 
     return null;
@@ -143,7 +148,5 @@ const create_service_record = async (formData: FormType) => {
     });
     return record;
 };
-
-
 
 export { create_service_record, validate_data };

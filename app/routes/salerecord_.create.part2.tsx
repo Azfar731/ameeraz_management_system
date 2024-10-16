@@ -13,6 +13,7 @@ import { prisma_client } from ".server/db";
 import { Client, Deal } from "@prisma/client";
 import Select, { OnChangeValue } from "react-select";
 import { FormType, PaymentModes } from "~/utils/types";
+import { fetchDeals, fetchServices } from "shared/utilityFunctions";
 
 export async function loader() {
   const deals = await prisma_client.deal.findMany();
@@ -89,17 +90,9 @@ export default function Part2() {
   //Parent Context
 
   // Map the deals recieved from the action function to pass to react-select
-  const deal_options = deals
-    .filter((deal) => !deal.auto_generated)
-    .map((deal) => {
-      return { value: deal.deal_id, label: deal.deal_name };
-    });
+  const deal_options = fetchDeals(deals)
 
-  const service_options = deals
-    .filter((deal) => deal.auto_generated)
-    .map((deal) => {
-      return { value: deal.deal_id, label: deal.deal_name };
-    });
+  const service_options = fetchServices(deals)
 
   const payment_options: {value: PaymentModes,label: string}[] = [
     { value: "cash", label: "Cash" },

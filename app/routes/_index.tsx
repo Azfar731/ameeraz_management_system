@@ -1,6 +1,12 @@
 import { useState, useRef } from "react";
 import type { MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData, Form, useSearchParams, useNavigate } from "@remix-run/react";
+import {
+  Link,
+  useLoaderData,
+  Form,
+  useSearchParams,
+  useNavigate,
+} from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { prisma_client } from ".server/db";
 import {
@@ -58,7 +64,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const category_ids = searchParams.get("categories")?.split("|");
   const client_mobile_num = searchParams.get("mob_num") || undefined;
 
-  if ( startDate && endDate &&  startDate > endDate) {
+  if (startDate && endDate && startDate > endDate) {
     throw new Error("Start Date can not be greater than End date");
   }
   // if (endDate > currentDate) {
@@ -92,12 +98,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
           },
         },
       },
-    },include: {
+    },
+    include: {
       client: true,
       transactions: true,
       deals: true,
-      employees: true
-    }
+      employees: true,
+    },
   });
 
   const deals = await prisma_client.deal.findMany();
@@ -114,7 +121,7 @@ export default function Index() {
     return today.toISOString().split("T")[0]; // Formats the date to 'YYYY-MM-DD'
   });
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   //loader Data
   const { service_records, deals, employees, categories } = useLoaderData<{
     service_records: ServiceSaleRecordWithRelations[];
@@ -136,36 +143,101 @@ export default function Index() {
   const data = { nodes };
   console.log("Service_records: ", service_records);
 
+  const [ids, setIds] = useState<string[]>([]);
+  const handleExpand = (item: ServiceSaleRecordWithRelations) => {
+    if (ids.includes(item.service_record_id)) {
+      setIds(ids.filter((id) => id !== item.service_record_id));
+    } else {
+      setIds(ids.concat(item.service_record_id));
+    }
+  };
+
+  const ROW_PROPS = {
+    onClick: handleExpand,
+  };
+
+  const getEmployeeNames = (item: ServiceSaleRecordWithRelations,fullName?: boolean) => {
+    const emp_ids = item.employees.map((emp) => emp.emp_id);
+    const emp_entities = employees.filter((emp) =>
+      emp_ids.includes(emp.emp_id)
+    );
+    if(fullName){
+      return emp_entities.map((emp) => `${emp.emp_fname} ${emp.emp_lname}`).join(", ");
+    }
+    return emp_entities.map((emp) => emp.emp_fname).join(", ");
+  };
+
+  const ROW_OPTIONS = {
+    renderAfterRow: (item: ServiceSaleRecordWithRelations) => (
+      <>
+        {ids.includes(item.service_record_id) && (
+          <tr style={{ display: "flex", gridColumn: "1 / -1" }}>
+            <td style={{ flex: "1" }}>
+              <ul
+                style={{
+                  margin: "0",
+                  padding: "0",
+                  backgroundColor: "#e0e0e0",
+                }}
+              >
+                <li>
+                  <strong>Deals/Services</strong>
+                  {item.deals.map((deal) => deal.deal_name).join(", ")}
+                </li>
+                <li>
+                  <strong>Employees</strong> {getEmployeeNames(item,true)}
+                </li>
+              </ul>
+            </td>
+          </tr>
+        )}
+      </>
+    ),
+  };
+
   const COLUMNS = [
     {
       label: "Date",
-      renderCell: (item: ServiceSaleRecordWithRelations) => formatDate(item.created_at),
+      renderCell: (item: ServiceSaleRecordWithRelations) =>
+        formatDate(item.created_at),
     },
     {
       label: "Client Name",
-      renderCell: (item: ServiceSaleRecordWithRelations) => `${item.client.client_fname} ${item.client.client_lname}`,
+      renderCell: (item: ServiceSaleRecordWithRelations) =>
+        `${item.client.client_fname} ${item.client.client_lname}`,
     },
     {
       label: "Total Amount",
       renderCell: (item: ServiceSaleRecordWithRelations) => item.total_amount,
     },
     {
-      label:"Paid Amount",
-      renderCell:(item: ServiceSaleRecordWithRelations) => item.transactions.reduce((sum, transaction) => sum + transaction.amount_paid, 0)      
-    },{
-      label: "Deals/Services",
-      renderCell: (item: ServiceSaleRecordWithRelations) => item.deals.map(deal => deal.deal_name).join(", ")
-    },{
-      label:"Employees",
-      renderCell: (item: ServiceSaleRecordWithRelations) => {
-        const emp_ids = item.employees.map(emp => emp.emp_id)
-        const emp_entities = employees.filter(emp => emp_ids.includes(emp.emp_id))
-        return emp_entities.map(emp => emp.emp_fname).join(", ")}
+      label: "Paid Amount",
+      renderCell: (item: ServiceSaleRecordWithRelations) =>
+        item.transactions.reduce(
+          (sum, transaction) => sum + transaction.amount_paid,
+          0
+        ),
     },
     {
-      label:"Edit",
+      label: "Deals/Services",
+      renderCell: (item: ServiceSaleRecordWithRelations) =>
+        item.deals.map((deal) => deal.deal_name).join(", "),
+    },
+    {
+      label: "Employees",
+      renderCell: getEmployeeNames
+    },
+    {
+      label: "Edit",
       renderCell: (item: ServiceSaleRecordWithRelations) => {
-      return (<button onClick={() =>navigate(`/salerecord/${item.service_record_id}`)}>Edit</button>)} 
+        return (
+          <button
+            onClick={() => navigate(`/salerecord/${item.service_record_id}`)}
+          >
+            Edit
+          </button>
+        );
+      },
     },
   ];
 
@@ -389,7 +461,13 @@ export default function Index() {
       </Form>
 
       <div className="mt-60">
-        <CompactTable columns={COLUMNS} data={data} theme={theme} />
+        <CompactTable
+          columns={COLUMNS}
+          data={data}
+          theme={theme}
+          rowProps={ROW_PROPS}
+          rowOptions={ROW_OPTIONS}
+        />
       </div>
     </div>
   );

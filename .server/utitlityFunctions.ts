@@ -47,7 +47,7 @@ const validate_types = (formData: FormType): { msg: string } | null => {
         !services.every(
             (service) =>
                 typeof service.value === "string" &&
-                typeof service.label === "string"
+                typeof service.label === "string",
         )
     ) {
         return {
@@ -60,7 +60,7 @@ const validate_types = (formData: FormType): { msg: string } | null => {
         !employees.every(
             (employee) =>
                 typeof employee.id === "string" &&
-                typeof employee.work_share === "number"
+                typeof employee.work_share === "number",
         )
     ) {
         return {
@@ -98,7 +98,7 @@ const validate_conditions = (formData: FormType): { msg: string } | null => {
 
     const totalWorkShare = employees.reduce(
         (sum, employee) => sum + employee.work_share,
-        0
+        0,
     );
     if (amount_charged !== totalWorkShare) {
         return {
@@ -149,4 +149,27 @@ const create_service_record = async (formData: FormType) => {
     return record;
 };
 
-export { create_service_record, validate_data };
+const fetch_index_search_params = async (searchParams: URLSearchParams) => {
+    const currentDate = new Date(new Date().toISOString().slice(0, 10));
+    const startDate = new Date(searchParams.get("startDate") || currentDate);
+    const endDate = new Date(searchParams.get("endDate") || currentDate);
+    endDate.setHours(23, 59, 59);
+    const client_mobile_num = searchParams.get("mob_num");
+    const deals = searchParams.get("deals");
+    const employees = searchParams.get("employees");
+    const categories = searchParams.get("categories");
+    return {
+        currentDate,
+        startDate,
+        endDate,
+        client_mobile_num,
+        deals,
+        employees,
+        categories,
+    };
+};
+
+const validate_index_search_params = (searchParamsObject) => {
+};
+
+export { create_service_record, fetch_index_search_params, validate_data };

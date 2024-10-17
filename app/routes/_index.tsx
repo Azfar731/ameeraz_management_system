@@ -1,5 +1,6 @@
+import { useState, useRef } from "react";
 import type { MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData, Form } from "@remix-run/react";
+import { Link, useLoaderData, Form, useSearchParams, useNavigate } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { prisma_client } from ".server/db";
 import {
@@ -19,34 +20,44 @@ import {
   getCategoryOptions,
   getEmployeeOptions,
 } from "shared/utilityFunctions";
-import { useRef } from "react";
+import { ServiceSaleRecordWithRelations } from "~/utils/types";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Ameera Management" },
+    { title: "Ameeraz Management" },
     { name: "Sales Page", content: "This is the sales page of ameeraz" },
   ];
+};
+
+type FormValues = {
+  start_date: string;
+  end_date: string;
+  all_deals: string[];
+  mobile_num: string;
+  employees: string[];
+  categories: string[];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
   const currentDate = new Date(new Date().toISOString().slice(0, 10));
-  const startDate = new Date(searchParams.get("startDate") || currentDate);
-  const endDate = new Date(searchParams.get("endDate") || currentDate);
-  endDate.setHours(23, 59, 59);
-  const encoded_deals = searchParams.get("deals");
-  const client_mobile_num = searchParams.get("mob_num");
-  let client: Client | null | undefined = undefined;
-  if (client_mobile_num) {
-    client = await prisma_client.client.findFirst({
-      where: { client_mobile_num: client_mobile_num },
-    });
-    if (!client) {
-      throw new Error("Specified Client doesn't exist");
-    }
-  }
+  const startDate = searchParams.get("startDate")
+    ? new Date(searchParams.get("startDate")!)
+    : undefined;
+  const endDate = searchParams.get("endDate")
+    ? new Date(searchParams.get("endDate")!)
+    : undefined;
 
-  if (startDate > endDate) {
+  currentDate.setHours(23, 59, 59);
+  if (endDate) {
+    endDate.setHours(23, 59, 59);
+  }
+  const deal_ids = searchParams.get("all_deals")?.split("|");
+  const employee_ids = searchParams.get("employees")?.split("|");
+  const category_ids = searchParams.get("categories")?.split("|");
+  const client_mobile_num = searchParams.get("mob_num") || undefined;
+
+  if ( startDate && endDate &&  startDate > endDate) {
     throw new Error("Start Date can not be greater than End date");
   }
   // if (endDate > currentDate) {
@@ -56,8 +67,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const service_records = await prisma_client.service_Sale_Record.findMany({
     where: {
       created_at: { gte: startDate, lte: endDate },
-      client_id: client?.client_id,
-    },
+      client: { client_mobile_num: client_mobile_num },
+      deals: {
+        some: {
+          deal_id: {
+            in: deal_ids, // Check if the post's ID is in the array of post IDs
+          },
+          services: {
+            some: {
+              category: {
+                cat_id: {
+                  in: category_ids,
+                },
+              },
+            },
+          },
+        },
+      },
+      employees: {
+        some: {
+          emp_id: {
+            in: employee_ids,
+          },
+        },
+      },
+    },include: {
+      client: true,
+      transactions: true,
+      deals: true,
+      employees: true
+    }
   });
 
   const deals = await prisma_client.deal.findMany();
@@ -68,36 +107,64 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Index() {
+  //states
+  const [currentDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split("T")[0]; // Formats the date to 'YYYY-MM-DD'
+  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate()
+  //loader Data
   const { service_records, deals, employees, categories } = useLoaderData<{
-    service_records: Service_Sale_Record[];
+    service_records: ServiceSaleRecordWithRelations[];
     deals: Deal[];
     employees: Employee[];
     categories: Category[];
   }>();
-  
+
   //references
-  const dealsRef = useRef<{ value: string; label: string }[]>();
-  const servicesRef = useRef<{ value: string; label: string }[]>();
-  const empRef = useRef<{ value: string; label: string }[]>();
-  const catRef = useRef<{ value: string; label: string }[]>();
-  
+  const dealsRef = useRef<{ value: string; label: string }[]>([]);
+  const servicesRef = useRef<{ value: string; label: string }[]>([]);
+  const empRef = useRef<{ value: string; label: string }[]>([]);
+  const catRef = useRef<{ value: string; label: string }[]>([]);
+
+  //other values
+  let errorMessage: string = "";
   //it throws an error, while passing service_records directly
   const nodes = [...service_records];
   const data = { nodes };
-  console.log(service_records);
+  console.log("Service_records: ", service_records);
 
   const COLUMNS = [
     {
       label: "Date",
-      renderCell: (item: Service_Sale_Record) => item.created_at,
+      renderCell: (item: ServiceSaleRecordWithRelations) => item.created_at,
     },
     {
       label: "Client Name",
-      renderCell: (item: Service_Sale_Record) => item.client_id,
+      renderCell: (item: ServiceSaleRecordWithRelations) => `${item.client.client_fname} ${item.client.client_lname}`,
     },
     {
       label: "Total Amount",
-      renderCell: (item: Service_Sale_Record) => item.total_amount,
+      renderCell: (item: ServiceSaleRecordWithRelations) => item.total_amount,
+    },
+    {
+      label:"Paid Amount",
+      renderCell:(item: ServiceSaleRecordWithRelations) => item.transactions.reduce((sum, transaction) => sum + transaction.amount_paid, 0)      
+    },{
+      label: "Deals/Services",
+      renderCell: (item: ServiceSaleRecordWithRelations) => item.deals.map(deal => deal.deal_name).join(", ")
+    },{
+      label:"Employees",
+      renderCell: (item: ServiceSaleRecordWithRelations) => {
+        const emp_ids = item.employees.map(emp => emp.emp_id)
+        const emp_entities = employees.filter(emp => emp_ids.includes(emp.emp_id))
+        return emp_entities.map(emp => emp.emp_fname).join(", ")}
+    },
+    {
+      label:"Edit",
+      renderCell: (item: ServiceSaleRecordWithRelations) => {
+      return (<button onClick={() =>navigate(`/salerecord/${item.service_record_id}`)}>Edit</button>)} 
     },
   ];
 
@@ -146,20 +213,110 @@ export default function Index() {
     catRef.current = [...newValue];
     console.log(catRef.current);
   };
+
+  const fetchFormValues = (formData: FormData) => {
+    const start_date: string = (formData.get("start_date") as string) || "";
+    const end_date: string = (formData.get("end_date") as string) || "";
+    const mobile_num: string = (formData.get("mobile_num") as string) || "";
+    const deals = dealsRef.current?.map((deal) => deal.value);
+    const services = servicesRef.current?.map((service) => service.value);
+    const all_deals = [...deals, ...services];
+    const employees = empRef.current?.map((emp) => emp.value);
+    const categories = catRef.current?.map((cat) => cat.value);
+    if (start_date || end_date || mobile_num || employees || categories) {
+      return {
+        start_date,
+        end_date,
+        all_deals,
+        mobile_num,
+        employees,
+        categories,
+      };
+    } else {
+      return null;
+    }
+  };
+
+  const setSearchParameters = (formValues: FormValues) => {
+    const params = new URLSearchParams();
+
+    // Loop over the properties of formValues and append them to params
+    for (const [key, value] of Object.entries(formValues)) {
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          // Join array values with commas and append
+          params.set(key, value.join("|"));
+        }
+      } else if (value) {
+        // Append non-empty string values
+        params.set(key, value);
+      }
+    }
+
+    // Set the search params in the URL
+    setSearchParams(params);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const formValues = fetchFormValues(formData);
+    if (!formValues) {
+      errorMessage = "Atleast One vale must be selected";
+      return;
+    }
+    setSearchParameters(formValues);
+    // const { start_date, end_date, mobile_num, employees, categories } =
+    //   formValues;
+  };
   return (
     <div>
       <h1 className="text-red-500">This is the index page</h1>
       <Link to="/salerecord/create">Create a new record</Link>
 
-      <Form method="get">
-        <label htmlFor="mobile_num">Client Mobile number</label>
+      <Form method="get" onSubmit={handleSubmit}>
+        <label
+          htmlFor="start_date"
+          className="block text-gray-700 text-sm font-bold mt-4"
+        >
+          Starting Date
+        </label>
+        <input
+          id="start_date"
+          name="start_date"
+          aria-label="Date"
+          type="date"
+          max={currentDate}
+          className="border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-64 sm:text-sm"
+        />
+        <label
+          htmlFor="end_date"
+          className="block text-gray-700 text-sm font-bold mt-4"
+        >
+          Ending Date
+        </label>
+        <input
+          id="end_date"
+          name="end_date"
+          aria-label="Date"
+          type="date"
+          max={currentDate}
+          className="border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-64 sm:text-sm"
+        />
+        <label
+          htmlFor="mobile_num"
+          className="block text-gray-700 text-sm font-bold mt-4"
+        >
+          Client Mobile number
+        </label>
         <input
           type="text"
           id="mobile_num"
           name="mobile_num"
           pattern="^0[0-9]{10}$"
           placeholder="03334290689"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
           required
         />
         <label
@@ -204,7 +361,6 @@ export default function Index() {
           options={getEmployeeOptions(employees)}
           className="basic-multi-select mt-2"
           classNamePrefix="select"
-          required
         />
         <label
           htmlFor="categories"
@@ -220,6 +376,15 @@ export default function Index() {
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
+        {errorMessage ? (
+          <h2 className="text-red-500 font-semibold">{errorMessage}</h2>
+        ) : undefined}
+        <button
+          type="submit"
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Fetch
+        </button>
       </Form>
 
       <div className="mt-60">

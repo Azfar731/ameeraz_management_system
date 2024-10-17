@@ -17,6 +17,7 @@ import Select, { OnChangeValue } from "react-select";
 import {
   fetchDeals,
   fetchServices,
+  formatDate,
   getCategoryOptions,
   getEmployeeOptions,
 } from "shared/utilityFunctions";
@@ -138,7 +139,7 @@ export default function Index() {
   const COLUMNS = [
     {
       label: "Date",
-      renderCell: (item: ServiceSaleRecordWithRelations) => item.created_at,
+      renderCell: (item: ServiceSaleRecordWithRelations) => formatDate(item.created_at),
     },
     {
       label: "Client Name",

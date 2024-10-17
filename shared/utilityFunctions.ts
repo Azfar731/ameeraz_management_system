@@ -41,6 +41,7 @@ function getEmployeeOptions(employees: Employee[]) {
     });
 }
 
+
 function getCategoryOptions(categories: Category[]){
     return categories.map(category => {
         return {value: category.cat_id, label: category.cat_name}

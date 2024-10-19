@@ -42,56 +42,89 @@ type FormValues = {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
-  const currentDate = new Date(new Date().toISOString().slice(0, 10));
-  const startDate = searchParams.get("startDate")
-    ? new Date(searchParams.get("startDate")!)
+
+  // Extract dates
+  const { start_date, end_date, current_date } = extractDates(searchParams);
+
+  // Extract filters
+  const { deal_ids, employee_ids, category_ids, client_mobile_num } = extractFilters(searchParams);
+
+  // Validate dates
+  validateDates(current_date,start_date, end_date);
+
+  // Fetch data
+  const service_records = await fetchServiceRecords(start_date, end_date, client_mobile_num, deal_ids, category_ids, employee_ids);
+  const deals = await prisma_client.deal.findMany();
+  const employees = await prisma_client.employee.findMany();
+  const categories = await prisma_client.category.findMany();
+
+  return { service_records, deals, employees, categories };
+}
+
+// Helper function to extract and format dates
+function extractDates(searchParams: URLSearchParams) {
+  const current_date = new Date(new Date().toISOString().slice(0, 10));
+  const start_date = searchParams.get("start_date")
+    ? new Date(searchParams.get("start_date")!)
     : undefined;
-  const endDate = searchParams.get("endDate")
-    ? new Date(searchParams.get("endDate")!)
+  const end_date = searchParams.get("end_date")
+    ? new Date(searchParams.get("end_date")!)
     : undefined;
 
-  currentDate.setHours(23, 59, 59);
-  if (endDate) {
-    endDate.setHours(23, 59, 59);
+  current_date.setHours(23, 59, 59);
+  if (end_date) {
+    end_date.setHours(23, 59, 59);
   }
+
+  return { start_date, end_date, current_date };
+}
+
+// Helper function to extract filters from search parameters
+function extractFilters(searchParams: URLSearchParams) {
   const deal_ids = searchParams.get("all_deals")?.split("|");
   const employee_ids = searchParams.get("employees")?.split("|");
   const category_ids = searchParams.get("categories")?.split("|");
-  const client_mobile_num = searchParams.get("mob_num") || undefined;
+  const client_mobile_num = searchParams.get("mobile_num") || undefined;
 
+  return { deal_ids, employee_ids, category_ids, client_mobile_num };
+}
+
+// Helper function to validate the dates
+function validateDates( currentDate: Date, startDate: Date | undefined, endDate: Date | undefined) {
   if (startDate && endDate && startDate > endDate) {
-    throw new Error("Start Date can not be greater than End date");
+    throw new Error("Start Date can not be greater than End Date");
   }
-  // if (endDate > currentDate) {
-  //   return { msg: "End date can not be greater than today's date" };
-  // }
+  
+  if (endDate && endDate > currentDate) {
+    throw new Error("End Date cannot be greater than today's date");
+  }
+}
 
-  const service_records = await prisma_client.service_Sale_Record.findMany({
+// Helper function to fetch service records from Prisma
+async function fetchServiceRecords(
+  startDate?: Date,
+  endDate?: Date,
+  client_mobile_num?: string,
+  deal_ids?: string[],
+  category_ids?: string[],
+  employee_ids?: string[]
+) {
+  return prisma_client.service_Sale_Record.findMany({
     where: {
       created_at: { gte: startDate, lte: endDate },
       client: { client_mobile_num: client_mobile_num },
       deals: {
         some: {
-          deal_id: {
-            in: deal_ids, // Check if the post's ID is in the array of post IDs
-          },
+          deal_id: { in: deal_ids },
           services: {
             some: {
-              category: {
-                cat_id: {
-                  in: category_ids,
-                },
-              },
+              category: { cat_id: { in: category_ids } },
             },
           },
         },
       },
       employees: {
-        some: {
-          emp_id: {
-            in: employee_ids,
-          },
-        },
+        some: { emp_id: { in: employee_ids } },
       },
     },
     include: {
@@ -101,13 +134,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
       employees: true,
     },
   });
-
-  const deals = await prisma_client.deal.findMany();
-  const employees = await prisma_client.employee.findMany();
-  const categories = await prisma_client.category.findMany();
-
-  return { service_records, deals, employees, categories };
 }
+
 
 export default function Index() {
   //states
@@ -174,10 +202,11 @@ export default function Index() {
 
   //other values
   let errorMessage: string = "";
+  
+  //Creating a Table
   //it throws an error, while passing service_records directly
   const nodes = [...service_records];
   const data = { nodes };
-  console.log("Service_records: ", service_records);
 
   const [ids, setIds] = useState<string[]>([]);
   const handleExpand = (item: ServiceSaleRecordWithRelations) => {
@@ -300,6 +329,7 @@ export default function Index() {
     },
   ]);
 
+  
   const onDealsChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {

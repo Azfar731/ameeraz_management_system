@@ -9,13 +9,7 @@ import {
 } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { prisma_client } from ".server/db";
-import {
-  Category,
-  Client,
-  Deal,
-  Employee,
-  Service_Sale_Record,
-} from "@prisma/client";
+import { Category, Deal, Employee } from "@prisma/client";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
@@ -28,6 +22,7 @@ import {
   getEmployeeOptions,
 } from "shared/utilityFunctions";
 import { ServiceSaleRecordWithRelations } from "~/utils/types";
+
 
 export const meta: MetaFunction = () => {
   return [
@@ -136,6 +131,47 @@ export default function Index() {
   const empRef = useRef<{ value: string; label: string }[]>([]);
   const catRef = useRef<{ value: string; label: string }[]>([]);
 
+  //search Parameter values
+  const start_date = searchParams.get("startDate") 
+  const end_date = searchParams.get("endDate")
+  const all_deals = searchParams.get("deals")?.split("|") || [];
+  const sel_deals = all_deals.filter(
+    (id) => !deals.find((deal) => deal.deal_id === id)?.auto_generated
+  );
+  const sel_services = all_deals.filter(
+    (id) => deals.find((deal) => deal.deal_id === id)?.auto_generated
+  );
+  const sel_emp = searchParams.get("employees")?.split("|") || [];
+  const sel_categories = searchParams.get("categories")?.split("|") || [];
+
+  //default form Options
+  const def_deals = sel_deals.map((id) => ({
+    value: id,
+    label:
+      deals.find((deal) => deal.deal_id === id)?.deal_name || "No deal exists",
+  }));
+  const def_services = sel_services.map((id) => ({
+    value: id,
+    label:
+      deals.find((deal) => deal.deal_id === id)?.deal_name ||
+      "No service exists",
+  }));
+  const def_emp = sel_emp.map((id) => {
+    const employee = employees.find((emp) => emp.emp_id === id);
+    return {
+      value: id,
+      label: employee
+        ? `${employee.emp_fname} ${employee.emp_lname}`
+        : "No employee exists",
+    };
+  });
+
+  const def_categories =  sel_categories.map((id) => ({
+    value: id,
+    label:
+      categories.find((cat) => cat.cat_id === id)?.cat_name || "No Category exists",
+  }));
+
   //other values
   let errorMessage: string = "";
   //it throws an error, while passing service_records directly
@@ -156,13 +192,18 @@ export default function Index() {
     onClick: handleExpand,
   };
 
-  const getEmployeeNames = (item: ServiceSaleRecordWithRelations,fullName?: boolean) => {
+  const getEmployeeNames = (
+    item: ServiceSaleRecordWithRelations,
+    fullName?: boolean
+  ) => {
     const emp_ids = item.employees.map((emp) => emp.emp_id);
     const emp_entities = employees.filter((emp) =>
       emp_ids.includes(emp.emp_id)
     );
-    if(fullName){
-      return emp_entities.map((emp) => `${emp.emp_fname} ${emp.emp_lname}`).join(", ");
+    if (fullName) {
+      return emp_entities
+        .map((emp) => `${emp.emp_fname} ${emp.emp_lname}`)
+        .join(", ");
     }
     return emp_entities.map((emp) => emp.emp_fname).join(", ");
   };
@@ -185,7 +226,7 @@ export default function Index() {
                   {item.deals.map((deal) => deal.deal_name).join(", ")}
                 </li>
                 <li>
-                  <strong>Employees</strong> {getEmployeeNames(item,true)}
+                  <strong>Employees</strong> {getEmployeeNames(item, true)}
                 </li>
               </ul>
             </td>
@@ -225,7 +266,7 @@ export default function Index() {
     },
     {
       label: "Employees",
-      renderCell: getEmployeeNames
+      renderCell: getEmployeeNames,
     },
     {
       label: "Edit",
@@ -344,11 +385,18 @@ export default function Index() {
     //   formValues;
   };
   return (
-    <div>
-      <h1 className="text-red-500">This is the index page</h1>
-      <Link to="/salerecord/create">Create a new record</Link>
-
-      <Form method="get" onSubmit={handleSubmit}>
+    <div className="m-8">
+      <div className="w-full flex justify-center items-center ">
+        <h1 className=" font-semibold text-6xl text-gray-700">Sales Page</h1>
+      </div>
+      <Form
+        method="get"
+        className="bg-white rounded w-1/2"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="text-3xl font-semibold text-gray-700 mt-6">
+          Search Records
+        </h2>
         <label
           htmlFor="start_date"
           className="block text-gray-700 text-sm font-bold mt-4"
@@ -360,8 +408,9 @@ export default function Index() {
           name="start_date"
           aria-label="Date"
           type="date"
+          defaultValue={start_date? formatDate(start_date) : undefined}
           max={currentDate}
-          className="border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-64 sm:text-sm"
+          className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         />
         <label
           htmlFor="end_date"
@@ -374,8 +423,9 @@ export default function Index() {
           name="end_date"
           aria-label="Date"
           type="date"
+          defaultValue={end_date? formatDate(end_date) : undefined}
           max={currentDate}
-          className="border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-64 sm:text-sm"
+          className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         />
         <label
           htmlFor="mobile_num"
@@ -389,8 +439,8 @@ export default function Index() {
           name="mobile_num"
           pattern="^0[0-9]{10}$"
           placeholder="03334290689"
+          defaultValue={searchParams.get("mobile_num") || undefined}
           className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
-          required
         />
         <label
           htmlFor="services"
@@ -403,6 +453,7 @@ export default function Index() {
           name="services"
           onChange={onServicesChange}
           options={fetchServices(deals)}
+          defaultValue={def_services}
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
@@ -418,6 +469,7 @@ export default function Index() {
           onChange={onDealsChange}
           id="deal"
           options={fetchDeals(deals)}
+          defaultValue={def_deals}
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
@@ -432,6 +484,7 @@ export default function Index() {
           name="employees"
           onChange={onEmployeeChange}
           options={getEmployeeOptions(employees)}
+          defaultValue={def_emp}
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
@@ -446,6 +499,7 @@ export default function Index() {
           name="categories"
           onChange={onCategoriesChange}
           options={getCategoryOptions(categories)}
+          defaultValue={def_categories}
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
@@ -460,14 +514,22 @@ export default function Index() {
         </button>
       </Form>
 
-      <div className="mt-60">
-        <CompactTable
-          columns={COLUMNS}
-          data={data}
-          theme={theme}
-          rowProps={ROW_PROPS}
-          rowOptions={ROW_OPTIONS}
-        />
+      <div className="mt-20">
+        <Link
+          to="/salerecord/create"
+          className="w-full bg-green-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Create a new record
+        </Link>
+        <div className="mt-6">
+          <CompactTable
+            columns={COLUMNS}
+            data={data}
+            theme={theme}
+            rowProps={ROW_PROPS}
+            rowOptions={ROW_OPTIONS}
+          />
+        </div>
       </div>
     </div>
   );

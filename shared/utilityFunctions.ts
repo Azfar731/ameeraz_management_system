@@ -37,7 +37,7 @@ function fetchServices<
 
 function getEmployeeOptions(employees: Employee[]) {
     return employees.map((employee) => {
-        return { value: employee.emp_id, label: employee.emp_fname };
+        return { value: employee.emp_id, label: `${employee.emp_fname} ${employee.emp_lname}` };
     });
 }
 

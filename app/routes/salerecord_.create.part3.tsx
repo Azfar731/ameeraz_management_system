@@ -17,6 +17,7 @@ import {
   validate_data,
 } from ".server/utitlityFunctions";
 import { ActionFunctionArgs } from "@remix-run/node";
+import { getEmployeeOptions } from "shared/utilityFunctions";
 
 export async function loader() {
   const employees = await prisma_client.employee.findMany();
@@ -25,18 +26,25 @@ export async function loader() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData: FormType = await request.json();
-  const employees = formData.employees;
-  const amount_charged = formData.amount_charged;
-  let total_work_share = 0;
-  //calculate total_work_share
-  employees.forEach((emp) => (total_work_share += emp.work_share));
-  if (amount_charged !== total_work_share) {
-    return { msg: "Amount charged must match Employees total Work share" };
+  const employees = formData.employees
+  // Calculate total work share of employees
+  if(employees.length < 1) return {msg: "Atleast 1 employee must be selcted"}
+
+  const total_work_share = calculateTotalWorkShare(employees);
+
+  // Validate if amount charged matches total work share
+  const validationError = validateWorkShare(
+    total_work_share,
+    formData.amount_charged
+  );
+  if (validationError) {
+    return { msg: validationError };
   }
 
-  //validate data, returns null if successfull
+  // Validate the entire form data
   const isNotValid = validate_data(formData);
   if (!isNotValid) {
+    // Create the service record and redirect to the new record's page
     const record = await create_service_record(formData);
     return redirect(`/salerecord/${record.service_record_id}`);
   } else {
@@ -44,10 +52,30 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
+// Helper function to calculate total work share of employees
+function calculateTotalWorkShare(
+  employees: { id: string; work_share: number }[]
+): number {
+  return employees.reduce((total, emp) => total + emp.work_share, 0);
+}
+
+// Helper function to validate if amount charged matches total work share
+function validateWorkShare(
+  total_work_share: number,
+  amount_charged: number
+): string | null {
+  if (amount_charged !== total_work_share) {
+    return "Amount charged must match Employees total Work share";
+  }
+  return null;
+}
+
+// The validate_data and create_service_record functions remain unchanged.
+
 export default function Part3() {
   //action data
-  const actionData = useActionData<{msg: string}| undefined>();
-  
+  const actionData = useActionData<{ msg: string } | undefined>();
+
   //context data
   const { formData, setFormData } = useOutletContext<{
     formData: FormType;
@@ -57,11 +85,14 @@ export default function Part3() {
   const getEmpList = () => {
     if (formData.employees) {
       const empList = formData.employees.map((emp) => {
+        const employee = employees.find(
+          (employee) => employee.emp_id === emp.id
+        );
         return {
           id: emp.id,
-          name:
-            employees.find((employee) => employee.emp_id === emp.id)
-              ?.emp_fname || "Employee doesn't exist",
+          name: employee
+            ? `${employee.emp_fname} ${employee.emp_lname}`
+            : "No employee exists",
         };
       });
       return empList;
@@ -80,9 +111,7 @@ export default function Part3() {
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  const employee_options = employees.map((employee) => {
-    return { value: employee.emp_id, label: employee.emp_fname };
-  });
+  const employee_options = getEmployeeOptions(employees);
 
   const navigate = useNavigate();
   const submit = useSubmit();
@@ -91,20 +120,6 @@ export default function Part3() {
     return selectedEmpList.map((emp) => {
       return { value: emp.id, label: emp.name };
     });
-  };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const pageForm = event.currentTarget;
-    const pageFormData = new FormData(pageForm);
-    const employees = selectedEmpList.map((emp, index) => {
-      const work_share: number =
-        Number(pageFormData.get(`Emp-${index}-share`)) || 0;
-      return { id: emp.id, work_share };
-    });
-    setFormData((prev) => ({ ...prev, employees }));
-    const formDatalocal = { ...formData, employees };
-    console.log("Final form data: ", formData);
-    submit(formDatalocal, { method: "post", encType: "application/json" });
   };
 
   const empWorkShareList = selectedEmpList.map((emp, index) => {
@@ -121,7 +136,6 @@ export default function Part3() {
           id={`Emp-${index}`}
           name={`Emp-${index}-share`}
           min={0}
-
           defaultValue={
             formData.employees.find((employee) => employee.id === emp.id)
               ?.work_share || undefined
@@ -148,22 +162,46 @@ export default function Part3() {
       });
     });
   };
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // Extract form data
+    const employees = getEmployeeWorkShare(event.currentTarget);
+
+    // Prepare form data
+    const formDatalocal = { ...formData, employees };
+    console.log("Final form data: ", formDatalocal);
+
+    // Submit form
+    submit(formDatalocal, { method: "post", encType: "application/json" });
+  };
 
   const GoToPrevPage = () => {
-    // get form data if any employee is selected
-    if (selectedEmpList.length > 0) {
-      const pageFormData = new FormData(formRef.current);
-      // save form data in formData global object
-      const employees = selectedEmpList.map((emp, index) => {
-        const work_share: number =
-          Number(pageFormData.get(`Emp-${index}-share`)) || 0;
-        return { id: emp.id, work_share };
-      });
-      setFormData((prev) => ({ ...prev, employees }));
-    }
-    //navigate to previous page
+    const form = formRef.current;
+    if (!form) return;
+
+    // Extract form data
+    const employees = getEmployeeWorkShare(form);
+
+    // Update formData with employee work share
+    setFormData((prev) => ({ ...prev, employees }));
+
+    // Navigate to the previous page
     navigate("../part2");
   };
+
+  // Helper function to extract employee work share from the form
+  function getEmployeeWorkShare(
+    formElement: HTMLFormElement
+  ): { id: string; work_share: number }[] {
+    const formData = new FormData(formElement);
+
+    return selectedEmpList.map((emp, index) => {
+      const work_share: number =
+        Number(formData.get(`Emp-${index}-share`)) || 0;
+      return { id: emp.id, work_share };
+    });
+  }
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -185,7 +223,9 @@ export default function Part3() {
           required
         />
         {empWorkShareList}
-        {actionData?.msg && <h2 className="text-red-500 font-semibold">{actionData.msg}</h2>}
+        {actionData?.msg && (
+          <h2 className="text-red-500 font-semibold">{actionData.msg}</h2>
+        )}
         <div className="flex justify-between items-center mt-6">
           <button
             type="button"

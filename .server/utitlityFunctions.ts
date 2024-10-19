@@ -1,10 +1,12 @@
 import { FormType } from "~/utils/types";
 import { prisma_client } from "./db";
-const validate_data = (formData: FormType): string | null => {
+const validate_data = (formData: FormType): { msg: string } | null => {
     // 1. Type checks, success returns null
     const types_response = validate_types(formData);
     if (types_response) return types_response;
 
+    const values_response = validate_values(formData)
+    if(values_response) return values_response
     // 2. Validate numerical values greater than 0, success returns null
     const cond_response = validate_conditions(formData);
     if (cond_response) return cond_response;
@@ -12,6 +14,10 @@ const validate_data = (formData: FormType): string | null => {
     // If all validations pass, return null (indicating no errors)
     return null;
 };
+
+
+
+
 const validate_types = (formData: FormType): { msg: string } | null => {
     const {
         amount_charged,
@@ -81,12 +87,34 @@ const validate_types = (formData: FormType): { msg: string } | null => {
     return null;
 };
 
-const validate_conditions = (formData: FormType): { msg: string } | null => {
-    const { amount_charged, amount_paid, employees } = formData;
+const validate_values = (formData: FormType) :  { msg: string } | null =>{
+    const {
+        amount_charged,
+        amount_paid,
+        mobile_num,
+        deals,
+        services,
+        employees,
+        mode_of_payment,
+    } = formData;
 
     if (amount_charged <= 0) {
         return { msg: "Amount charged must be greater than 0." };
     }
+    if(amount_paid < 0) return {msg: "Amount paid can't be smaller than 0"}
+
+    if(!mobile_num) return {msg: "Mobile number not provided"}
+    
+    if(deals.length < 1 && services.length < 1) return {msg: "Select atleast one service or deal"}
+    if(employees.length < 1) return {msg: "Atleast one employee must be selected"}
+    if(!["cash","card","bank_transfer"].includes(mode_of_payment.value)) return {msg: "Mode of Payment must be either cash,card or bank_transfer"}
+    return null
+}
+
+const validate_conditions = (formData: FormType): { msg: string } | null => {
+    const { amount_charged, amount_paid, employees } = formData;
+
+   
 
     if (!employees.every((employee) => employee.work_share > 0)) {
         return { msg: "Each employee's work share must be greater than 0." };
@@ -169,7 +197,6 @@ const fetch_index_search_params = async (searchParams: URLSearchParams) => {
     };
 };
 
-const validate_index_search_params = (searchParamsObject) => {
-};
+
 
 export { create_service_record, fetch_index_search_params, validate_data };

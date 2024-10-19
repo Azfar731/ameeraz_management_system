@@ -6,11 +6,16 @@ type FormType = {
     amount_charged: number;
     amount_paid: number;
     mobile_num: string;
-    deals: { value: string; label: string }[];
-    services: { value: string; label: string }[];
+    deals: MenuOption[];
+    services: MenuOption[];
     employees: { id: string; work_share: number }[];
     mode_of_payment: { value: PaymentModes; label: string };
 };
+
+type MenuOption = {
+    value: string;
+    label: string
+}
 
 type ServiceSaleRecordWithRelations = Service_Sale_Record & {
     client: Client;
@@ -21,4 +26,4 @@ type ServiceSaleRecordWithRelations = Service_Sale_Record & {
     transactions: Client_Transaction[];
 };
 
-export type { FormType, PaymentModes, ServiceSaleRecordWithRelations };
+export type { FormType, PaymentModes, ServiceSaleRecordWithRelations, MenuOption };

@@ -12,7 +12,7 @@ import {
 import { prisma_client } from ".server/db";
 import { Client, Deal } from "@prisma/client";
 import Select, { OnChangeValue } from "react-select";
-import { FormType, PaymentModes } from "~/utils/types";
+import { FormType, MenuOption, PaymentModes } from "~/utils/types";
 import { fetchDeals, fetchServices } from "shared/utilityFunctions";
 
 export async function loader() {
@@ -21,18 +21,43 @@ export async function loader() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const json: Omit<FormType, 'employees' | 'mobile_num'> = await request.json();
-  const amount_paid: number = json.amount_paid;
-  const amount_charged: number = json.amount_charged;
-  if (amount_paid > amount_charged) {
-    return { amount_paid_msg: "Amount Paid can not be greater than Amount Charged" };
+  const json: Omit<FormType, "employees" | "mobile_num"> = await request.json();
+
+  // Validate payment details
+  const paymentError = validatePayment(json.amount_paid, json.amount_charged);
+  if (paymentError) {
+    return paymentError;
   }
-  if((json.deals.length < 1)  && (json.services.length < 1)){
-    return {deals_msg: "Atleast one service or deal must be selected"}
+
+  // Validate selection of deals or services
+  const selectionError = validateDealsAndServices(json.deals, json.services);
+  if (selectionError) {
+    return selectionError;
   }
-  
+
+  // Redirect to the next part if all is valid
   throw redirect("../part3");
 }
+
+// Helper function to validate the payment amounts
+function validatePayment(amount_paid: number, amount_charged: number) {
+  if (amount_paid > amount_charged) {
+    return {
+      amount_paid_msg: "Amount Paid cannot be greater than Amount Charged",
+    };
+  }
+  return null;
+}
+
+// Helper function to validate that at least one deal or service is selected
+function validateDealsAndServices(deals: MenuOption[], services: MenuOption[]) {
+  if (deals.length < 1 && services.length < 1) {
+    return { deals_msg: "At least one service or deal must be selected" };
+  }
+  return null;
+}
+
+// Helper function to handle redirection
 
 export default function Part2() {
   //context
@@ -41,7 +66,7 @@ export default function Part2() {
     setFormData: React.Dispatch<React.SetStateAction<FormType>>;
   }>();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   //loader Data
   const { deals } = useLoaderData<{
@@ -50,13 +75,11 @@ export default function Part2() {
   }>();
 
   //Action Data
-  const actionData = useActionData< { amount_paid_msg: string }
-  | { deals_msg: string }
-  | undefined // In case there's no validation error
->();
+  const actionData = useActionData<
+    { amount_paid_msg: string | undefined , deals_msg: string | undefined} | undefined // In case there's no validation error
+  >();
 
   
-  //states
   const calc_services_amount = () => {
     let tmp_amount = 0;
     formData.services.forEach((elem) => {
@@ -82,19 +105,19 @@ export default function Part2() {
     paid: formData.amount_paid,
   });
 
-  
-
-  const servicesRef = useRef<{ value: string; label: string }[]>(formData.services);
+  const servicesRef = useRef<{ value: string; label: string }[]>(
+    formData.services
+  );
   const dealsRef = useRef<{ value: string; label: string }[]>(formData.deals);
-  const formRef = useRef<HTMLFormElement>(null)
+  const formRef = useRef<HTMLFormElement>(null);
   //Parent Context
 
   // Map the deals recieved from the action function to pass to react-select
-  const deal_options = fetchDeals(deals)
+  const deal_options = fetchDeals(deals);
 
-  const service_options = fetchServices(deals)
+  const service_options = fetchServices(deals);
 
-  const payment_options: {value: PaymentModes,label: string}[] = [
+  const payment_options: { value: PaymentModes; label: string }[] = [
     { value: "cash", label: "Cash" },
     { value: "bank_transfer", label: "Bank transfer" },
     { value: "card", label: "Card" },
@@ -102,24 +125,24 @@ export default function Part2() {
 
   // handle Submit function which will run when the form submits
   const submit = useSubmit();
+  
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+  
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const services = servicesRef.current;
+  
+    // Get references to deals and services
     const deals = dealsRef.current;
-    const amount_charged = Number(formData.get("amount_charged"));
-    const amount_paid = Number(formData.get("amount_paid"));
-    const payment_mode = formData.get("mode_of_payment")?.toString() || "";
-    let mode_of_payment = payment_options[0]; //default value is {value: cash, label: Cash}
-     
-    if (["cash", "bank_transfer", "card"].includes(payment_mode)) {
-      const option = payment_options.find((opt) => opt.value === payment_mode);
-      if (option) {
-        mode_of_payment = option;
-      }
-    }
-
+    const services = servicesRef.current;
+  
+    // Extract relevant data from formData
+    const { amount_charged, amount_paid, payment_mode } = extractFormData(formData);
+  
+    // Determine the mode of payment
+    const mode_of_payment = getPaymentOption(payment_mode);
+  
+    // Create formData object
     const formDataObj = {
       deals,
       services,
@@ -127,35 +150,61 @@ export default function Part2() {
       amount_paid,
       mode_of_payment,
     };
-
-    
+  
+    // Update form data state
     setFormData((prev) => ({ ...prev, ...formDataObj }));
-
-    submit(
-      formDataObj,
-      { method: "post", encType: "application/json" }
-    );
+  
+    // Submit form
+    submit(formDataObj, { method: "post", encType: "application/json" })
   };
-
-  const GoToPrevPage = ()=>{
-    const form = formRef.current
-    if (!form)
-      return
-    const pageFormData = new FormData(form)
-    const services = servicesRef.current;
-    const deals = dealsRef.current;
-    const amount_charged = Number(pageFormData.get("amount_charged"));
-    const amount_paid = Number(pageFormData.get("amount_paid"));
-    const payment_mode = pageFormData.get("mode_of_payment")?.toString() || "";
-    let mode_of_payment = payment_options[0]; //default value is {value: cash, label: Cash}
-     
+  
+  // Helper function to extract amount_charged, amount_paid, and payment_mode
+  function extractFormData(formData: FormData) {
+    const amount_charged = extractNumber(formData, "amount_charged");
+    const amount_paid = extractNumber(formData, "amount_paid");
+    const payment_mode = extractString(formData, "mode_of_payment");
+  
+    return { amount_charged, amount_paid, payment_mode };
+  }
+  
+  // Helper function to extract number values from form data
+  function extractNumber(formData: FormData, fieldName: string): number {
+    return Number(formData.get(fieldName));
+  }
+  
+  // Helper function to extract string values from form data
+  function extractString(formData: FormData, fieldName: string): string {
+    return formData.get(fieldName)?.toString() || "";
+  }
+  // Helper function to get the selected payment option
+  function getPaymentOption(payment_mode: string) {
+    const default_payment = payment_options[0]; // default is {value: cash, label: Cash}
+  
     if (["cash", "bank_transfer", "card"].includes(payment_mode)) {
-      const option = payment_options.find((opt) => opt.value === payment_mode);
-      if (option) {
-        mode_of_payment = option;
-      }
+      const selectedOption = payment_options.find((opt) => opt.value === payment_mode);
+      return selectedOption ? selectedOption : default_payment;
     }
-
+  
+    return default_payment;
+  }
+  
+  const GoToPrevPage = () => {
+    const form = formRef.current;
+    if (!form) return;
+  
+    const pageFormData = new FormData(form);
+  
+    // Get references to deals and services
+    const deals = dealsRef.current;
+    const services = servicesRef.current;
+  
+    // Extract relevant data from formData
+    const { amount_charged, amount_paid, payment_mode } = extractFormData(pageFormData);
+  
+    // Determine the mode of payment
+    const mode_of_payment = getPaymentOption(payment_mode);
+  
+    // Create formData object
     const formDataObj = {
       deals,
       services,
@@ -163,37 +212,34 @@ export default function Part2() {
       amount_paid,
       mode_of_payment,
     };
-
+  
+    // Update form data state
     setFormData((prev) => ({ ...prev, ...formDataObj }));
-    navigate('../')
-
-  }
+  
+    // Navigate to the previous page
+    navigate("../");
+  };
+  
   const onServicesChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
-    let tmp_amount = 0;
-    const tmp_array: { value: string; label: string }[] = [];
-    newValue.forEach((element) => {
-      const deal = deals.find((deal) => deal.deal_id === element.value);
-      if (deal) {
-        tmp_amount += deal.deal_price;
-        tmp_array.push(element);
-      }
-    });
-    setAmount((prev) => ({
-      ...prev,
-      services: tmp_amount,
-      charged: prev.deals + tmp_amount,
-      paid: prev.deals + tmp_amount,
-    }));
-    servicesRef.current = [...tmp_array];
+    handleChange(newValue, "services");
   };
-
+  
   const onDealsChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
+    handleChange(newValue, "deals");
+  };
+  
+  // Helper function to handle both services and deals changes
+  function handleChange(
+    newValue: OnChangeValue<{ value: string; label: string }, true>,
+    type: "services" | "deals"
+  ) {
     let tmp_amount = 0;
     const tmp_array: { value: string; label: string }[] = [];
+  
     newValue.forEach((element) => {
       const deal = deals.find((deal) => deal.deal_id === element.value);
       if (deal) {
@@ -201,22 +247,28 @@ export default function Part2() {
         tmp_array.push(element);
       }
     });
+  
     setAmount((prev) => ({
       ...prev,
-      deals: tmp_amount,
-      charged: prev.services + tmp_amount,
-      paid: prev.services + tmp_amount,
+      [type]: tmp_amount,
+      charged: prev[type === "services" ? "deals" : "services"] + tmp_amount,
+      paid: prev[type === "services" ? "deals" : "services"] + tmp_amount,
     }));
-    dealsRef.current = [...tmp_array];
-  };
-
+  
+    if (type === "services") {
+      servicesRef.current = [...tmp_array];
+    } else if (type === "deals") {
+      dealsRef.current = [...tmp_array];
+    }
+  }
+  
 
   return (
     <div className="flex justify-center items-center h-screen">
       <Form
         method="post"
         onSubmit={handleSubmit}
-        ref = {formRef}
+        ref={formRef}
         className="bg-white mt-14 p-6 rounded shadow-md w-80 "
       >
         <h1 className="text-2xl font-bold mb-4 text-center">
@@ -236,7 +288,6 @@ export default function Part2() {
           defaultValue={formData.services}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
-          
         />
 
         <label
@@ -254,9 +305,10 @@ export default function Part2() {
           defaultValue={formData.deals}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
-          
         />
-        {actionData && 'deals_msg' in actionData && <h2 className="text-red-500 font-semibold">{actionData.deals_msg}</h2> }
+        {actionData?.deals_msg && (
+          <h2 className="text-red-500 font-semibold">{actionData.deals_msg}</h2>
+        )}
         <div className="text-gray-700 mb-4">
           Expected Total Amount: {amount.services + amount.deals}
         </div>
@@ -298,7 +350,9 @@ export default function Part2() {
           }
           required
         />
-        {actionData && 'amount_paid_msg' in actionData && <h2 className="text-red-700">{actionData.amount_paid_msg}</h2> }
+        {actionData?.amount_paid_msg && (
+          <h2 className="text-red-700">{actionData.amount_paid_msg}</h2>
+        )}
         <label htmlFor="payment_mode">Mode of Payment</label>
         <Select
           options={payment_options}

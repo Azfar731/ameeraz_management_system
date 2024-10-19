@@ -12,19 +12,29 @@ import { FormType } from "~/utils/types";
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const mobile_num = formData.get("mobile_num")?.toString() || "";
-  if (mobile_num) {
-    const client = prisma_client.client.findFirst({
-      where: { client_mobile_num: mobile_num },
-    });
-    if (!client) {
-      return `No client with mobile number: ${mobile_num} found`;
-    }
-    const redirectUrl = `part2?mobile_num=${encodeURIComponent(mobile_num)}`;
-    throw redirect(redirectUrl);
-  } else {
-    return "No mobile number recieved";
+  if (!mobile_num) {
+    return "No mobile number received";
   }
+
+  // Fetch the client
+  const client = await findClientByMobile(mobile_num);
+  if (!client) {
+    return `No client with mobile number: ${mobile_num} found`;
+  }
+
+  // Redirect to the next part of the process
+  const redirectUrl = `part2?mobile_num=${encodeURIComponent(mobile_num)}`;
+  throw redirect(redirectUrl);
+
 }
+
+//helper functions
+async function findClientByMobile(mobile_num: string) {
+  return prisma_client.client.findFirst({
+    where: { client_mobile_num: mobile_num },
+  });
+}
+
 
 export default function Part1() {
   const actionData = useActionData();
@@ -68,7 +78,7 @@ export default function Part1() {
           required
         />
         {actionData ? (
-          <div className="text-red-700">actionData</div>
+          <div className="text-red-700">{actionData}</div>
         ) : undefined}
         <button
           type="submit"

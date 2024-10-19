@@ -329,7 +329,7 @@ export default function Index() {
     },
   ]);
 
-  
+
   const onDealsChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
@@ -411,8 +411,7 @@ export default function Index() {
       return;
     }
     setSearchParameters(formValues);
-    // const { start_date, end_date, mobile_num, employees, categories } =
-    //   formValues;
+    
   };
   return (
     <div className="m-8">

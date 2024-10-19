@@ -26,9 +26,10 @@ export async function loader() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData: FormType = await request.json();
-  const employees = formData.employees
+  const employees = formData.employees;
   // Calculate total work share of employees
-  if(employees.length < 1) return {msg: "Atleast 1 employee must be selcted"}
+  if (employees.length < 1)
+    return { msg: "Atleast 1 employee must be selcted" };
 
   const total_work_share = calculateTotalWorkShare(employees);
 
@@ -124,10 +125,10 @@ export default function Part3() {
 
   const empWorkShareList = selectedEmpList.map((emp, index) => {
     return (
-      <div key={emp.id} className="w-full flex justify-between items-center">
+      <div key={emp.id} className="mt-4 w-full flex justify-between items-center">
         <label
           htmlFor={`Emp-${index}`}
-          className="text-gray-700 text-sm font-bold mb-2"
+          className="text-gray-700 text-sm font-bold mb-2 pr-4 w-1/3"
         >
           {emp.name}
         </label>
@@ -142,7 +143,7 @@ export default function Part3() {
           }
           required
           placeholder="1234"
-          className="px-3 py-2 border border-gray-300 rounded-md mb-4"
+          className="px-3 py-2 border border-gray-300 rounded-md mb-4 w-2/3"
         />
       </div>
     );
@@ -209,16 +210,23 @@ export default function Part3() {
         method="post"
         ref={formRef}
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-80"
+        className="bg-white p-6 rounded shadow-md w-120"
       >
-        <h1 className="text-2xl font-bold text-center">Select Employees</h1>
+        <div className="block text-gray-700 text-sm font-bold mb-2" >Amount Charged: <span className="font-semibold">{formData.amount_charged}</span></div>
+        <label
+          htmlFor="employees"
+          className="block text-gray-700 text-sm font-bold mb-2"
+        >
+          Employees
+        </label>
         <Select
           isMulti
+          id="employees"
           name="employees"
           onChange={onEmployeeChange}
           options={employee_options}
           defaultValue={getDefaultValue()}
-          className="basic-multi-select mt-4"
+          className="mt-4"
           classNamePrefix="select"
           required
         />

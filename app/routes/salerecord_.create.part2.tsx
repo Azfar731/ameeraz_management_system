@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   useLoaderData,
   useActionData,
@@ -15,9 +15,15 @@ import Select, { OnChangeValue } from "react-select";
 import { FormType, MenuOption, PaymentModes } from "~/utils/types";
 import { fetchDeals, fetchServices } from "shared/utilityFunctions";
 
-export async function loader() {
+export async function loader({request}: LoaderFunctionArgs) {
+  
+  const client_mobile_num = new URL(request.url).searchParams.get("mobile_num")
+  if(!client_mobile_num) throw new Error(`Client with mobile number: ${client_mobile_num} does not exist`)
+  
+  const client = await prisma_client.client.findFirst({where: {client_mobile_num: client_mobile_num}})
   const deals = await prisma_client.deal.findMany();
-  return { deals };
+  
+  return { deals, client };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -69,7 +75,7 @@ export default function Part2() {
   const navigate = useNavigate();
 
   //loader Data
-  const { deals } = useLoaderData<{
+  const { client, deals } = useLoaderData<{
     client: Client;
     deals: Deal[];
   }>();
@@ -271,9 +277,8 @@ export default function Part2() {
         ref={formRef}
         className="bg-white mt-14 p-6 rounded shadow-md w-80 "
       >
-        <h1 className="text-2xl font-bold mb-4 text-center">
-          This is form part 2
-        </h1>
+        <div className="block text-gray-700 text-sm font-bold mb-2">Client Name:<span className="font-semibold"> {`${client.client_fname} ${client.client_lname}`}</span></div>
+        <div className="block text-gray-700 text-sm font-bold mb-2">Mobile Number: <span className="font-semibold">{client.client_mobile_num}</span></div>
         <label
           htmlFor="service"
           className="block text-gray-700 text-sm font-bold mb-2"

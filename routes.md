@@ -46,10 +46,17 @@
 
 ### Create:
 
-- /clients/create => clients.create.tsx
+- /clients/create => clients_.create.tsx
+
+
+### View:
+- /clients/:id => clients_.$id.tsx
+    - /transactions
+    - /sales
+
 
 ### Update:
 
-- /clients/update/:id => clients.update.$id.tsx
+- /clients/:id/update => clients_.$id_.update.tsx
 
 ## Employee

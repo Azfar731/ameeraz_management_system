@@ -23,7 +23,6 @@ import {
 } from "shared/utilityFunctions";
 import { ServiceSaleRecordWithRelations } from "~/utils/types";
 
-
 export const meta: MetaFunction = () => {
   return [
     { title: "Ameeraz Management" },
@@ -47,13 +46,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { start_date, end_date, current_date } = extractDates(searchParams);
 
   // Extract filters
-  const { deal_ids, employee_ids, category_ids, client_mobile_num } = extractFilters(searchParams);
+  const { deal_ids, employee_ids, category_ids, client_mobile_num } =
+    extractFilters(searchParams);
 
   // Validate dates
-  validateDates(current_date,start_date, end_date);
+  validateDates(current_date, start_date, end_date);
 
   // Fetch data
-  const service_records = await fetchServiceRecords(start_date, end_date, client_mobile_num, deal_ids, category_ids, employee_ids);
+  const service_records = await fetchServiceRecords(
+    start_date,
+    end_date,
+    client_mobile_num,
+    deal_ids,
+    category_ids,
+    employee_ids
+  );
   const deals = await prisma_client.deal.findMany();
   const employees = await prisma_client.employee.findMany();
   const categories = await prisma_client.category.findMany();
@@ -90,11 +97,15 @@ function extractFilters(searchParams: URLSearchParams) {
 }
 
 // Helper function to validate the dates
-function validateDates( currentDate: Date, startDate: Date | undefined, endDate: Date | undefined) {
+function validateDates(
+  currentDate: Date,
+  startDate: Date | undefined,
+  endDate: Date | undefined
+) {
   if (startDate && endDate && startDate > endDate) {
     throw new Error("Start Date can not be greater than End Date");
   }
-  
+
   if (endDate && endDate > currentDate) {
     throw new Error("End Date cannot be greater than today's date");
   }
@@ -102,12 +113,12 @@ function validateDates( currentDate: Date, startDate: Date | undefined, endDate:
 
 // Helper function to fetch service records from Prisma
 async function fetchServiceRecords(
-  startDate?: Date,
-  endDate?: Date,
-  client_mobile_num?: string,
-  deal_ids?: string[],
-  category_ids?: string[],
-  employee_ids?: string[]
+  startDate: Date | undefined,
+  endDate: Date | undefined,
+  client_mobile_num: string | undefined,
+  deal_ids: string[] | undefined,
+  category_ids: string[] | undefined,
+  employee_ids: string[] | undefined
 ) {
   return prisma_client.service_Sale_Record.findMany({
     where: {
@@ -136,7 +147,6 @@ async function fetchServiceRecords(
   });
 }
 
-
 export default function Index() {
   //states
   const [currentDate] = useState(() => {
@@ -160,8 +170,8 @@ export default function Index() {
   const catRef = useRef<{ value: string; label: string }[]>([]);
 
   //search Parameter values
-  const start_date = searchParams.get("startDate") 
-  const end_date = searchParams.get("endDate")
+  const start_date = searchParams.get("startDate");
+  const end_date = searchParams.get("endDate");
   const all_deals = searchParams.get("deals")?.split("|") || [];
   const sel_deals = all_deals.filter(
     (id) => !deals.find((deal) => deal.deal_id === id)?.auto_generated
@@ -194,32 +204,22 @@ export default function Index() {
     };
   });
 
-  const def_categories =  sel_categories.map((id) => ({
+  const def_categories = sel_categories.map((id) => ({
     value: id,
     label:
-      categories.find((cat) => cat.cat_id === id)?.cat_name || "No Category exists",
+      categories.find((cat) => cat.cat_id === id)?.cat_name ||
+      "No Category exists",
   }));
 
   //other values
   let errorMessage: string = "";
-  
+
   //Creating a Table
   //it throws an error, while passing service_records directly
   const nodes = [...service_records];
   const data = { nodes };
 
   const [ids, setIds] = useState<string[]>([]);
-  const handleExpand = (item: ServiceSaleRecordWithRelations) => {
-    if (ids.includes(item.service_record_id)) {
-      setIds(ids.filter((id) => id !== item.service_record_id));
-    } else {
-      setIds(ids.concat(item.service_record_id));
-    }
-  };
-
-  const ROW_PROPS = {
-    onClick: handleExpand,
-  };
 
   const getEmployeeNames = (
     item: ServiceSaleRecordWithRelations,
@@ -235,6 +235,18 @@ export default function Index() {
         .join(", ");
     }
     return emp_entities.map((emp) => emp.emp_fname).join(", ");
+  };
+
+  const handleExpand = (item: ServiceSaleRecordWithRelations) => {
+    if (ids.includes(item.service_record_id)) {
+      setIds(ids.filter((id) => id !== item.service_record_id));
+    } else {
+      setIds(ids.concat(item.service_record_id));
+    }
+  };
+
+  const ROW_PROPS = {
+    onClick: handleExpand,
   };
 
   const ROW_OPTIONS = {
@@ -329,33 +341,32 @@ export default function Index() {
     },
   ]);
 
-
   const onDealsChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     dealsRef.current = [...newValue];
-    console.log(dealsRef.current);
+    
   };
 
   const onServicesChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     servicesRef.current = [...newValue];
-    console.log(servicesRef.current);
+    
   };
 
   const onEmployeeChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     empRef.current = [...newValue];
-    console.log(empRef.current);
+    
   };
 
   const onCategoriesChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     catRef.current = [...newValue];
-    console.log(catRef.current);
+    
   };
 
   const fetchFormValues = (formData: FormData) => {
@@ -411,7 +422,6 @@ export default function Index() {
       return;
     }
     setSearchParameters(formValues);
-    
   };
   return (
     <div className="m-8">
@@ -437,7 +447,7 @@ export default function Index() {
           name="start_date"
           aria-label="Date"
           type="date"
-          defaultValue={start_date? formatDate(start_date) : undefined}
+          defaultValue={start_date ? formatDate(start_date) : undefined}
           max={currentDate}
           className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         />
@@ -452,7 +462,7 @@ export default function Index() {
           name="end_date"
           aria-label="Date"
           type="date"
-          defaultValue={end_date? formatDate(end_date) : undefined}
+          defaultValue={end_date ? formatDate(end_date) : undefined}
           max={currentDate}
           className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         />

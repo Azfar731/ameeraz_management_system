@@ -1,3 +1,3 @@
 
-Edit the index page
-Format the code into mulitple modules to increases readability
+use loader data to display clients in client.tsx
+create "client create form"

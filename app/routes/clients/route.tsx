@@ -1,11 +1,11 @@
 //This component is a template for displaying entities
-import { useRef, useState } from "react";
-import { Form, useLoaderData, useSearchParams } from "@remix-run/react";
+import { useRef } from "react";
+import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import Select, { OnChangeValue } from "react-select";
-import { ServiceSaleRecordWithRelations } from "~/utils/types";
+
 import areasList from "../../components/clients/areas.json";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { getSearchParams, fetchClients } from "./utilityFunctions.server";
@@ -23,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Clients() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const { clients } = useLoaderData<{ clients: Client[] }>();
   console.log("Clients Fetched: ", clients);
   //other values
@@ -60,6 +60,10 @@ export default function Clients() {
       label: "Registrated On",
       renderCell: (item: Client) => formatDate(item.created_at),
     },
+    {
+      label: "Edit",
+      renderCell: (item: Client) => <Link to={`${item.client_id}/update`}>Edit</Link>,
+    }
   ];
 
   const theme = useTheme([

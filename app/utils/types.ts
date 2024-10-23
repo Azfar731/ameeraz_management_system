@@ -26,7 +26,8 @@ type ServiceSaleRecordWithRelations = Service_Sale_Record & {
     transactions: Client_Transaction[];
 };
 
-type ClientValues = Pick<Client, 'client_fname' | 'client_lname' | 'client_area' | 'client_mobile_num' >
-
+type ClientValues = Pick<Client, 'client_fname' | 'client_lname' | 'client_area' | 'client_mobile_num'> & {
+    client_id?: string; // Add client_id as optional
+  };
 
 export type { FormType, PaymentModes, ServiceSaleRecordWithRelations, MenuOption, ClientValues };

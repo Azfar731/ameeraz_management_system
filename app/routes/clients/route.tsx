@@ -6,10 +6,11 @@ import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import Select, { OnChangeValue } from "react-select";
 import { ServiceSaleRecordWithRelations } from "~/utils/types";
-import areasList from "./areas.json";
+import areasList from "../../components/clients/areas.json";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { getSearchParams, fetchClients } from "./utilityFunctions.server";
 import { Client } from "@prisma/client";
+import { formatDate } from "shared/utilityFunctions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -18,8 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const clients = await fetchClients(mobile_num, fname, lname, areas);
     return { clients };
   }
-  return {clients: []};
-  
+  return { clients: [] };
 }
 
 export default function Clients() {
@@ -36,78 +36,49 @@ export default function Clients() {
   //references
   const areasRef = useRef<{ value: string; label: string }[]>([]);
   //table values
-  //   const [ids, setIds] = useState<string[]>([]);
+  const nodes = [...clients];
+  const data = { nodes };
+  
+  const COLUMNS = [
+    {
+      label: "Mobile Number",
+      renderCell: (item: Client) => item.client_mobile_num,
+    },
+    {
+      label: "First Name",
+      renderCell: (item: Client) => `${item.client_fname}`,
+    },
+    {
+      label: "Last Name",
+      renderCell: (item: Client) => `${item.client_lname}`,
+    },
+    {
+      label: "Area",
+      renderCell: (item: Client) => `${item.client_area}`,
+    },
+    {
+      label: "Registrated On",
+      renderCell: (item: Client) => formatDate(item.created_at),
+    },
+  ];
 
-  //   const handleExpand = (item: ServiceSaleRecordWithRelations) => {
-  //     if (ids.includes(item.service_record_id)) {
-  //       setIds(ids.filter((id) => id !== item.service_record_id));
-  //     } else {
-  //       setIds(ids.concat(item.service_record_id));
-  //     }
-  //   };
+  const theme = useTheme([
+    getTheme(),
+    {
+      HeaderRow: `
+              background-color: #eaf5fd;
+            `,
+      Row: `
+              &:nth-of-type(odd) {
+                background-color: #d2e9fb;
+              }
 
-  //   const ROW_PROPS = {
-  //     onClick: handleExpand,
-  //   };
-
-  //   const ROW_OPTIONS = {
-  //     renderAfterRow: (item: ServiceSaleRecordWithRelations) => (
-  //       <>
-  //         {ids.includes(item.service_record_id) && (
-  //           <tr style={{ display: "flex", gridColumn: "1 / -1" }}>
-  //             <td style={{ flex: "1" }}>
-  //               <ul
-  //                 style={{
-  //                   margin: "0",
-  //                   padding: "0",
-  //                   backgroundColor: "#e0e0e0",
-  //                 }}
-  //               >
-  //                 <li>
-  //                   <strong>Deals/Services</strong>
-  //                   {item.deals.map((deal) => deal.deal_name).join(", ")}
-  //                 </li>
-  //                 <li>
-  //                   <strong>Employees</strong> {"Data for employees"}
-  //                 </li>
-  //               </ul>
-  //             </td>
-  //           </tr>
-  //         )}
-  //       </>
-  //     ),
-  //   };
-
-  //   const COLUMNS = [
-  //     {
-  //       label: "Date",
-  //       renderCell: (item: ServiceSaleRecordWithRelations) =>
-  //         "Return Value for the function",
-  //     },
-  //     {
-  //       label: "Client Name",
-  //       renderCell: (item: ServiceSaleRecordWithRelations) =>
-  //         `${item.client.client_fname} ${item.client.client_lname}`,
-  //     },
-  //   ];
-
-  //   const theme = useTheme([
-  //     getTheme(),
-  //     {
-  //       HeaderRow: `
-  //             background-color: #eaf5fd;
-  //           `,
-  //       Row: `
-  //             &:nth-of-type(odd) {
-  //               background-color: #d2e9fb;
-  //             }
-
-  //             &:nth-of-type(even) {
-  //               background-color: #eaf5fd;
-  //             }
-  //           `,
-  //     },
-  //   ]);
+              &:nth-of-type(even) {
+                background-color: #eaf5fd;
+              }
+            `,
+    },
+  ]);
 
   const getFormData = (form: HTMLFormElement) => {
     const formData = new FormData(form);
@@ -223,7 +194,7 @@ export default function Clients() {
           onChange={onAreaChange}
           options={area_options}
           //   defaultValue={def_services}
-          className="basic-multi-select mt-2"
+          className="basic-multi-select mt-2 z-10"
           classNamePrefix="select"
         />
         {errorMessage && (
@@ -236,14 +207,15 @@ export default function Clients() {
           Fetch
         </button>
       </Form>
-
-      {/* <CompactTable
-        columns={COLUMNS}
-        data={data}
-        theme={theme}
-        rowProps={ROW_PROPS}
-        rowOptions={ROW_OPTIONS}
-      /> */}
+      <div className="mt-10">
+        <CompactTable
+          columns={COLUMNS}
+          data={data}
+          theme={theme}
+          // rowProps={ROW_PROPS}
+          // rowOptions={ROW_OPTIONS}
+        />
+      </div>
     </div>
   );
 }

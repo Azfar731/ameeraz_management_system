@@ -1,3 +1,5 @@
 
 use loader data to display clients in client.tsx
 create "client create form"
+Change areas data location.
+import in create cient

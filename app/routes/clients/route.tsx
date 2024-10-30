@@ -10,8 +10,8 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { fetchClients } from "./utilityFunctions.server";
 import { Client } from "@prisma/client";
 import { formatDate } from "shared/utilityFunctions";
-import { FaPlus } from "react-icons/fa";
-import { FaExternalLinkAlt } from "react-icons/fa";
+import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
+
 import { getSearchParams } from "~/utils/client/functions";
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -25,7 +25,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Clients() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const {mobile_num: sp_mobile_num,fname: sp_fname,lname: sp_lname,areas: sp_areas}  = getSearchParams(searchParams)
+  const {
+    mobile_num: sp_mobile_num,
+    fname: sp_fname,
+    lname: sp_lname,
+    areas: sp_areas,
+  } = getSearchParams(searchParams);
   const { clients } = useLoaderData<{ clients: Client[] }>();
   console.log("Clients Fetched: ", clients);
   //other values
@@ -65,7 +70,10 @@ export default function Clients() {
     {
       label: "View",
       renderCell: (item: Client) => (
-        <Link to={`${item.client_id}`} state={{sp_mobile_num,sp_areas,sp_fname,sp_lname}}>
+        <Link
+          to={`${item.client_id}`}
+          state={{ sp_mobile_num, sp_areas, sp_fname, sp_lname }}
+        >
           <FaExternalLinkAlt />
         </Link>
       ),
@@ -211,7 +219,7 @@ export default function Clients() {
           name="area"
           onChange={onAreaChange}
           options={area_options}
-          defaultValue={sp_areas?.map(area => ({value: area,label: area}))}
+          defaultValue={sp_areas?.map((area) => ({ value: area, label: area }))}
           className="basic-multi-select mt-2 z-10"
           classNamePrefix="select"
         />

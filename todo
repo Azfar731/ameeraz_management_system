@@ -3,3 +3,8 @@ use loader data to display clients in client.tsx
 create "client create form"
 Change areas data location.
 import in create cient
+
+
+later:
+change all names to lowercase when entring in db. Turn the input to lowercase when fetching from db.
+paste fetchAllClients function in /utils/clients/functions

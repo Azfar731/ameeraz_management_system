@@ -556,7 +556,7 @@ export default function Index() {
       <div className="mt-20">
         <Link
           to="/salerecord/create"
-          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+          className=" bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
         >
           Create a new record
         </Link>

@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 type ClientErrorData = {
     errors?: {
         client_fname?: string[];
@@ -7,4 +9,12 @@ type ClientErrorData = {
     };
 };
 
-export type { ClientErrorData };
+type ClientWithRelations = Prisma.ClientGetPayload<{
+    include: {
+      services: true;
+      products: true;
+    };
+  }>;
+
+
+export type { ClientErrorData, ClientWithRelations };

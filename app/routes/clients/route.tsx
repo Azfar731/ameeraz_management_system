@@ -1,4 +1,3 @@
-//This component is a template for displaying entities
 import { useRef } from "react";
 import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
@@ -8,10 +7,12 @@ import Select, { OnChangeValue } from "react-select";
 
 import areasList from "../../components/clients/areas.json";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { getSearchParams, fetchClients } from "./utilityFunctions.server";
+import { fetchClients } from "./utilityFunctions.server";
 import { Client } from "@prisma/client";
 import { formatDate } from "shared/utilityFunctions";
-
+import { FaPlus } from "react-icons/fa";
+import { FaExternalLinkAlt } from "react-icons/fa";
+import { getSearchParams } from "~/utils/client/functions";
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
   const { mobile_num, fname, lname, areas } = getSearchParams(searchParams);
@@ -23,7 +24,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Clients() {
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const {mobile_num: sp_mobile_num,fname: sp_fname,lname: sp_lname,areas: sp_areas}  = getSearchParams(searchParams)
   const { clients } = useLoaderData<{ clients: Client[] }>();
   console.log("Clients Fetched: ", clients);
   //other values
@@ -38,7 +40,7 @@ export default function Clients() {
   //table values
   const nodes = [...clients];
   const data = { nodes };
-  
+
   const COLUMNS = [
     {
       label: "Mobile Number",
@@ -61,9 +63,13 @@ export default function Clients() {
       renderCell: (item: Client) => formatDate(item.created_at),
     },
     {
-      label: "Edit",
-      renderCell: (item: Client) => <Link to={`${item.client_id}/update`}>Edit</Link>,
-    }
+      label: "View",
+      renderCell: (item: Client) => (
+        <Link to={`${item.client_id}`} state={{sp_mobile_num,sp_areas,sp_fname,sp_lname}}>
+          <FaExternalLinkAlt />
+        </Link>
+      ),
+    },
   ];
 
   const theme = useTheme([
@@ -161,6 +167,7 @@ export default function Clients() {
           id="mobile_num"
           className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
           pattern="^0[0-9]{10}$"
+          defaultValue={sp_mobile_num}
           placeholder="03334290689"
         />
         <label
@@ -174,6 +181,7 @@ export default function Clients() {
           name="fname"
           id="fname"
           pattern="^[A-Za-z]+$"
+          defaultValue={sp_fname}
           className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
           placeholder="Irha"
         />
@@ -188,16 +196,22 @@ export default function Clients() {
           name="lname"
           id="lname"
           pattern="^[A-Za-z]+(\s[A-Za-z]+)*$"
+          defaultValue={sp_lname}
           className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
           placeholder="Razzaq"
         />
-        <label htmlFor="area">Client Area</label>
+        <label
+          htmlFor="area"
+          className="block text-gray-700 text-sm font-bold mt-4"
+        >
+          Client Area
+        </label>
         <Select
           isMulti
           name="area"
           onChange={onAreaChange}
           options={area_options}
-          //   defaultValue={def_services}
+          defaultValue={sp_areas?.map(area => ({value: area,label: area}))}
           className="basic-multi-select mt-2 z-10"
           classNamePrefix="select"
         />
@@ -211,14 +225,23 @@ export default function Clients() {
           Fetch
         </button>
       </Form>
-      <div className="mt-10">
-        <CompactTable
-          columns={COLUMNS}
-          data={data}
-          theme={theme}
-          // rowProps={ROW_PROPS}
-          // rowOptions={ROW_OPTIONS}
-        />
+
+      <div className="mt-20">
+        <Link
+          to="/salerecord/create"
+          className="w-44 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+        >
+          Register Client <FaPlus />
+        </Link>
+        <div className="mt-6">
+          <CompactTable
+            columns={COLUMNS}
+            data={data}
+            theme={theme}
+            // rowProps={ROW_PROPS}
+            // rowOptions={ROW_OPTIONS}
+          />
+        </div>
       </div>
     </div>
   );

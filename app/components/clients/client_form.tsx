@@ -46,7 +46,9 @@ export default function Client_Form({
         required
       />
       {errorMessage?.client_mobile_num && (
-        <h2 className="text-red-500 font-semibold">{errorMessage.client_mobile_num[0]}</h2>
+        <h2 className="text-red-500 font-semibold">
+          {errorMessage.client_mobile_num[0]}
+        </h2>
       )}
       <label
         htmlFor="fname"
@@ -65,7 +67,9 @@ export default function Client_Form({
         required
       />
       {errorMessage?.client_fname && (
-        <h2 className="text-red-500 font-semibold">{errorMessage.client_fname[0]}</h2>
+        <h2 className="text-red-500 font-semibold">
+          {errorMessage.client_fname[0]}
+        </h2>
       )}
       <label
         htmlFor="lname"
@@ -84,7 +88,9 @@ export default function Client_Form({
         required
       />
       {errorMessage?.client_lname && (
-        <h2 className="text-red-500 font-semibold">{errorMessage.client_lname[0]}</h2>
+        <h2 className="text-red-500 font-semibold">
+          {errorMessage.client_lname[0]}
+        </h2>
       )}
       <label
         htmlFor="area"
@@ -108,14 +114,18 @@ export default function Client_Form({
         required
       />
       {errorMessage?.client_area && (
-        <h2 className="text-red-500 font-semibold">{errorMessage.client_area[0]}</h2>
+        <h2 className="text-red-500 font-semibold">
+          {errorMessage.client_area[0]}
+        </h2>
       )}
-      <button
-        type="submit"
-        className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Register
-      </button>
+      <div className="w-full flex justify-center items-center">
+        <button
+          type="submit"
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          {client ? "Update" : "Register"}
+        </button>
+      </div>
     </Form>
   );
 }

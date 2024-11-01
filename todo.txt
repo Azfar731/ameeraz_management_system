@@ -1,5 +1,9 @@
 
+convert employee values to number
+
+
 Fixes:
 change all names to lowercase when entring in db. Turn the input to lowercase when fetching from db.
 paste fetchAllClients function in /utils/clients/functions
-fixx salesrecord fethcing all records if no search params are provided. It should only get the current date one.
+
+

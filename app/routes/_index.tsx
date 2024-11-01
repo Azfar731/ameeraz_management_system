@@ -52,15 +52,31 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Validate dates
   validateDates(current_date, start_date, end_date);
 
+  let service_records;
+  //if no search param is provided, only fetch the current date records
+  if (
+    start_date ||
+    end_date ||
+    deal_ids ||
+    employee_ids ||
+    category_ids ||
+    client_mobile_num
+  ) {
+    service_records = await fetchServiceRecords(
+      start_date,
+      end_date,
+      client_mobile_num,
+      deal_ids,
+      category_ids,
+      employee_ids
+    );
+  }else {
+    current_date.setHours(0,0,0)
+    service_records = await fetchServiceRecords(current_date)
+  }
+
   // Fetch data
-  const service_records = await fetchServiceRecords(
-    start_date,
-    end_date,
-    client_mobile_num,
-    deal_ids,
-    category_ids,
-    employee_ids
-  );
+
   const deals = await prisma_client.deal.findMany();
   const employees = await prisma_client.employee.findMany();
   const categories = await prisma_client.category.findMany();
@@ -114,11 +130,11 @@ function validateDates(
 // Helper function to fetch service records from Prisma
 async function fetchServiceRecords(
   startDate: Date | undefined,
-  endDate: Date | undefined,
-  client_mobile_num: string | undefined,
-  deal_ids: string[] | undefined,
-  category_ids: string[] | undefined,
-  employee_ids: string[] | undefined
+  endDate?: Date | undefined,
+  client_mobile_num?: string | undefined,
+  deal_ids?: string[] | undefined,
+  category_ids?: string[] | undefined,
+  employee_ids?: string[] | undefined
 ) {
   return prisma_client.service_Sale_Record.findMany({
     where: {
@@ -345,28 +361,24 @@ export default function Index() {
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     dealsRef.current = [...newValue];
-    
   };
 
   const onServicesChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     servicesRef.current = [...newValue];
-    
   };
 
   const onEmployeeChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     empRef.current = [...newValue];
-    
   };
 
   const onCategoriesChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
     catRef.current = [...newValue];
-    
   };
 
   const fetchFormValues = (formData: FormData) => {

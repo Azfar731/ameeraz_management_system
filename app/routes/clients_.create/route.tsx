@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, replace } from "@remix-run/node";
 import Client_Form from "~/components/clients/client_form";
 import { prisma_client } from ".server/db";
 import { ClientValues } from "~/utils/types";
@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
       client_area,
     });
 
-    throw redirect(`/clients/${client.client_id}`);
+    throw replace(`/clients/${client.client_id}`);
   
 }
 

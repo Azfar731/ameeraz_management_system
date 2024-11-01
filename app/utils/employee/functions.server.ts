@@ -1,5 +1,10 @@
 
+import { prisma_client } from ".server/db";
 
+const fetchEmployeeFromId = async(id)=>{
+    const employee = await prisma_client.employee.findFirst({where: {emp_id: id}})
+    return employee;
+}
 const getEmployeeFormData = (formData: FormData) => {
     const fname = (formData.get("fname") as string) || "";
     const lname = (formData.get("lname") as string) || "";
@@ -21,4 +26,4 @@ const getEmployeeFormData = (formData: FormData) => {
 
 
 
-export { getEmployeeFormData };
+export { getEmployeeFormData, fetchEmployeeFromId };

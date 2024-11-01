@@ -56,7 +56,11 @@ export default function Employees() {
     },
     {
       label: "View",
-      renderCell: (item: Employee) => <Link to={`${item.emp_id}`}><FaExternalLinkAlt /></Link>,
+      renderCell: (item: Employee) => (
+        <Link to={`${item.emp_id}`}>
+          <FaExternalLinkAlt />
+        </Link>
+      ),
     },
   ];
 
@@ -79,8 +83,11 @@ export default function Employees() {
   ]);
 
   return (
-    <div>
-      <h1>THis is the employees page</h1>
+    <div className="m-8">
+      <div className="w-full flex justify-center items-center ">
+        <h1 className=" font-semibold text-6xl text-gray-700">Employees</h1>
+      </div>
+      
       <div className="mt-6">
         <CompactTable
           columns={COLUMNS}

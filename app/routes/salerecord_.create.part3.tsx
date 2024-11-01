@@ -7,7 +7,7 @@ import {
   useSubmit,
   useNavigate,
   useActionData,
-  redirect,
+  
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
@@ -16,7 +16,7 @@ import {
   create_service_record,
   validate_data,
 } from ".server/utitlityFunctions";
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { getEmployeeOptions } from "shared/utilityFunctions";
 
 export async function loader() {
@@ -47,7 +47,7 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!isNotValid) {
     // Create the service record and redirect to the new record's page
     const record = await create_service_record(formData);
-    return redirect(`/salerecord/${record.service_record_id}`);
+    return replace(`/salerecord/${record.service_record_id}`);
   } else {
     return isNotValid;
   }

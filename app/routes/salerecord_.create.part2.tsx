@@ -1,12 +1,12 @@
 import { useState, useRef } from "react";
-import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
 import {
   useLoaderData,
   useActionData,
   Form,
   useOutletContext,
   useSubmit,
-  redirect,
+  
   useNavigate,
 } from "@remix-run/react";
 import { prisma_client } from ".server/db";
@@ -42,7 +42,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // Redirect to the next part if all is valid
-  throw redirect("../part3");
+  throw replace("../part3");
 }
 
 // Helper function to validate the payment amounts

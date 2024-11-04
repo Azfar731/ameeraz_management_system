@@ -87,15 +87,22 @@ export default function Employees() {
       <div className="w-full flex justify-center items-center ">
         <h1 className=" font-semibold text-6xl text-gray-700">Employees</h1>
       </div>
-      
-      <div className="mt-6">
-        <CompactTable
-          columns={COLUMNS}
-          data={data}
-          theme={theme}
-          // rowProps={ROW_PROPS}
-          // rowOptions={ROW_OPTIONS}
-        />
+      <div className="mt-20">
+          <Link
+            to="create"
+            className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+          >
+            Register Employee <FaPlus />
+          </Link>
+          <div className="mt-6">
+            <CompactTable
+              columns={COLUMNS}
+              data={data}
+              theme={theme}
+              // rowProps={ROW_PROPS}
+              // rowOptions={ROW_OPTIONS}
+            />
+          </div>
       </div>
     </div>
   );

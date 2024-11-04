@@ -1,7 +1,7 @@
 import { Form } from "@remix-run/react";
 import { Employee } from "@prisma/client";
 import { EmployeeErrors } from "~/utils/employee/types";
-
+import Select from "react-select";
 export default function Employee_Form({
   employee,
   errorMessage,
@@ -93,7 +93,6 @@ export default function Employee_Form({
         defaultValue={employee?.base_salary}
         placeholder="35000"
         className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
-
         required
       />
       {errorMessage?.base_salary && (
@@ -122,6 +121,27 @@ export default function Employee_Form({
         <h2 className="text-red-500 font-semibold">
           {errorMessage.percentage[0]}
         </h2>
+      )}
+      {employee && (
+        <>
+          <label
+            htmlFor="percentage"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            Status
+          </label>
+          <Select
+            name="status"
+            id="deal"
+            options={[
+              { value: "true", label: "Active" },
+              { value: "false", label: "Left" },
+            ]}
+            defaultValue={employee.emp_status? { value: "true", label: "Active" }: { value: "false", label: "Left" }}
+            className="basic-multi-select mb-4"
+            classNamePrefix="select"
+          />
+        </>
       )}
       <div className="w-full flex justify-center items-center">
         <button

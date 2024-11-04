@@ -33,8 +33,8 @@ const create_employee_fn = async({
 }: EmployeeValues)=>{
     const employee = await prisma_client.employee.create({
         data: {
-            emp_fname,
-            emp_lname,
+            emp_fname: emp_fname.toLowerCase(),
+            emp_lname: emp_lname.toLowerCase(),
             emp_mobile_num,
             base_salary,
             percentage,

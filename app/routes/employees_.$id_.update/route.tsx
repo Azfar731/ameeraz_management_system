@@ -73,13 +73,12 @@ const update_employee_fn = async({
             emp_id
         },
         data: {
-            emp_fname,
-            emp_lname,
+            emp_fname: emp_fname.toLowerCase(),
+            emp_lname: emp_lname.toLowerCase(),
             emp_mobile_num,
             base_salary,
             percentage,
-            emp_status
-            
+            emp_status         
         }   
     })
     return updated_employee

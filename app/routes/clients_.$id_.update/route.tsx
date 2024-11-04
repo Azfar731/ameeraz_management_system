@@ -65,8 +65,8 @@ const update_client_fn = async ({
       client_id, // The unique identifier for the client record you want to update
     },
     data: {
-      client_fname,
-      client_lname,
+      client_fname: client_fname.toLowerCase(),
+      client_lname: client_lname.toLowerCase(),
       client_mobile_num,
       client_area,
     },

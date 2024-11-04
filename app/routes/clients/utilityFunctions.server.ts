@@ -19,8 +19,8 @@ const fetchClients = async (
         const clients = await prisma_client.client.findMany({
             where: {
                 client_area: { in: areas },
-                client_fname: fname,
-                client_lname: lname,
+                client_fname: fname?.toLowerCase(),
+                client_lname: lname?.toLowerCase(),
             },
         });
 

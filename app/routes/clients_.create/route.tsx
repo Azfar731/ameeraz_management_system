@@ -37,8 +37,8 @@ const create_client_fn = async ({
 }: ClientValues) => {
   const client = await prisma_client.client.create({
     data: {
-      client_fname,
-      client_lname,
+      client_fname: client_fname.toLowerCase(),
+      client_lname: client_lname.toLowerCase(),
       client_area,
       client_mobile_num,
     },

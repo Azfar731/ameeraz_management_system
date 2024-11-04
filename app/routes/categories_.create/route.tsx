@@ -5,6 +5,7 @@ import { CategoryErrors } from "~/utils/category/types";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { prisma_client } from ".server/db";
 import { categorySchema } from "~/utils/category/validation";
+import { capitalizeFirstLetter } from "~/utils/functions";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -22,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
 const create_category_fn = async ({ cat_name }: { cat_name: string }) => {
   const category = await prisma_client.category.create({
     data: {
-      cat_name: cat_name.toLowerCase(),
+      cat_name: capitalizeFirstLetter(cat_name.toLowerCase()),
     },
   });
   return category;

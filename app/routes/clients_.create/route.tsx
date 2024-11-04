@@ -6,6 +6,7 @@ import { useActionData } from "@remix-run/react";
 import { clientSchema } from "../../utils/client/validation";
 import { getClientFormData } from "~/utils/client/functions.server";
 import { ClientErrorData } from "~/utils/client/types";
+import { capitalizeFirstLetter } from "~/utils/functions";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -37,8 +38,8 @@ const create_client_fn = async ({
 }: ClientValues) => {
   const client = await prisma_client.client.create({
     data: {
-      client_fname: client_fname.toLowerCase(),
-      client_lname: client_lname.toLowerCase(),
+      client_fname: capitalizeFirstLetter(client_fname.toLowerCase()),
+      client_lname: capitalizeFirstLetter(client_lname.toLowerCase()),
       client_area,
       client_mobile_num,
     },

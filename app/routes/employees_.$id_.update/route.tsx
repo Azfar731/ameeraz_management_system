@@ -1,7 +1,11 @@
 import Employee_Form from "~/components/employees/employee_form";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { EmployeeErrors } from "~/utils/employee/types";
-import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  replace,
+} from "@remix-run/node";
 import {
   fetchEmployeeFromId,
   getEmployeeFormData,
@@ -10,6 +14,7 @@ import { Employee } from "@prisma/client";
 import { employeeSchema } from "~/utils/employee/validation";
 import { EmployeeValues } from "~/utils/employee/types";
 import { prisma_client } from ".server/db";
+import { capitalizeFirstLetter } from "~/utils/functions";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -51,46 +56,42 @@ export async function action({ request, params }: ActionFunctionArgs) {
     emp_mobile_num,
     base_salary,
     percentage,
-    emp_status
+    emp_status,
   });
 
   throw replace(`/employees/${updated_employee.emp_id}`);
 }
 
-
-const update_employee_fn = async({
-    emp_id,
-    emp_fname,
-    emp_lname,
-    emp_mobile_num,
-    base_salary,
-    percentage,
-    emp_status
-    
-}: EmployeeValues)=>{
-    const updated_employee = await prisma_client.employee.update({
-        where:{
-            emp_id
-        },
-        data: {
-            emp_fname: emp_fname.toLowerCase(),
-            emp_lname: emp_lname.toLowerCase(),
-            emp_mobile_num,
-            base_salary,
-            percentage,
-            emp_status         
-        }   
-    })
-    return updated_employee
-}
-
-
+const update_employee_fn = async ({
+  emp_id,
+  emp_fname,
+  emp_lname,
+  emp_mobile_num,
+  base_salary,
+  percentage,
+  emp_status,
+}: EmployeeValues) => {
+  const updated_employee = await prisma_client.employee.update({
+    where: {
+      emp_id,
+    },
+    data: {
+      emp_fname: capitalizeFirstLetter(emp_fname.toLowerCase()),
+      emp_lname: capitalizeFirstLetter(emp_lname.toLowerCase()),
+      emp_mobile_num,
+      base_salary,
+      percentage,
+      emp_status,
+    },
+  });
+  return updated_employee;
+};
 
 export default function Update_Employee() {
   const actionData = useActionData<{ errors: EmployeeErrors }>();
 
   const { employee } = useLoaderData<{ employee: Employee }>();
-  console.log(employee)
+  console.log(employee);
   return (
     <div className="flex justify-center items-center h-screen">
       <Employee_Form employee={employee} errorMessage={actionData?.errors} />

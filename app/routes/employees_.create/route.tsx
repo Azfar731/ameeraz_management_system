@@ -5,12 +5,12 @@ import { ActionFunctionArgs } from "@remix-run/node";
 import { getEmployeeFormData } from "~/utils/employee/functions.server";
 import { prisma_client } from ".server/db";
 import { employeeSchema } from "~/utils/employee/validation";
+import { capitalizeFirstLetter } from "~/utils/functions";
 
-export async function action({request}: ActionFunctionArgs){
-    const formData = await request.formData();
-    const employeeData = getEmployeeFormData(formData)
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const employeeData = getEmployeeFormData(formData);
 
-    
   const validationResult = employeeSchema.safeParse(employeeData);
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
@@ -18,39 +18,42 @@ export async function action({request}: ActionFunctionArgs){
   const { emp_fname, emp_lname, emp_mobile_num, base_salary, percentage } =
     validationResult.data;
 
-    const employee= await create_employee_fn({emp_fname, emp_lname, emp_mobile_num,  base_salary, percentage})
-
-    throw replace( `/employees/${employee.emp_id}`);
-}   
-
-const create_employee_fn = async({
+  const employee = await create_employee_fn({
     emp_fname,
     emp_lname,
     emp_mobile_num,
     base_salary,
     percentage,
-    
-}: EmployeeValues)=>{
-    const employee = await prisma_client.employee.create({
-        data: {
-            emp_fname: emp_fname.toLowerCase(),
-            emp_lname: emp_lname.toLowerCase(),
-            emp_mobile_num,
-            base_salary,
-            percentage,
-            
-        }   
-    })
-    return employee
+  });
+
+  throw replace(`/employees/${employee.emp_id}`);
 }
 
+const create_employee_fn = async ({
+  emp_fname,
+  emp_lname,
+  emp_mobile_num,
+  base_salary,
+  percentage,
+}: EmployeeValues) => {
+  const employee = await prisma_client.employee.create({
+    data: {
+      emp_fname: capitalizeFirstLetter(emp_fname.toLowerCase()),
+      emp_lname: capitalizeFirstLetter(emp_lname.toLowerCase()),
+      emp_mobile_num,
+      base_salary,
+      percentage,
+    },
+  });
+  return employee;
+};
 
-export default function Create_Employee(){
-    const actionData = useActionData<{errors: EmployeeErrors}>()
+export default function Create_Employee() {
+  const actionData = useActionData<{ errors: EmployeeErrors }>();
 
-    return(
-        <div className="flex justify-center items-center h-screen">
-            <Employee_Form errorMessage={actionData?.errors}/>
-        </div>
-    )
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <Employee_Form errorMessage={actionData?.errors} />
+    </div>
+  );
 }

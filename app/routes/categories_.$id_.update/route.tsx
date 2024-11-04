@@ -11,6 +11,7 @@ import { prisma_client } from ".server/db";
 import { categorySchema } from "~/utils/category/validation";
 import { fetchCategoryFromId } from "~/utils/category/functions.server";
 import { Category } from "@prisma/client";
+import { capitalizeFirstLetter } from "~/utils/functions";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -53,7 +54,7 @@ const update_category_fn = async ({
   const category = await prisma_client.category.update({
     where: { cat_id: id },
     data: {
-      cat_name: cat_name.toLowerCase(),
+      cat_name: capitalizeFirstLetter(cat_name.toLowerCase()),
     },
   });
   return category;

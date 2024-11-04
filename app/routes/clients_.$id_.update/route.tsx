@@ -14,12 +14,13 @@ import {
 import { clientSchema } from "~/utils/client/validation";
 import { ClientValues } from "~/utils/types";
 import { ClientErrorData } from "~/utils/client/types";
+import { capitalizeFirstLetter } from "~/utils/functions";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Client id not provided for Client Update Page");
   }
-  const client = await fetchClientFromId({id});
+  const client = await fetchClientFromId({ id });
   if (!client) {
     throw new Error(`No client with id:${id} found`);
   }
@@ -65,8 +66,8 @@ const update_client_fn = async ({
       client_id, // The unique identifier for the client record you want to update
     },
     data: {
-      client_fname: client_fname.toLowerCase(),
-      client_lname: client_lname.toLowerCase(),
+      client_fname: capitalizeFirstLetter(client_fname.toLowerCase()),
+      client_lname: capitalizeFirstLetter(client_lname.toLowerCase()),
       client_mobile_num,
       client_area,
     },

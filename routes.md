@@ -59,4 +59,18 @@
 
 - /clients/:id/update => clients_.$id_.update.tsx
 
-## Employee
+
+
+## Category
+
+- /cateogries => cateogries.tsx
+
+### Create:
+
+- /cateogries/create => categories_.create.tsx
+
+
+### View:
+- /cateogries/:id => categories_.$id.tsx
+    - /transactions
+    - /sales

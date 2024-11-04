@@ -1,9 +1,10 @@
 
+create validation for cateogies.
 
 
 
 Fixes:
-change all names to lowercase when entring in db. Turn the input to lowercase when fetching from db.
-paste fetchAllClients function in /utils/clients/functions
+In addition to lowercase, capitalize the first word of the string before entering in db
+
 
 

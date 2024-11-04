@@ -1,0 +1,118 @@
+import Service_Form from "~/components/services/service_form";
+import { useActionData, useLoaderData } from "@remix-run/react";
+
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  replace,
+} from "@remix-run/node";
+import { prisma_client } from ".server/db";
+
+import { capitalizeFirstLetter } from "~/utils/functions";
+import { ServiceErrors, ServiceWithRelations } from "~/utils/service/types";
+import { Category } from "@prisma/client";
+import { serviceSchema } from "~/utils/service/validation.server";
+import {
+  fetchServiceFromId,
+  getServiceFormData,
+} from "~/utils/service/functions.server";
+
+export async function loader({ params }: LoaderFunctionArgs) {
+  const { id } = params;
+  if (!id) {
+    throw new Error("No ID provided in the parameter");
+  }
+
+  const service = await fetchServiceFromId({ id, includeCategory: true });
+  if (!service) {
+    throw new Error(`No Service found with id:${id}`);
+  }
+  const categories = await prisma_client.category.findMany();
+
+  return { service, categories };
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+  const {id} = params
+  if(!id){
+    throw new Error("No id provided in URL")
+  }
+    const formData = await request.formData();
+  const serviceFormData = getServiceFormData(formData);
+
+  const validationResult = serviceSchema.safeParse(serviceFormData);
+  if (!validationResult.success) {
+    return { errors: validationResult.error.flatten().fieldErrors };
+  }
+
+  const { serv_name, serv_category, serv_price } = validationResult.data;
+  const updated_service = await update_service_fn({
+    id,
+    serv_name,
+    serv_category,
+    serv_price,
+  });
+  throw replace(`/services/${updated_service.serv_id}`);
+}
+
+const update_service_fn = async ({
+  id,
+  serv_name,
+  serv_category,
+  serv_price,
+}: {
+  id: string;
+  serv_name: string;
+  serv_category: string;
+  serv_price: number;
+}) => {
+  const capitalized_name = capitalizeFirstLetter(serv_name.toLowerCase());
+  const current_date = new Date();
+  const service = await prisma_client.service.update({
+    where: {serv_id: id},
+    data: {
+      serv_name: capitalized_name,
+      serv_category,
+      serv_price,
+    },
+  });
+  const deal = await prisma_client.deal.findFirst({
+    where: {
+        services: {
+          some: {
+            serv_id: id
+          }
+        },
+        auto_generated: true
+      }
+  })
+
+  const updated_deal = await prisma_client.deal.update({
+    where: {deal_id: deal?.deal_id},
+    data:{
+        deal_name: capitalized_name,
+        deal_price: serv_price,
+
+    }
+  })
+
+  return service;
+};
+
+export default function Update_Service() {
+  const { service, categories } = useLoaderData<{
+    service: ServiceWithRelations;
+    categories: Category[];
+  }>();
+  const actionData = useActionData<{ errors: ServiceErrors }>();
+
+  return (
+    <div className="flex justify-center">
+      <Service_Form
+        service={service}
+        categories={categories}
+        errorMessage={actionData?.errors}
+      />
+    </div>
+  );
+}

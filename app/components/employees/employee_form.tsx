@@ -125,14 +125,14 @@ export default function Employee_Form({
       {employee && (
         <>
           <label
-            htmlFor="percentage"
+            htmlFor="status"
             className="block text-gray-700 text-sm font-bold mt-4"
           >
             Status
           </label>
           <Select
             name="status"
-            id="deal"
+            id="status"
             options={[
               { value: "true", label: "Active" },
               { value: "false", label: "Left" },

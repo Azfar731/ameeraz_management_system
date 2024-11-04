@@ -1,10 +1,7 @@
 
-create validation for cateogies.
-
 
 
 Fixes:
-In addition to lowercase, capitalize the first word of the string before entering in db
 
 
 

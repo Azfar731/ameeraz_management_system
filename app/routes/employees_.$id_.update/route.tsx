@@ -1,6 +1,6 @@
 import Employee_Form from "~/components/employees/employee_form";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { EmployeeErrors } from "~/utils/employee/types";
+import { EmployeeErrors, EmployeeValues } from "~/utils/employee/types";
 import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -12,7 +12,7 @@ import {
 } from "~/utils/employee/functions.server";
 import { Employee } from "@prisma/client";
 import { employeeSchema } from "~/utils/employee/validation";
-import { EmployeeValues } from "~/utils/employee/types";
+
 import { prisma_client } from ".server/db";
 import { capitalizeFirstLetter } from "~/utils/functions";
 export async function loader({ params }: LoaderFunctionArgs) {

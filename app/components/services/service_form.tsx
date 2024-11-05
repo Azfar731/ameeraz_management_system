@@ -17,6 +17,8 @@ export default function Service_Form({
     label: category.cat_name,
   }));
 
+  const status_options = [{value: "true" , label: "Active"},{value: "false" , label: "Inactive"}]
+
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
       <div className="w-full flex justify-center items-center">
@@ -76,7 +78,9 @@ export default function Service_Form({
         name="category"
         id="category"
         options={category_options}
-        defaultValue={ category_options.find(opt => opt.value === service?.serv_category)}
+        defaultValue={category_options.find(
+          (opt) => opt.value === service?.serv_category
+        )}
         className="basic-multi-select mb-4"
         classNamePrefix="select"
       />
@@ -84,6 +88,24 @@ export default function Service_Form({
         <h2 className="text-red-500 font-semibold">
           {errorMessage.serv_category[0]}
         </h2>
+      )}
+      {service && (
+        <>
+          <label
+            htmlFor="status"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            Status
+          </label>
+          <Select
+            name="status"
+            id="status"
+            options={status_options}
+            defaultValue={service.deals[0].activate_till? status_options[1]: status_options[0]}
+            className="basic-multi-select mb-4"
+            classNamePrefix="select"
+          />
+        </>
       )}
       <div className="w-full flex justify-center items-center">
         <button

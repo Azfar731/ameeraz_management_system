@@ -1,7 +1,13 @@
 
 
 
+
 Fixes:
 
+
+
+Improvements:
+Services:
+1. save search parameters when going from "/services" to "/services/$id"
 
 

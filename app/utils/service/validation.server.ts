@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const serviceSchema = z.object({
-    
     serv_name: z
         .string()
         .regex(
@@ -17,9 +16,10 @@ const serviceSchema = z.object({
 
     serv_category: z
         .string()
-        .min(1, "Category id is required")
-        
+        .min(1, "Category id is required"),
 
+    serv_status: z
+        .boolean(),
 });
 
 export { serviceSchema };

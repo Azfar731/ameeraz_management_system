@@ -1,6 +1,6 @@
 import { prisma_client } from ".server/db";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { DealWithServices } from "~/utils/deal/types";
 import { Link } from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
@@ -28,7 +28,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Services() {
-  const { deals, categories } = useLoaderData<{ deals: DealWithServices[], categories: Category[] }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { deals, categories } = useLoaderData<{
+    deals: DealWithServices[];
+    categories: Category[];
+  }>();
   console.log(deals);
 
   // other values
@@ -48,12 +52,14 @@ export default function Services() {
     },
     {
       label: "Category",
-      renderCell: (item: DealWithServices) => categories.find(cat => cat.cat_id === item.services[0].serv_category)?.cat_name,
+      renderCell: (item: DealWithServices) =>
+        categories.find((cat) => cat.cat_id === item.services[0].serv_category)
+          ?.cat_name,
     },
     {
       label: "Status",
       renderCell: (item: DealWithServices) =>
-        item.activate_till && item.activate_till < current_date
+        item.activate_till 
           ? "InActive"
           : "Active",
     },
@@ -85,18 +91,40 @@ export default function Services() {
     },
   ]);
 
+  const handleServices = () => {
+    setSearchParams((prevParams) => {
+      const params = new URLSearchParams(prevParams);
+
+      if (params.get("fetchAllServices")) {
+        params.delete("fetchAllServices");
+      } else {
+        params.set("fetchAllServices", "true");
+      }
+
+      return params;
+    });
+  };
+
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
         <h1 className=" font-semibold text-6xl text-gray-700">Services</h1>
       </div>
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
-        >
-          Create Service <FaPlus />
-        </Link>
+        <div className="w-full flex justify-between items-center">
+          <Link
+            to="create"
+            className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+          >
+            Create Service <FaPlus />
+          </Link>
+          <button
+            onClick={handleServices}
+            className="w-60 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          >
+            {searchParams.get("fetchAllServices")? "Hide Incactive Services": "Get all Services"}
+          </button>
+        </div>
         <div className="mt-6">
           <CompactTable
             columns={COLUMNS}

@@ -1,7 +1,7 @@
 
 import { prisma_client } from ".server/db";
 
-const fetchEmployeeFromId = async(id)=>{
+const fetchEmployeeFromId = async(id: string)=>{
     const employee = await prisma_client.employee.findFirst({where: {emp_id: id}})
     return employee;
 }

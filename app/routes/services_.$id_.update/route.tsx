@@ -33,6 +33,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
+  console.log("In update action function")
   const {id} = params
   if(!id){
     throw new Error("No id provided in URL")
@@ -45,12 +46,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
 
-  const { serv_name, serv_category, serv_price } = validationResult.data;
+  const { serv_name, serv_category, serv_price, serv_status } = validationResult.data;
   const updated_service = await update_service_fn({
     id,
     serv_name,
     serv_category,
     serv_price,
+    serv_status,
   });
   throw replace(`/services/${updated_service.serv_id}`);
 }
@@ -60,11 +62,13 @@ const update_service_fn = async ({
   serv_name,
   serv_category,
   serv_price,
+  serv_status,
 }: {
   id: string;
   serv_name: string;
   serv_category: string;
   serv_price: number;
+  serv_status: boolean;
 }) => {
   const capitalized_name = capitalizeFirstLetter(serv_name.toLowerCase());
   const current_date = new Date();
@@ -86,13 +90,14 @@ const update_service_fn = async ({
         auto_generated: true
       }
   })
-
-  const updated_deal = await prisma_client.deal.update({
+  //if serv_status is false, it means that the service has been updated 
+  // to be inactive, so we assign activate_till a value of current date
+  await prisma_client.deal.update({
     where: {deal_id: deal?.deal_id},
     data:{
         deal_name: capitalized_name,
         deal_price: serv_price,
-
+        activate_till: serv_status? null : current_date
     }
   })
 

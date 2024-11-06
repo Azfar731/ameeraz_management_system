@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react';
+import { NavLink } from "@remix-run/react";
 
 interface NavProps {
   closeNav: () => void;
@@ -9,26 +9,65 @@ const Nav: React.FC<NavProps> = ({ closeNav }) => {
     <div className="fixed inset-0 bg-gray-900 bg-opacity-80 z-50 flex">
       {/* Sidebar navigation taking up 1/3 of the screen */}
       <div className="w-1/3 bg-gray-800 h-full flex flex-col text-white p-6">
-        <button
-          className="absolute top-4 right-4 text-3xl"
-          onClick={closeNav}
-        >
+        <button className="absolute top-4 right-4 text-3xl" onClick={closeNav}>
           &times;
         </button>
 
         <nav className="text-2xl flex flex-col justify-start gap-4">
-          <Link to="/" className="hover:underline" onClick={closeNav}>
-            Home
-          </Link>
-          <Link to="/about" className="hover:underline" onClick={closeNav}>
-            About
-          </Link>
-          <Link to="/services" className="hover:underline" onClick={closeNav}>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Sale Records
+          </NavLink>
+          <NavLink
+            to="/clients"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Clients
+          </NavLink>
+          <NavLink
+            to="/services"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
             Services
-          </Link>
-          <Link to="/contact" className="hover:underline" onClick={closeNav}>
-            Contact
-          </Link>
+          </NavLink>
+          <NavLink
+            to="/deals"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Deals
+          </NavLink>
+          <NavLink
+            to="/categories"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Categories
+          </NavLink>
+          <NavLink
+            to="/employees"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Employees
+          </NavLink>
         </nav>
       </div>
 

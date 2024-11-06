@@ -1,4 +1,4 @@
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 
 const fetchClients = async (
     mobile_num: string | undefined,

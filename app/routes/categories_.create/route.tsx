@@ -3,7 +3,7 @@ import Category_Form from "~/components/categories/category_form";
 import { useActionData } from "@remix-run/react";
 import { CategoryErrors } from "~/utils/category/types";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { categorySchema } from "~/utils/category/validation";
 import { capitalizeFirstLetter } from "~/utils/functions";
 

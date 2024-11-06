@@ -1,4 +1,4 @@
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { Service } from "@prisma/client";
 import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
@@ -60,7 +60,7 @@ const update_deal_fn = async ({
   services: string[];
 }) => {
   const newDeal = await prisma_client.deal.update({
-    where:{ deal_id},
+    where: { deal_id },
     data: {
       deal_name,
       deal_price,

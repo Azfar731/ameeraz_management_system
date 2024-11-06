@@ -2,7 +2,7 @@ import Service_Form from "~/components/services/service_form";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
 import { ActionFunctionArgs, replace } from "@remix-run/node";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 
 import { capitalizeFirstLetter } from "~/utils/functions";
 import { ServiceErrors } from "~/utils/service/types";
@@ -27,7 +27,6 @@ export async function action({ request }: ActionFunctionArgs) {
   const new_service = await create_service_fn(validationResult.data);
   throw replace(`/services/${new_service.serv_id}`);
 }
-
 
 const create_service_fn = async ({
   serv_name,

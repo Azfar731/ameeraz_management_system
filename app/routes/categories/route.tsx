@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { Category } from "@prisma/client";
 import { useLoaderData, Link } from "@remix-run/react";
 import { CategoryWithServices } from "~/utils/category/types";
@@ -49,11 +49,10 @@ export default function Categories() {
       setIds(ids.concat(item.cat_id));
     }
   };
-  
+
   const ROW_PROPS = {
     onClick: handleExpand,
   };
-
 
   const ROW_OPTIONS = {
     renderAfterRow: (item: CategoryWithServices) => (
@@ -72,7 +71,6 @@ export default function Categories() {
                   <strong>Services: </strong>
                   {item.services.map((service) => service.serv_name).join(", ")}
                 </li>
-                
               </ul>
             </td>
           </tr>

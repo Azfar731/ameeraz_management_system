@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, replace } from "@remix-run/node";
 import Client_Form from "~/components/clients/client_form";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { ClientValues } from "~/utils/types";
 import { useActionData } from "@remix-run/react";
 import { clientSchema } from "../../utils/client/validation";
@@ -19,15 +19,14 @@ export async function action({ request }: ActionFunctionArgs) {
   const { client_fname, client_lname, client_mobile_num, client_area } =
     validationResult.data;
 
-    const client = await create_client_fn({
-      client_fname,
-      client_lname,
-      client_mobile_num,
-      client_area,
-    });
+  const client = await create_client_fn({
+    client_fname,
+    client_lname,
+    client_mobile_num,
+    client_area,
+  });
 
-    throw replace(`/clients/${client.client_id}`);
-  
+  throw replace(`/clients/${client.client_id}`);
 }
 
 const create_client_fn = async ({

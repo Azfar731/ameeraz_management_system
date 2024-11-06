@@ -13,7 +13,7 @@ import {
 import { Employee } from "@prisma/client";
 import { employeeSchema } from "~/utils/employee/validation";
 
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { capitalizeFirstLetter } from "~/utils/functions";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;

@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { ServiceSaleRecordWithRelations } from "~/utils/types";
 import { formatDate } from "shared/utilityFunctions";
 export async function loader({ params }: LoaderFunctionArgs) {

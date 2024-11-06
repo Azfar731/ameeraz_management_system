@@ -1,4 +1,4 @@
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { Service } from "@prisma/client";
 import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors } from "~/utils/deal/types";
@@ -21,40 +21,38 @@ export async function action({ request }: ActionFunctionArgs) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
 
-  const newDeal = await create_deal_fn(validationResult.data)
+  const newDeal = await create_deal_fn(validationResult.data);
 
-
-  throw replace(`/deals/${(newDeal).deal_id}`)
+  throw replace(`/deals/${newDeal.deal_id}`);
 }
 
-const create_deal_fn = async({
-    deal_name,
-    deal_price,
-    activate_from,
-    activate_till,
-    services,
+const create_deal_fn = async ({
+  deal_name,
+  deal_price,
+  activate_from,
+  activate_till,
+  services,
 }: {
-    deal_name: string,
-    deal_price: number,
-    activate_from: Date,
-    activate_till: Date,
-    services: string[]
-})=>{
-    const newDeal = await prisma_client.deal.create({
-        data: {
-            deal_name,
-            deal_price,
-            activate_from,
-            activate_till,
-            services: {
-                connect: services.map(serviceId => ({ serv_id: serviceId })),
-            },
-        },
-    });
+  deal_name: string;
+  deal_price: number;
+  activate_from: Date;
+  activate_till: Date;
+  services: string[];
+}) => {
+  const newDeal = await prisma_client.deal.create({
+    data: {
+      deal_name,
+      deal_price,
+      activate_from,
+      activate_till,
+      services: {
+        connect: services.map((serviceId) => ({ serv_id: serviceId })),
+      },
+    },
+  });
 
-    
-    return newDeal;
-}
+  return newDeal;
+};
 export default function Create_Deal() {
   const { services } = useLoaderData<{ services: Service[] }>();
   const actionData = useActionData<{ errors: DealErrors }>();

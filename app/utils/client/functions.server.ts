@@ -1,4 +1,4 @@
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 const getClientFormData = (formData: FormData) => {
     const fname = (formData.get("fname") as string) || "";
     const lname = (formData.get("lname") as string) || "";
@@ -29,8 +29,5 @@ const fetchClientFromId = async (
     });
     return client;
 };
-
-
-
 
 export { fetchClientFromId, getClientFormData };

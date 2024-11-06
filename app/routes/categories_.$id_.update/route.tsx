@@ -7,7 +7,7 @@ import {
   LoaderFunctionArgs,
   replace,
 } from "@remix-run/node";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { categorySchema } from "~/utils/category/validation";
 import { fetchCategoryFromId } from "~/utils/category/functions.server";
 import { Category } from "@prisma/client";

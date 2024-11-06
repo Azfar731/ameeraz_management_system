@@ -1,4 +1,4 @@
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { DealWithServices } from "~/utils/deal/types";
@@ -59,9 +59,7 @@ export default function Services() {
     {
       label: "Status",
       renderCell: (item: DealWithServices) =>
-        item.activate_till 
-          ? "InActive"
-          : "Active",
+        item.activate_till ? "InActive" : "Active",
     },
     {
       label: "View",
@@ -122,7 +120,9 @@ export default function Services() {
             onClick={handleServices}
             className="w-60 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
           >
-            {searchParams.get("fetchAllServices")? "Hide Incactive Services": "Get all Services"}
+            {searchParams.get("fetchAllServices")
+              ? "Hide Incactive Services"
+              : "Get all Services"}
           </button>
         </div>
         <div className="mt-6">

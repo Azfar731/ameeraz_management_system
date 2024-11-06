@@ -1,4 +1,4 @@
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { Employee } from "@prisma/client";
 import {
   useLoaderData,
@@ -7,7 +7,6 @@ import {
   useSubmit,
   useNavigate,
   useActionData,
-  
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
@@ -15,7 +14,7 @@ import { FormType } from "~/utils/types";
 import {
   create_service_record,
   validate_data,
-} from ".server/utitlityFunctions";
+} from "~/.server/utitlityFunctions";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { getEmployeeOptions } from "shared/utilityFunctions";
 
@@ -125,7 +124,10 @@ export default function Part3() {
 
   const empWorkShareList = selectedEmpList.map((emp, index) => {
     return (
-      <div key={emp.id} className="mt-4 w-full flex justify-between items-center">
+      <div
+        key={emp.id}
+        className="mt-4 w-full flex justify-between items-center"
+      >
         <label
           htmlFor={`Emp-${index}`}
           className="text-gray-700 text-sm font-bold mb-2 pr-4 w-1/3"
@@ -212,7 +214,10 @@ export default function Part3() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded shadow-md w-120"
       >
-        <div className="block text-gray-700 text-sm font-bold mb-2" >Amount Charged: <span className="font-semibold">{formData.amount_charged}</span></div>
+        <div className="block text-gray-700 text-sm font-bold mb-2">
+          Amount Charged:{" "}
+          <span className="font-semibold">{formData.amount_charged}</span>
+        </div>
         <label
           htmlFor="employees"
           className="block text-gray-700 text-sm font-bold mb-2"

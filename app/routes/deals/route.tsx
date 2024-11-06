@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 
 import { useLoaderData, useSearchParams, Link } from "@remix-run/react";
 

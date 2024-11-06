@@ -1,4 +1,4 @@
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 
 const fetchDealFromId = async (
     { id, includeServices }: { id: string; includeServices: boolean },
@@ -17,7 +17,7 @@ const getDealFormData = (formData: FormData) => {
     const services = formData.get("services") as string;
     const activate_from = formData.get("startDate") as string;
     const activate_till = formData.get("endDate") as string;
-    
+
     return {
         deal_name,
         deal_price,

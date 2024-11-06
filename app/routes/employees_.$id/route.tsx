@@ -1,6 +1,6 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Employee } from "@prisma/client";
 
@@ -10,19 +10,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Error("Id not provided in URL");
   }
   const employee = await prisma_client.employee.findFirst({
-    where: { emp_id: id }
+    where: { emp_id: id },
   });
   if (!employee) {
     throw new Error(`Client with id:${id} not found`);
   }
-  return {employee}
+  return { employee };
 }
 
 export default function View_Employee() {
-  
-    const { employee: emp } = useLoaderData<{employee: Employee}>()
-    console.log(emp)
-    return (
+  const { employee: emp } = useLoaderData<{ employee: Employee }>();
+  console.log(emp);
+  return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <Link
         to="/employees"
@@ -51,7 +50,7 @@ export default function View_Employee() {
         <h3 className="text-gray-600">{`${emp.percentage}%`}</h3>
 
         <h3 className="font-medium text-gray-700">Status</h3>
-        <h3 className="text-gray-600">{emp.emp_status? "Active": "Left"}</h3>
+        <h3 className="text-gray-600">{emp.emp_status ? "Active" : "Left"}</h3>
         <Link
           to={`update`}
           className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"

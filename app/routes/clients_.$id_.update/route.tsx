@@ -4,7 +4,7 @@ import {
   redirect,
 } from "@remix-run/node";
 import Client_Form from "~/components/clients/client_form";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { useLoaderData, useActionData } from "@remix-run/react";
 import { Client } from "@prisma/client";
 import {

@@ -8,7 +8,7 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { Category, Deal, Employee } from "@prisma/client";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
@@ -71,9 +71,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       category_ids,
       employee_ids
     );
-  }else {
-    current_date.setHours(0,0,0)
-    service_records = await fetchServiceRecords(current_date)
+  } else {
+    current_date.setHours(0, 0, 0);
+    service_records = await fetchServiceRecords(current_date);
   }
 
   // Fetch data

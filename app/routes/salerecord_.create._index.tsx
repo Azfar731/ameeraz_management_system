@@ -5,26 +5,25 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { FormType } from "~/utils/types";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const mobile_num = formData.get("mobile_num")?.toString() || "";
   if (!mobile_num) {
-    return {msg: "No mobile number received"};
+    return { msg: "No mobile number received" };
   }
 
   // Fetch the client
   const client = await findClientByMobile(mobile_num);
   if (!client) {
-    return {msg: `No client with mobile number: ${mobile_num} found`};
+    return { msg: `No client with mobile number: ${mobile_num} found` };
   }
 
   // Redirect to the next part of the process
   const redirectUrl = `part2?mobile_num=${encodeURIComponent(mobile_num)}`;
   throw replace(redirectUrl);
-
 }
 
 //helper functions
@@ -34,17 +33,15 @@ async function findClientByMobile(mobile_num: string) {
   });
 }
 
-
 export default function Part1() {
-  const actionData = useActionData<{msg: string}>();
+  const actionData = useActionData<{ msg: string }>();
   const { formData, setFormData } = useOutletContext<{
     formData: FormType;
     setFormData: React.Dispatch<React.SetStateAction<FormType>>;
   }>();
-  
+
   const submit = useSubmit();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    
     const form = event.currentTarget;
     const formData = new FormData(form);
     const mobile_num = formData.get("mobile_num")?.toString() || "";

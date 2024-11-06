@@ -3,7 +3,7 @@ import Employee_Form from "~/components/employees/employee_form";
 import { replace, useActionData } from "@remix-run/react";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { getEmployeeFormData } from "~/utils/employee/functions.server";
-import { prisma_client } from ".server/db";
+import { prisma_client } from "~/.server/db";
 import { employeeSchema } from "~/utils/employee/validation";
 import { capitalizeFirstLetter } from "~/utils/functions";
 

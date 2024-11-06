@@ -18,6 +18,7 @@ import {
   fetchDeals,
   fetchServices,
   formatDate,
+  formatDateToISO,
   getCategoryOptions,
   getEmployeeOptions,
 } from "shared/utilityFunctions";
@@ -459,7 +460,7 @@ export default function Index() {
           name="start_date"
           aria-label="Date"
           type="date"
-          defaultValue={start_date ? formatDate(start_date) : undefined}
+          defaultValue={start_date ? formatDateToISO(start_date) : undefined}
           max={currentDate}
           className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         />

@@ -17,8 +17,7 @@ const getDealFormData = (formData: FormData) => {
     const services = formData.get("services") as string;
     const activate_from = formData.get("startDate") as string;
     const activate_till = formData.get("endDate") as string;
-    console.log(activate_from)
-    console.log(activate_till)
+    
     return {
         deal_name,
         deal_price,

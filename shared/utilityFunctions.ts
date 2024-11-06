@@ -15,6 +15,18 @@ function formatDate(input: Date | string): string {
     }).format(date);
 }
 
+function formatDateToISO(input: Date | string): string {
+    let date: Date;
+
+    if (typeof input === "string") {
+        date = new Date(input);
+    } else {
+        date = input;
+    }
+
+    return date.toISOString().split("T")[0]; // Returns YYYY-MM-DD format
+}
+
 function fetchDeals<
     T extends Pick<Deal, "deal_id" | "deal_name" | "auto_generated">,
 >(deals: T[]) {
@@ -37,15 +49,24 @@ function fetchServices<
 
 function getEmployeeOptions(employees: Employee[]) {
     return employees.map((employee) => {
-        return { value: employee.emp_id, label: `${employee.emp_fname} ${employee.emp_lname}` };
+        return {
+            value: employee.emp_id,
+            label: `${employee.emp_fname} ${employee.emp_lname}`,
+        };
     });
 }
 
-
-function getCategoryOptions(categories: Category[]){
-    return categories.map(category => {
-        return {value: category.cat_id, label: category.cat_name}
-    })
+function getCategoryOptions(categories: Category[]) {
+    return categories.map((category) => {
+        return { value: category.cat_id, label: category.cat_name };
+    });
 }
 
-export { fetchDeals, fetchServices, formatDate, getEmployeeOptions, getCategoryOptions };
+export {
+    fetchDeals,
+    fetchServices,
+    formatDate,
+    formatDateToISO,
+    getCategoryOptions,
+    getEmployeeOptions,
+};

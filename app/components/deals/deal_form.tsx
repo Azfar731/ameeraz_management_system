@@ -1,7 +1,7 @@
 import { Service } from "@prisma/client";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
 import { Form, useSubmit } from "@remix-run/react";
-import { formatDate } from "shared/utilityFunctions";
+import { formatDateToISO } from "shared/utilityFunctions";
 import Select, { OnChangeValue } from "react-select";
 import { useRef } from "react";
 export default function Deal_Form({
@@ -20,6 +20,11 @@ export default function Deal_Form({
   const submit = useSubmit();
 
   const service_options = services.map((serv) => ({
+    value: serv.serv_id,
+    label: serv.serv_name,
+  }));
+
+  const existing_services = deal?.services.map((serv) => ({
     value: serv.serv_id,
     label: serv.serv_name,
   }));
@@ -63,7 +68,7 @@ export default function Deal_Form({
         type="text"
         name="name"
         id="name"
-       pattern="^[A-Za-z0-9]+(\s[A-Za-z0-9]+)*$"
+        pattern="^[A-Za-z0-9]+(\s[A-Za-z0-9]+)*$"
         className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
         placeholder="Pedicure"
         defaultValue={deal?.deal_name}
@@ -106,9 +111,7 @@ export default function Deal_Form({
         name="startDate"
         aria-label="Date"
         type="date"
-        defaultValue={
-          deal?  formatDate(deal.activate_from) : undefined
-        }
+        defaultValue={deal ? formatDateToISO(deal.activate_from) : undefined}
         className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         required
       />
@@ -128,7 +131,9 @@ export default function Deal_Form({
         name="endDate"
         aria-label="Date"
         type="date"
-        defaultValue={deal?.activate_till? formatDate(deal.activate_till) : undefined}
+        defaultValue={
+          deal?.activate_till ? formatDateToISO(deal.activate_till) : undefined
+        }
         className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         required
       />
@@ -138,17 +143,17 @@ export default function Deal_Form({
         </h2>
       )}
       <label
-        htmlFor="services"
+        htmlFor="service_options"
         className="block text-gray-700 text-sm font-bold mt-4"
       >
         Services
       </label>
       <Select
         isMulti
-        name="services"
+        name="service_options"
         onChange={onServicesChange}
         options={service_options}
-        // defaultValue={def_services}
+        defaultValue={existing_services}
         className="basic-multi-select mt-2"
         classNamePrefix="select"
         required

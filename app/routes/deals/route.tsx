@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { prisma_client } from ".server/db";
-import { fetchActiveServices } from "~/utils/service/functions.server";
+
 import { useLoaderData, useSearchParams, Link } from "@remix-run/react";
 
 import { CompactTable } from "@table-library/react-table-library/compact";

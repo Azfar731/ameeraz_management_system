@@ -391,7 +391,7 @@ export default function Index() {
     const all_deals = [...deals, ...services];
     const employees = empRef.current?.map((emp) => emp.value);
     const categories = catRef.current?.map((cat) => cat.value);
-    if (start_date || end_date || mobile_num || employees || categories) {
+    if (start_date || end_date || mobile_num || employees.length > 0  || categories.length > 0 || all_deals.length > 0) {
       return {
         start_date,
         end_date,

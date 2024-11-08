@@ -10,4 +10,9 @@ type CategoryErrors = {
     cat_name?: string[];
 };
 
-export type { CategoryErrors, CategoryWithServices };
+
+type FormValues = {
+    [key: string]: string | string[];
+  };
+
+export type { CategoryErrors, CategoryWithServices, FormValues };

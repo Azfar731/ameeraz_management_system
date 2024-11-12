@@ -1,12 +1,17 @@
-import { Form, useLoaderData, useSearchParams } from "@remix-run/react";
+import {useState} from "react"
+import { Form, useLoaderData, useNavigate, useSearchParams, Link } from "@remix-run/react";
 import { formatDateToISO } from "shared/utilityFunctions";
 import Select, { OnChangeValue } from "react-select";
-import { getPaymentMenuOptions, setSearchParameters } from "~/utils/functions";
+import { capitalizeFirstLetter, getPaymentMenuOptions, setSearchParameters } from "~/utils/functions";
 import { useRef } from "react";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { getClientTransactions } from "~/utils/clientTransaction/db.server";
-import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation.server";
+import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation";
 import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
+import { CompactTable } from "@table-library/react-table-library/compact";
+import { useTheme } from "@table-library/react-table-library/theme";
+import { getTheme } from "@table-library/react-table-library/baseline";
+import { formatDate } from "shared/utilityFunctions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -18,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const transactions = await getClientTransactions(validationResult.data);
-  return { transactions };
+  return { transactions};
 }
 
 const FetchFormValues = (searchParams: URLSearchParams) => {
@@ -37,8 +42,8 @@ const FetchFormValues = (searchParams: URLSearchParams) => {
 export default function Client_Transactions() {
   //hooks
   const [searchParams, setSearchParams] = useSearchParams();
-  const { transactions } = useLoaderData<{ transactions: ClientTransactionWithRelations }>();
-  console.log(transactions)
+  const { transactions } = useLoaderData<{ transactions: ClientTransactionWithRelations[] }>();
+  const navigate = useNavigate()
   //references
   const payment_option_ref = useRef<{ value: string; label: string }[]>([]);
   //searchParam values
@@ -68,7 +73,7 @@ export default function Client_Transactions() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("In submit function");
+    
     const form = event.currentTarget;
     const formData = new FormData(form);
     const formValues = fetchFormValues(formData);
@@ -174,6 +179,23 @@ export default function Client_Transactions() {
           Fetch
         </button>
       </Form>
+      <div className="mt-20">
+        <Link
+          to="create"
+          className=" bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Create a new Transaction
+        </Link>
+        <div className="mt-6">
+          <CompactTable
+            columns={COLUMNS}
+            data={data}
+            theme={theme}
+            rowProps={ROW_PROPS}
+            rowOptions={ROW_OPTIONS}
+          />
+        </div>
+      </div>
 
     </div>
   );

@@ -53,6 +53,125 @@ export default function Client_Transactions() {
   //other values
   const current_date = formatDateToISO(new Date());
   let error_message = "";
+  
+  
+  //table values
+  const nodes = [...transactions];
+  const data = { nodes };
+  const [ids, setIds] = useState<string[]>([]);
+
+  const handleExpand = (item: ClientTransactionWithRelations) => {
+    if (ids.includes(item.client_transaction_id)) {
+      setIds(ids.filter((id) => id !== item.client_transaction_id));
+    } else {
+      setIds(ids.concat(item.client_transaction_id));
+    }
+  };
+
+  const ROW_PROPS = {
+    onClick: handleExpand,
+  };
+
+  const ROW_OPTIONS = {
+    renderAfterRow: (item: ClientTransactionWithRelations) => (
+      <>
+        {ids.includes(item.client_transaction_id) && (
+          <tr style={{ display: "flex", gridColumn: "1 / -1" }}>
+            <td style={{ flex: "1" }}>
+              <ul
+                style={{
+                  margin: "0",
+                  padding: "0",
+                  backgroundColor: "#e0e0e0",
+                }}
+              >
+                <li>
+                  <Link to={`/salerecord/${item.record.service_record_id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:font-semibold" >Sale Record Link</Link>
+                </li>
+                <li>
+                  <strong>Total Amount: </strong>
+                  {item.record.total_amount}
+                </li>
+                <li>
+                  <strong>Client Mobile Number: </strong>
+                  {item.record.client.client_mobile_num}
+                </li>
+                <li>
+                  <strong>Deals/Services: </strong>
+                  {item.record.deals.map((deal) => deal.deal_name).join(", ")}
+                </li>
+      
+              </ul>
+            </td>
+          </tr>
+        )}
+      </>
+    ),
+  };
+
+  const COLUMNS = [
+    {
+      label: "Date",
+      renderCell: (item: ClientTransactionWithRelations) =>
+        formatDate(item.created_at),
+    },
+    {
+      label: "Client Name",
+      renderCell: (item: ClientTransactionWithRelations) =>
+        `${item.record.client.client_fname} ${item.record.client.client_lname}`,
+    },
+    {
+      label: "Paid Amount",
+      renderCell: (item: ClientTransactionWithRelations) => item.amount_paid,
+    },
+    {
+      label: "Payment Cleared",
+      renderCell: (item: ClientTransactionWithRelations) => item.record.payment_cleared? "Yes": "No",
+    },
+    {
+      label: "Mode of Payment",
+      renderCell: (item: ClientTransactionWithRelations) =>
+        capitalizeFirstLetter(item.mode_of_payment)
+    },
+    {
+      label: "Deals/Services",
+      renderCell: (item: ClientTransactionWithRelations) =>
+        item.record.deals.map((deal) => deal.deal_name).join(", "),
+    },
+    
+    {
+      label: "Edit",
+      renderCell: (item: ClientTransactionWithRelations) => {
+        return (
+          <button
+            onClick={() => navigate(`/transactions/clientTransactions/${item.client_transaction_id}`)}
+          >
+            Edit
+          </button>
+        );
+      },
+    },
+  ];
+
+  const theme = useTheme([
+    getTheme(),
+    {
+      HeaderRow: `
+        background-color: #eaf5fd;
+      `,
+      Row: `
+        &:nth-of-type(odd) {
+          background-color: #d2e9fb;
+        }
+
+        &:nth-of-type(even) {
+          background-color: #eaf5fd;
+        }
+      `,
+    },
+  ]);
+
+  
   const fetchFormValues = (formData: FormData) => {
     const start_date: string = (formData.get("start_date") as string) || "";
     const end_date: string = (formData.get("end_date") as string) || "";
@@ -78,7 +197,6 @@ export default function Client_Transactions() {
     const formData = new FormData(form);
     const formValues = fetchFormValues(formData);
     if (!formValues) {
-      console.log("In if condition");
       error_message = "Atleast One value must be selected";
       return;
     }

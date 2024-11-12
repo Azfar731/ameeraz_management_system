@@ -1,13 +1,44 @@
-import { Form, useSearchParams } from "@remix-run/react";
+import { Form, useLoaderData, useSearchParams } from "@remix-run/react";
 import { formatDateToISO } from "shared/utilityFunctions";
 import Select, { OnChangeValue } from "react-select";
 import { getPaymentMenuOptions, setSearchParameters } from "~/utils/functions";
 import { useRef } from "react";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { getClientTransactions } from "~/utils/clientTransaction/db.server";
+import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation.server";
+import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const searchParams = new URL(request.url).searchParams;
+  const formValues = FetchFormValues(searchParams);
+
+  const validationResult = clientTransactionFetchSchema.safeParse(formValues);
+  if (!validationResult.success) {
+    return { errors: validationResult.error.flatten().fieldErrors };
+  }
+
+  const transactions = await getClientTransactions(validationResult.data);
+  return { transactions };
+}
+
+const FetchFormValues = (searchParams: URLSearchParams) => {
+  const start_date = searchParams.get("start_date") || undefined;
+  const end_date = searchParams.get("end_date") || undefined;
+  const mobile_num = searchParams.get("mobile_num") || undefined;
+  const payment_options = searchParams.get("payment_options") || undefined;
+  return {
+    start_date,
+    end_date,
+    mobile_num,
+    payment_options,
+  };
+};
 
 export default function Client_Transactions() {
   //hooks
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const { transactions } = useLoaderData<{ transactions: ClientTransactionWithRelations }>();
+  console.log(transactions)
   //references
   const payment_option_ref = useRef<{ value: string; label: string }[]>([]);
   //searchParam values
@@ -17,7 +48,6 @@ export default function Client_Transactions() {
   //other values
   const current_date = formatDateToISO(new Date());
   let error_message = "";
-  console.log("Error_message:", error_message )
   const fetchFormValues = (formData: FormData) => {
     const start_date: string = (formData.get("start_date") as string) || "";
     const end_date: string = (formData.get("end_date") as string) || "";
@@ -144,6 +174,7 @@ export default function Client_Transactions() {
           Fetch
         </button>
       </Form>
+
     </div>
   );
 }

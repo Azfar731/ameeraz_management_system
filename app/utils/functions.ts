@@ -1,12 +1,13 @@
 import { FormValues } from "./category/types";
 import { useSearchParams } from "@remix-run/react";
+import { PaymentModes } from "./types";
 
 const capitalizeFirstLetter = (str: string) => {
     if (str.length === 0) return str; // Return the string as is if it's empty
     return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const getPaymentOptions = () => {
+const getPaymentOptions = (): PaymentModes[] => {
     return ["cash", "bank_transfer", "card"];
 };
 
@@ -37,5 +38,6 @@ const setSearchParameters = (formValues: FormValues, setSearchParams: ReturnType
     setSearchParams(params);
   };
 
+  
 
 export { capitalizeFirstLetter, getPaymentMenuOptions, getPaymentOptions, setSearchParameters };

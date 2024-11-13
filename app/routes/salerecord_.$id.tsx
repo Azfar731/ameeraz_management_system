@@ -1,18 +1,20 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { prisma_client } from "~/.server/db";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import { formatDate } from "shared/utilityFunctions";
 import { generate_heading } from "~/utils/render_functions";
+import { getServiceSaleRecordFromId } from "~/utils/saleRecord/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
-  const record = await prisma_client.service_Sale_Record.findFirst({
-    where: { service_record_id: params.id },
-    include: {
-      client: true,
-      deals: true,
-      employees: { include: { employee: true } },
-      transactions: true,
-    },
+  const { id } = params;
+  if (!id) {
+    throw new Error("No id Provided in the URL");
+  }
+  const record = await getServiceSaleRecordFromId({
+    id,
+    includeClient: true,
+    includeTransactions: true,
+    includeEmployees: true,
+    includeDeals: true
   });
   if (record) {
     return { record };
@@ -64,7 +66,6 @@ export default function Record() {
 
     return rendered_transactions;
   };
- 
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 ">

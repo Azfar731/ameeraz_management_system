@@ -22,7 +22,7 @@ import {
   getCategoryOptions,
   getEmployeeOptions,
 } from "shared/utilityFunctions";
-import { ServiceSaleRecordWithRelations } from "~/utils/types";
+import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 
 export const meta: MetaFunction = () => {
   return [

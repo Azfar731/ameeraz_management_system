@@ -40,7 +40,7 @@ const getClientTransactionFromID = async (
         include: {
             record: includeRecord
                 ? {
-                    include: { deals: true, client: true },
+                    include: { deals: true, client: true, transactions: true },
                 }
                 : false,
         },

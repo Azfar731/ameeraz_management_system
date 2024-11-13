@@ -1,8 +1,9 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { prisma_client } from "~/.server/db";
-import { ServiceSaleRecordWithRelations } from "~/utils/types";
+import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import { formatDate } from "shared/utilityFunctions";
+import { generate_heading } from "~/utils/render_functions";
 export async function loader({ params }: LoaderFunctionArgs) {
   const record = await prisma_client.service_Sale_Record.findFirst({
     where: { service_record_id: params.id },
@@ -63,32 +64,7 @@ export default function Record() {
 
     return rendered_transactions;
   };
-  const generate_heading = (
-    title: string,
-    subHeading1: string,
-    subHeading2: string
-  ) => {
-    return [
-      <h2
-        key={title}
-        className="col-span-2 text-xl font-semibold text-gray-800 mt-4 border-b pb-2"
-      >
-        {title}
-      </h2>,
-      <h3
-        key={`${title} SubHeading 1`}
-        className="font-medium text-gray-600 mt-2"
-      >
-        {subHeading1}
-      </h3>,
-      <h3
-        key={`${title} SubHeading 2`}
-        className="font-medium text-gray-600 mt-2"
-      >
-        {subHeading2}
-      </h3>,
-    ];
-  };
+ 
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 ">

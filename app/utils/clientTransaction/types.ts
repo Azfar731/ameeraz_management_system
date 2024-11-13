@@ -6,6 +6,7 @@ type ClientTransactionWithRelations = Prisma.Client_TransactionGetPayload<{
             include: {
                 deals: true;
                 client: true;
+                transactions: true;
             };
         };
     };

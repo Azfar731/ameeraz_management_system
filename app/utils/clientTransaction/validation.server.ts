@@ -53,4 +53,21 @@ const clientTransactionFetchSchema = z.object({
     },
 );
 
-export { clientTransactionFetchSchema };
+
+const clientTransactionSchema = z.object({
+    amount_paid: z
+    .string()
+    .transform((amount) => parseInt(amount))
+    .refine((amount) => amount > 0, {
+        message: "Amount paid must be greater than 0",
+    }),
+    mode_of_payment: z
+    .string()
+    .refine((mode) => validPaymentModes.includes(mode as PaymentModes), {
+        message: "Invalid payment mode",
+    })
+    .transform((mode) => mode as PaymentModes), 
+
+})
+
+export { clientTransactionFetchSchema, clientTransactionSchema };

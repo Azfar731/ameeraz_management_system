@@ -3,15 +3,16 @@ import { Form } from "@remix-run/react";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import Select from "react-select";
 import { getPaymentMenuOptions } from "~/utils/functions";
+import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 export default function ClientTransaction_Form({
   service_sale_record,
-}: //   errorMessage,
-{
+  errorMessages,
+}: {
   service_sale_record: Omit<
     ServiceSaleRecordWithRelations,
     "employees" | "deals"
   >;
-  //   errorMessage?: ClientTransactionError
+  errorMessages?: ClientTransactionErrors;
 }) {
   const remaining_amount =
     service_sale_record.total_amount -
@@ -51,13 +52,22 @@ export default function ClientTransaction_Form({
         onChange={(e) => setAmountPaid(parseInt(e.target.value))}
         required
       />
+      {errorMessages?.amount_paid && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.amount_paid[0]}
+        </h2>
+      )}
       <label htmlFor="payment_mode">Mode of Payment</label>
       <Select
         options={getPaymentMenuOptions()}
         name="mode_of_payment"
         id="payment_mode"
       />
-
+      {errorMessages?.mode_of_payment && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.mode_of_payment[0]}
+        </h2>
+      )}
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"

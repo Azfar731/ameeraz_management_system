@@ -6,7 +6,6 @@ import { formatDate } from "shared/utilityFunctions";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
-import { Service } from "@prisma/client";
 import { FaExternalLinkAlt } from "react-icons/fa";
 
 export async function loader() {
@@ -16,7 +15,7 @@ export async function loader() {
 
 export default function Client_Transaction_Create_Part1() {
   const { pending_records } = useLoaderData<{
-    pending_records: ServiceSaleRecordWithRelations;
+    pending_records: ServiceSaleRecordWithRelations[];
   }>();
 
   //table values

@@ -26,10 +26,25 @@ const getClientTransactions = async ({
         },
         include: {
             record: {
-                include: {deals: true, client: true}
+                include: { deals: true, client: true },
             },
         },
     });
 };
 
-export { getClientTransactions };
+const getClientTransactionFromID = async (
+    { id, includeRecord = false }: { id: string; includeRecord?: boolean },
+) => {
+    return await prisma_client.client_Transaction.findFirst({
+        where: { client_transaction_id: id },
+        include: {
+            record: includeRecord
+                ? {
+                    include: { deals: true, client: true },
+                }
+                : false,
+        },
+    });
+};
+
+export { getClientTransactionFromID, getClientTransactions };

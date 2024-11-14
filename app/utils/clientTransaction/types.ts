@@ -12,6 +12,10 @@ type ClientTransactionWithRelations = Prisma.Client_TransactionGetPayload<{
     };
 }>;
 
+
+
+
+
 type ClientTransactionErrors = {
     amount_paid: string[];
     mode_of_payment: string[];

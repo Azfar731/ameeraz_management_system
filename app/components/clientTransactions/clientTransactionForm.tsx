@@ -2,16 +2,22 @@ import { useState } from "react";
 import { Form } from "@remix-run/react";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import Select from "react-select";
-import { getPaymentMenuOptions } from "~/utils/functions";
+import {
+  getAllPaymentMenuOptions,
+  getSinglePaymentMenyOption,
+} from "~/utils/functions";
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
+import { Client_Transaction } from "@prisma/client";
 export default function ClientTransaction_Form({
   service_sale_record,
+  transaction,
   errorMessages,
 }: {
   service_sale_record: Omit<
     ServiceSaleRecordWithRelations,
     "employees" | "deals"
   >;
+  transaction?: Client_Transaction;
   errorMessages?: ClientTransactionErrors;
 }) {
   const remaining_amount =
@@ -47,7 +53,7 @@ export default function ClientTransaction_Form({
         name="amount_paid"
         id="amount_paid"
         className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
-        value={amountPaid}
+        value={transaction?.amount_paid || amountPaid}
         min={0}
         onChange={(e) => setAmountPaid(parseInt(e.target.value))}
         required
@@ -59,9 +65,14 @@ export default function ClientTransaction_Form({
       )}
       <label htmlFor="payment_mode">Mode of Payment</label>
       <Select
-        options={getPaymentMenuOptions()}
+        options={getAllPaymentMenuOptions()}
         name="mode_of_payment"
         id="payment_mode"
+        defaultValue={
+          transaction
+            ? getSinglePaymentMenyOption(transaction.mode_of_payment)
+            : undefined
+        }
       />
       {errorMessages?.mode_of_payment && (
         <h2 className="text-red-500 font-semibold">
@@ -73,7 +84,7 @@ export default function ClientTransaction_Form({
           type="submit"
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          Create
+          {transaction ? "Update" : "Create"}
         </button>
       </div>
     </Form>

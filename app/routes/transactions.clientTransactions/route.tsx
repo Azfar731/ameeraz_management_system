@@ -1,17 +1,20 @@
-import {useState} from "react"
-import { Form, useLoaderData, useNavigate, useSearchParams, Link } from "@remix-run/react";
-import { formatDateToISO } from "shared/utilityFunctions";
-import Select, { OnChangeValue } from "react-select";
-import { capitalizeFirstLetter, getPaymentMenuOptions, setSearchParameters } from "~/utils/functions";
-import { useRef } from "react";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { getClientTransactions } from "~/utils/clientTransaction/db.server";
-import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation";
-import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
+import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { getTheme } from "@table-library/react-table-library/baseline";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
-import { formatDate } from "shared/utilityFunctions";
+import { useRef, useState } from "react";
+import { FaExternalLinkAlt, FaPlus } from "react-icons/fa";
+import Select, { OnChangeValue } from "react-select";
+import { formatDate, formatDateToISO } from "shared/utilityFunctions";
+import { getClientTransactions } from "~/utils/clientTransaction/db.server";
+import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
+import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation";
+import {
+  capitalizeFirstLetter,
+  getAllPaymentMenuOptions,
+  setSearchParameters,
+} from "~/utils/functions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -23,7 +26,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const transactions = await getClientTransactions(validationResult.data);
-  return { transactions};
+  return { transactions };
 }
 
 const FetchFormValues = (searchParams: URLSearchParams) => {
@@ -42,8 +45,10 @@ const FetchFormValues = (searchParams: URLSearchParams) => {
 export default function Client_Transactions() {
   //hooks
   const [searchParams, setSearchParams] = useSearchParams();
-  const { transactions } = useLoaderData<{ transactions: ClientTransactionWithRelations[] }>();
-  const navigate = useNavigate()
+  const { transactions } = useLoaderData<{
+    transactions: ClientTransactionWithRelations[];
+  }>();
+
   //references
   const payment_option_ref = useRef<{ value: string; label: string }[]>([]);
   //searchParam values
@@ -53,8 +58,7 @@ export default function Client_Transactions() {
   //other values
   const current_date = formatDateToISO(new Date());
   let error_message = "";
-  
-  
+
   //table values
   const nodes = [...transactions];
   const data = { nodes };
@@ -86,7 +90,14 @@ export default function Client_Transactions() {
                 }}
               >
                 <li>
-                  <Link to={`/salerecord/${item.record.service_record_id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:font-semibold" >Sale Record Link</Link>
+                  <Link
+                    to={`/salerecord/${item.record.service_record_id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:font-semibold"
+                  >
+                    Sale Record Link
+                  </Link>
                 </li>
                 <li>
                   <strong>Total Amount: </strong>
@@ -100,7 +111,6 @@ export default function Client_Transactions() {
                   <strong>Deals/Services: </strong>
                   {item.record.deals.map((deal) => deal.deal_name).join(", ")}
                 </li>
-      
               </ul>
             </td>
           </tr>
@@ -126,28 +136,29 @@ export default function Client_Transactions() {
     },
     {
       label: "Payment Cleared",
-      renderCell: (item: ClientTransactionWithRelations) => item.record.payment_cleared? "Yes": "No",
+      renderCell: (item: ClientTransactionWithRelations) =>
+        item.record.payment_cleared ? "Yes" : "No",
     },
     {
       label: "Mode of Payment",
       renderCell: (item: ClientTransactionWithRelations) =>
-        capitalizeFirstLetter(item.mode_of_payment)
+        capitalizeFirstLetter(item.mode_of_payment),
     },
     {
       label: "Deals/Services",
       renderCell: (item: ClientTransactionWithRelations) =>
         item.record.deals.map((deal) => deal.deal_name).join(", "),
     },
-    
+
     {
-      label: "Edit",
+      label: "View",
       renderCell: (item: ClientTransactionWithRelations) => {
         return (
-          <button
-            onClick={() => navigate(`/transactions/clientTransactions/${item.client_transaction_id}`)}
+          <Link
+            to={`/transactions/clientTransactions/${item.client_transaction_id}`}
           >
-            Edit
-          </button>
+            <FaExternalLinkAlt />
+          </Link>
         );
       },
     },
@@ -171,7 +182,6 @@ export default function Client_Transactions() {
     },
   ]);
 
-  
   const fetchFormValues = (formData: FormData) => {
     const start_date: string = (formData.get("start_date") as string) || "";
     const end_date: string = (formData.get("end_date") as string) || "";
@@ -192,7 +202,7 @@ export default function Client_Transactions() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
+
     const form = event.currentTarget;
     const formData = new FormData(form);
     const formValues = fetchFormValues(formData);
@@ -282,7 +292,7 @@ export default function Client_Transactions() {
           isMulti
           name="employees"
           onChange={onPaymentOptionChange}
-          options={getPaymentMenuOptions()}
+          options={getAllPaymentMenuOptions()}
           // defaultValue={def_emp}
           className="basic-multi-select mt-2"
           classNamePrefix="select"
@@ -302,7 +312,7 @@ export default function Client_Transactions() {
           to="create"
           className=" bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
         >
-          Create a new Transaction
+          Create a new Transaction <FaPlus />
         </Link>
         <div className="mt-6">
           <CompactTable
@@ -314,7 +324,6 @@ export default function Client_Transactions() {
           />
         </div>
       </div>
-
     </div>
   );
 }

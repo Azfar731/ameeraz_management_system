@@ -6,7 +6,7 @@ import { getClientTransactionFormData } from "~/utils/clientTransaction/function
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
 import { getServiceSaleRecordFromId } from "~/utils/saleRecord/db.server";
-import { getPendingAmount } from "~/utils/saleRecord/functions";
+import { getPendingAmount, updateServiceSaleRecordDateTypes } from "~/utils/saleRecord/functions";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -60,27 +60,9 @@ export default function Client_Transaction_Create_Part2() {
 
   const actionData = useActionData<{ errors: ClientTransactionErrors }>();
 
-  const updated_transaction = loaderData.service_sale_record.transactions.map(
-    (trans) => {
-      return {
-        ...trans,
-        created_at: new Date(trans.created_at),
-        modified_at: new Date(trans.modified_at),
-      };
-    }
-  );
+  
   //converting the type of Date objects
-  const service_sale_record = {
-    ...loaderData.service_sale_record,
-    created_at: new Date(loaderData.service_sale_record.created_at),
-    modified_at: new Date(loaderData.service_sale_record.modified_at),
-    client: {
-      ...loaderData.service_sale_record.client,
-      created_at: new Date(loaderData.service_sale_record.client.created_at),
-    },
-    transactions: updated_transaction,
-  };
-
+  const service_sale_record = updateServiceSaleRecordDateTypes(loaderData.service_sale_record)
   return (
     <div className="flex justify-center items-center h-screen">
       <ClientTransaction_Form

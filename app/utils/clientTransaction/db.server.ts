@@ -1,6 +1,6 @@
 import { prisma_client } from "~/.server/db";
 import { PaymentModes } from "../types";
-import { getPendingAmount } from "../saleRecord/functions";
+import { getPendingAmount } from "../saleRecord/functions.server";
 
 const getClientTransactions = async ({
     start_date,

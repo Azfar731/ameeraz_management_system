@@ -308,11 +308,11 @@ export default function Client_Transactions() {
         </button>
       </Form>
       <div className="mt-20">
-        <Link
+      <Link
           to="create"
-          className=" bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
-          Create a new Transaction <FaPlus />
+          Create Transaction <FaPlus />
         </Link>
         <div className="mt-6">
           <CompactTable

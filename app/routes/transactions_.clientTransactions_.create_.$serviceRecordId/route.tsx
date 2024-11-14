@@ -6,7 +6,8 @@ import { getClientTransactionFormData } from "~/utils/clientTransaction/function
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
 import { getServiceSaleRecordFromId } from "~/utils/saleRecord/db.server";
-import { getPendingAmount, updateServiceSaleRecordDateTypes } from "~/utils/saleRecord/functions";
+import { updateServiceSaleRecordDateTypes } from "~/utils/saleRecord/functions";
+import { getPendingAmount } from "~/utils/saleRecord/functions.server";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 
 export async function loader({ params }: LoaderFunctionArgs) {

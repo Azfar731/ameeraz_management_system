@@ -25,7 +25,7 @@ export default function ClientTransaction_Form({
     service_sale_record.transactions.reduce((sum, trans) => {
       return sum + trans.amount_paid;
     }, 0);
-  const [amountPaid, setAmountPaid] = useState(remaining_amount);
+  const [amountPaid, setAmountPaid] = useState(transaction? transaction.amount_paid  :remaining_amount);
 
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
@@ -53,7 +53,7 @@ export default function ClientTransaction_Form({
         name="amount_paid"
         id="amount_paid"
         className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
-        value={transaction?.amount_paid || amountPaid}
+        value={amountPaid}
         min={0}
         onChange={(e) => setAmountPaid(parseInt(e.target.value))}
         required

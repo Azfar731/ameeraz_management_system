@@ -1,6 +1,6 @@
 import { prisma_client } from "~/.server/db";
 import { PaymentModes } from "../types";
-import { getServiceSaleRecordFromId } from "../saleRecord/db.server";
+import { getPendingAmount } from "../saleRecord/functions";
 
 const getClientTransactions = async ({
     start_date,
@@ -55,20 +55,8 @@ const createClientTransaction = async (
         service_record_id: string;
     },
 ) => {
-    const service_sale_record = await getServiceSaleRecordFromId({
-        id: service_record_id,
-        includeTransactions: true,
-    });
-    if (!service_sale_record) {
-        throw new Error(
-            `No Service Sale Record Exists with id: ${service_record_id}`,
-        );
-    }
 
-    const new_remaining_amount = service_sale_record.total_amount -
-        (service_sale_record.transactions.reduce((sum, trans) => {
-            return sum + trans.amount_paid;
-        }, 0) + amount_paid);
+    const new_remaining_amount = (await getPendingAmount(service_record_id)) - amount_paid;
 
     const payment_cleared = new_remaining_amount === 0;
 

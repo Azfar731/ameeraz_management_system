@@ -53,21 +53,26 @@ const clientTransactionFetchSchema = z.object({
     },
 );
 
-
-const clientTransactionSchema = z.object({
-    amount_paid: z
-    .string()
-    .transform((amount) => parseInt(amount))
-    .refine((amount) => amount > 0, {
-        message: "Amount paid must be greater than 0",
-    }),
-    mode_of_payment: z
-    .string()
-    .refine((mode) => validPaymentModes.includes(mode as PaymentModes), {
-        message: "Invalid payment mode",
-    })
-    .transform((mode) => mode as PaymentModes), 
-
-})
+const clientTransactionSchema = (maxAmount: number) =>
+    z.object({
+        amount_paid: z
+            .string()
+            .transform((amount) => parseInt(amount))
+            .refine((amount) => amount > 0, {
+                message: "Amount paid must be greater than 0",
+            })
+            .refine((amount) => amount <= maxAmount, {
+                message: `Amount paid can not be greater than Pending Amount. Pending amount is ${maxAmount}`,
+            }),
+        mode_of_payment: z
+            .string()
+            .refine(
+                (mode) => validPaymentModes.includes(mode as PaymentModes),
+                {
+                    message: "Invalid payment mode",
+                },
+            )
+            .transform((mode) => mode as PaymentModes),
+    });
 
 export { clientTransactionFetchSchema, clientTransactionSchema };

@@ -6,6 +6,7 @@ import { getClientTransactionFormData } from "~/utils/clientTransaction/function
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
 import { getServiceSaleRecordFromId } from "~/utils/saleRecord/db.server";
+import { getPendingAmount } from "~/utils/saleRecord/functions";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -32,12 +33,13 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
   const formData = await request.formData();
   const formValues = getClientTransactionFormData(formData);
-  console.log("Form values: ", formValues);
-  const validationResult = clientTransactionSchema.safeParse(formValues);
+  const remaining_amount = await getPendingAmount(serviceRecordId)
+  const validationResult = clientTransactionSchema(remaining_amount).safeParse(formValues);
+  
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
-  console.log("Result: ", validationResult.data);
+  
   const new_transaction = await createClientTransaction({
     ...validationResult.data,
     service_record_id: serviceRecordId,

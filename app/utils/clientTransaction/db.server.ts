@@ -55,8 +55,8 @@ const createClientTransaction = async (
         service_record_id: string;
     },
 ) => {
-
-    const new_remaining_amount = (await getPendingAmount(service_record_id)) - amount_paid;
+    const new_remaining_amount = (await getPendingAmount(service_record_id)) -
+        amount_paid;
 
     const payment_cleared = new_remaining_amount === 0;
 
@@ -75,15 +75,43 @@ const createClientTransaction = async (
                 data: { payment_cleared: true },
             });
         }
-        
+
         return transaction;
     });
+};
 
+const updateClientTransaction = async (
+    {
+        id,
+        amount_paid,
+        mode_of_payment,
+        new_remaining_amount,
+    }: {
+        id: string;
+        amount_paid: number;
+        mode_of_payment: PaymentModes;
+        new_remaining_amount: number;
+    },
+) => {
+    const payment_cleared = new_remaining_amount - amount_paid === 0;
 
+    const updated_transaction = await prisma_client.client_Transaction.update({
+        where: { client_transaction_id: id },
+        data: {
+            amount_paid,
+            mode_of_payment,
+            record: {
+                update: { payment_cleared: payment_cleared },
+            },
+        },
+    });
+
+    return updated_transaction;
 };
 
 export {
     createClientTransaction,
     getClientTransactionFromID,
     getClientTransactions,
+    updateClientTransaction,
 };

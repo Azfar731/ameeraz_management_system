@@ -9,7 +9,7 @@ import Select, { OnChangeValue } from "react-select";
 import { formatDate, formatDateToISO } from "shared/utilityFunctions";
 import { getClientTransactions } from "~/utils/clientTransaction/db.server";
 import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
-import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation";
+import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation.server";
 import {
   capitalizeFirstLetter,
   getAllPaymentMenuOptions,

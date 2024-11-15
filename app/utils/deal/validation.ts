@@ -11,7 +11,7 @@ const dealSchema = z.object({
 
     deal_price: z
         .string()
-        .transform((value) => parseFloat(value))
+        .transform((value) => parseInt(value))
         .refine((value) => !isNaN(value) && value > 0, {
             message: "Price must be a number greater than 0.",
         }),

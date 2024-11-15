@@ -31,7 +31,7 @@ export default function Transactions() {
           Product Transactions
         </NavLink>
         <NavLink
-          to="operationalTransactions"
+          to="expenses"
           className={({ isActive }) =>
             `text-lg px-4 py-2 rounded-full transition-colors ${
               isActive

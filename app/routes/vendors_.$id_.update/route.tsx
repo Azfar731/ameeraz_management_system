@@ -3,9 +3,8 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Vendor_Form from "~/components/vendors/Vendor_Form";
 import {
-  createVendor,
-  getVendorFromId,
-  updateVendor,
+    getVendorFromId,
+    updateVendor
 } from "~/utils/vendors/db.server";
 import { getVendorFormData } from "~/utils/vendors/functions.server";
 import { VendorErrors } from "~/utils/vendors/types";

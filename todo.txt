@@ -1,8 +1,7 @@
 
 
 Next:
-Implement the check that amount paid is not greater than remaining amount in action function of client transaction
-
+Create expenses form, create and update
 
 
 Fixes:

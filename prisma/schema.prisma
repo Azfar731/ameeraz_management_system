@@ -131,7 +131,7 @@ model Product_Sale_Record {
   product_record_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   client_id String? @db.Uuid
   vendor_id String? @db.Uuid
-  status  TransactionType 
+  transaction_type  TransactionType 
   payment_cleared Boolean
   total_amount Int
   created_at DateTime @default(now())

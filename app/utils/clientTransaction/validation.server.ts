@@ -7,13 +7,21 @@ const clientTransactionFetchSchema = z.object({
     start_date: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
-        .transform((str) => new Date(str))
+        .transform((str) =>  {
+           const date =  new Date(str);
+           date.setHours(0,0,0,0)
+           return date
+        })
         .optional(),
 
     end_date: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
-        .transform((str) => new Date(str))
+        .transform((str) =>  {
+           const date =  new Date(str);
+           date.setHours(0,0,0,0)
+           return date
+        })
         .optional(),
 
     mobile_num: z
@@ -51,7 +59,11 @@ const clientTransactionFetchSchema = z.object({
         message: "End date must be greater than start date",
         path: ["end_date"],
     },
-);
+).superRefine((data) => {
+    if (!(data.start_date || data.end_date ||  data.mobile_num || data.payment_options)) {
+        data.start_date = new Date();
+    }
+});
 
 const clientTransactionSchema = (maxAmount: number) =>
     z.object({

@@ -8,13 +8,21 @@ const productSaleRecordFetchSchema = z.object({
     start_date: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
-        .transform((str) => new Date(str))
+        .transform((str) => {
+            const date = new Date(str);
+            date.setHours(0, 0, 0, 0);
+            return date;
+        })
         .optional(),
 
     end_date: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
-        .transform((str) => new Date(str))
+        .transform((str) => {
+            const date = new Date(str);
+            date.setHours(24, 59, 59, 999);
+            return date;
+        })
         .optional(),
 
     client_mobile_num: z
@@ -33,19 +41,33 @@ const productSaleRecordFetchSchema = z.object({
         )
         .optional(),
 
-    transaction_type: z
-        .array(z.string())
-        .transform((arr) => {
-            const filtered = arr.filter((item) => item.trim() !== "");
-            return filtered.length > 0 ? filtered : undefined;
+    transaction_types: z
+        .string()
+        .transform((val) => val.split("|") as TransactionType[])
+        .refine((array) => array.length > 0, {
+            message: "Transaction type can't be an empty string",
         })
+        .refine(
+            (array): array is TransactionType[] => {
+                if (array) {
+                    return array.every((val) =>
+                        validTransactionTypes.includes(val as TransactionType)
+                    );
+                } else {
+                    return true;
+                }
+            },
+            {
+                message: "Invalid Transaction Type provided",
+            },
+        )
         .optional(),
 
     products: z
-        .array(z.string())
-        .transform((arr) => {
-            const filtered = arr.filter((item) => item.trim() !== "");
-            return filtered.length > 0 ? filtered : undefined;
+        .string()
+        .transform((val) => val.split("|"))
+        .refine((array) => array.length > 0, {
+            message: "Products can't be an empty string ",
         })
         .optional(),
 }).refine(
@@ -61,15 +83,22 @@ const productSaleRecordFetchSchema = z.object({
         message: "End date must be greater than start date",
         path: ["end_date"],
     },
-);
-
+).superRefine((data) => {
+    if (
+        !(data.start_date || data.end_date || data.products ||
+            data.transaction_types || data.client_mobile_num ||
+            data.vendor_mobile_num)
+    ) {
+        data.start_date = new Date();
+        data.start_date.setHours(0, 0, 0, 0);
+    }
+});
 
 // .refine(
 //     (array): array is TransactionType[] => array?.every((val) => validTransactionTypes.includes(val)),
 //     {
 //         message: "Invalid Transaction Type provided"
-//     } 
+//     }
 // )
-
 
 export { productSaleRecordFetchSchema };

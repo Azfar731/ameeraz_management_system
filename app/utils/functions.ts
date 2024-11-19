@@ -86,7 +86,27 @@ const setSearchParameters = (
   setSearchParams(params);
 };
 
+const CreateSearchParamsString = (
+  formValues: FormValues,
+) => {
+  const params = new URLSearchParams();
 
+  // Loop over the properties of formValues and append them to params
+  for (const [key, value] of Object.entries(formValues)) {
+    if (Array.isArray(value)) {
+      if (value.length > 0) {
+        // Join array values with commas and append
+        value.forEach(val => params.set(key, val))
+      }
+    } else if (value) {
+      // Append non-empty string values
+      params.set(key, value);
+    }
+  }
+
+  // Set the search params in the URL
+  return params;
+};
 
 
 export {
@@ -97,6 +117,7 @@ export {
   setSearchParameters,
   getTransactionOptions,
   getAllTransactionMenuOptions,
-  getSingleTransactionMenuOption
+  getSingleTransactionMenuOption,
+  CreateSearchParamsString,
 
 };

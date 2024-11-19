@@ -1,6 +1,6 @@
 import { FormValues } from "./category/types";
 import { useSearchParams } from "@remix-run/react";
-import { PaymentModes } from "./types";
+import { PaymentModes, TransactionModes } from "./types";
 
 const capitalizeFirstLetter = (str: string) => {
   if (str.length === 0) return str; // Return the string as is if it's empty
@@ -32,6 +32,37 @@ const getSinglePaymentMenyOption = (mode_of_payment: PaymentModes) => {
   }
 };
 
+const getTransactionOptions = (): TransactionModes[] => {
+  return ["sold", "bought", "returned"]
+}
+
+
+const getAllTransactionMenuOptions = () => {
+  return [
+    { value: "sold", label: "Sold" },
+    { value: "bought", label: "Bought" },
+    { value: "returned", label: "Returned" },
+  ];
+};
+
+
+const getSingleTransactionMenuOption = (transaction_type: TransactionModes) => {
+  switch (transaction_type) {
+    case "sold":
+      return { value: "sold", label: "Sold" };
+    case "bought":
+      return { value: "bought", label: "Bought" };
+    case "returned":
+      return { value: "returned", label: "Returned" };
+    default:
+      throw new Error(`Unssuported Transaction Type: ${transaction_type} passed to function`)
+  }
+};
+
+
+
+
+
 const setSearchParameters = (
   formValues: FormValues,
   setSearchParams: ReturnType<typeof useSearchParams>[1],
@@ -55,10 +86,17 @@ const setSearchParameters = (
   setSearchParams(params);
 };
 
+
+
+
 export {
   capitalizeFirstLetter,
    getAllPaymentMenuOptions,
   getPaymentOptions,
   getSinglePaymentMenyOption,
   setSearchParameters,
+  getTransactionOptions,
+  getAllTransactionMenuOptions,
+  getSingleTransactionMenuOption
+
 };

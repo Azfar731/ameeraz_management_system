@@ -134,6 +134,8 @@ model Product_Sale_Record {
   status  TransactionType 
   payment_cleared Boolean
   total_amount Int
+  created_at DateTime @default(now())
+  modified_at DateTime @updatedAt
 
   client Client? @relation(fields: [client_id], references: [client_id])
   vendor Vendor? @relation(fields: [vendor_id], references: [vendor_id])
@@ -157,6 +159,8 @@ model Product_Transaction {
   record_id String @db.Uuid
   amount_paid Int
   mode_of_payment Payment 
+  created_at DateTime @default(now())
+  modified_at DateTime @updatedAt
 
   record Product_Sale_Record @relation(fields: [record_id], references: [product_record_id])
 }

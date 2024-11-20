@@ -19,7 +19,7 @@ const getAllPaymentMenuOptions = () => {
   ];
 };
 
-const getSinglePaymentMenyOption = (mode_of_payment: PaymentModes) => {
+const getSinglePaymentMenuOption = (mode_of_payment: PaymentModes) => {
   switch (mode_of_payment) {
     case "cash":
       return { value: "cash", label: "Cash" };
@@ -28,14 +28,15 @@ const getSinglePaymentMenyOption = (mode_of_payment: PaymentModes) => {
     case "bank_transfer":
       return { value: "bank_transfer", label: "Bank Transfer" };
     default:
-      throw new Error(`Unssuported Payment Mode: ${mode_of_payment} passed to function`)
+      throw new Error(
+        `Unssuported Payment Mode: ${mode_of_payment} passed to function`,
+      );
   }
 };
 
 const getTransactionOptions = (): TransactionModes[] => {
-  return ["sold", "bought", "returned"]
-}
-
+  return ["sold", "bought", "returned"];
+};
 
 const getAllTransactionMenuOptions = () => {
   return [
@@ -44,7 +45,6 @@ const getAllTransactionMenuOptions = () => {
     { value: "returned", label: "Returned" },
   ];
 };
-
 
 const getSingleTransactionMenuOption = (transaction_type: TransactionModes) => {
   switch (transaction_type) {
@@ -55,13 +55,11 @@ const getSingleTransactionMenuOption = (transaction_type: TransactionModes) => {
     case "returned":
       return { value: "returned", label: "Returned" };
     default:
-      throw new Error(`Unssuported Transaction Type: ${transaction_type} passed to function`)
+      throw new Error(
+        `Unssuported Transaction Type: ${transaction_type} passed to function`,
+      );
   }
 };
-
-
-
-
 
 const setSearchParameters = (
   formValues: FormValues,
@@ -96,7 +94,7 @@ const CreateSearchParamsString = (
     if (Array.isArray(value)) {
       if (value.length > 0) {
         // Join array values with commas and append
-        value.forEach(val => params.set(key, val))
+        value.forEach((val) => params.set(key, val));
       }
     } else if (value) {
       // Append non-empty string values
@@ -108,16 +106,14 @@ const CreateSearchParamsString = (
   return params;
 };
 
-
 export {
   capitalizeFirstLetter,
-   getAllPaymentMenuOptions,
-  getPaymentOptions,
-  getSinglePaymentMenyOption,
-  setSearchParameters,
-  getTransactionOptions,
-  getAllTransactionMenuOptions,
-  getSingleTransactionMenuOption,
   CreateSearchParamsString,
-
+  getAllPaymentMenuOptions,
+  getAllTransactionMenuOptions,
+  getPaymentOptions,
+  getSinglePaymentMenuOption,
+  getSingleTransactionMenuOption,
+  getTransactionOptions,
+  setSearchParameters,
 };

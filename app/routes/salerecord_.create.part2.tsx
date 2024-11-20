@@ -17,6 +17,8 @@ import { Client, Deal } from "@prisma/client";
 import Select, { OnChangeValue } from "react-select";
 import { FormType, MenuOption, PaymentModes } from "~/utils/types";
 import { fetchDeals, fetchServices } from "shared/utilityFunctions";
+import { findClientByMobile } from "~/utils/client/db.server";
+import { getAllPaymentMenuOptions } from "~/utils/functions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const client_mobile_num = new URL(request.url).searchParams.get("mobile_num");
@@ -25,9 +27,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       `Client with mobile number: ${client_mobile_num} does not exist`
     );
 
-  const client = await prisma_client.client.findFirst({
-    where: { client_mobile_num: client_mobile_num },
-  });
+  const client = await findClientByMobile(client_mobile_num);
   const deals = await prisma_client.deal.findMany();
 
   return { deals, client };
@@ -130,11 +130,7 @@ export default function Part2() {
 
   const service_options = fetchServices(deals);
 
-  const payment_options: { value: PaymentModes; label: string }[] = [
-    { value: "cash", label: "Cash" },
-    { value: "bank_transfer", label: "Bank transfer" },
-    { value: "card", label: "Card" },
-  ];
+  const payment_options = getAllPaymentMenuOptions() 
 
   // handle Submit function which will run when the form submits
   const submit = useSubmit();

@@ -1,4 +1,5 @@
 import { Payment, Prisma, TransactionType } from "@prisma/client";
+import { MenuOption } from "../types";
 type ProductSaleRecordWithRelations = Prisma.Product_Sale_RecordGetPayload<{
     include:{
         client: true,

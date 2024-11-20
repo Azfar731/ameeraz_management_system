@@ -30,8 +30,9 @@ export async function action({ request }: ActionFunctionArgs) {
     }
     
     // Redirect to the next part of the process
+    const searchParams = new URLSearchParams({ mobile_num, transaction_type });
+    throw replace(`../part3?${searchParams.toString()}`);
     
-    throw replace("part3");
   }
 
 

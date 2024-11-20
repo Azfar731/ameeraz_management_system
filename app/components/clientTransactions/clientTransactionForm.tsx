@@ -4,7 +4,7 @@ import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import Select from "react-select";
 import {
   getAllPaymentMenuOptions,
-  getSinglePaymentMenyOption,
+  getSinglePaymentMenuOption,
 } from "~/utils/functions";
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 import { Client_Transaction } from "@prisma/client";
@@ -25,7 +25,9 @@ export default function ClientTransaction_Form({
     service_sale_record.transactions.reduce((sum, trans) => {
       return sum + trans.amount_paid;
     }, 0);
-  const [amountPaid, setAmountPaid] = useState(transaction? transaction.amount_paid  :remaining_amount);
+  const [amountPaid, setAmountPaid] = useState(
+    transaction ? transaction.amount_paid : remaining_amount
+  );
 
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
@@ -70,7 +72,7 @@ export default function ClientTransaction_Form({
         id="payment_mode"
         defaultValue={
           transaction
-            ? getSinglePaymentMenyOption(transaction.mode_of_payment)
+            ? getSinglePaymentMenuOption(transaction.mode_of_payment)
             : undefined
         }
       />

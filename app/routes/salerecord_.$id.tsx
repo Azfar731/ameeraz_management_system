@@ -14,7 +14,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     includeClient: true,
     includeTransactions: true,
     includeEmployees: true,
-    includeDeals: true
+    includeDeals: true,
   });
   if (record) {
     return { record };
@@ -73,6 +73,8 @@ export default function Record() {
         <h1 className="text-2xl font-bold text-gray-800 mb-6 col-span-2 ">
           Service Record Details
         </h1>
+        <h3 className="font-medium text-gray-700">Date</h3>
+        <h3 className="text-gray-600">{formatDate(record.created_at)}</h3>
         <h3 className="font-medium text-gray-700">Client Name</h3>
         <h3 className="text-gray-600">{`${client.client_fname} ${client.client_lname}`}</h3>
 
@@ -82,6 +84,13 @@ export default function Record() {
         <h3 className="font-medium text-gray-700">Total Amount Charged</h3>
         <h3 className="text-gray-600">{record.total_amount}</h3>
 
+        <h3 className="font-medium text-gray-700">Remaining amount</h3>
+        <h3 className="text-gray-600">
+          {record.total_amount -   transactions.reduce(
+            (sum, transaction) => sum + transaction.amount_paid,
+            0
+          )}
+        </h3>
         {generate_heading("Deals/Services Taken", "Name", "Price")}
         {renderered_deals}
 

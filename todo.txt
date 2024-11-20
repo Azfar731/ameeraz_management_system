@@ -1,8 +1,8 @@
 
 
 Next:
-add superrefineto validation of productSale, and clientTransaction
-
+add superrefine to validation of  clientTransaction
+create view,update and create section of product sale record
 
 Fixes:
 

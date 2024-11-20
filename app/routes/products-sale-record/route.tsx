@@ -14,6 +14,7 @@ import { formatDate } from "shared/utilityFunctions";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
+import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 export async function loader({ request }: LoaderFunctionArgs) {
   const products = await getAllProducts();
   const searchParams = new URL(request.url).searchParams;
@@ -31,6 +32,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   return { products, records, errors: [] };
 }
+
+
 
 const fetchsearchParams = (searchParams: URLSearchParams) => {
   const start_date = searchParams.get("start_date") || undefined;
@@ -158,7 +161,7 @@ export default function View_Product_Sale_Record() {
       label: "Edit",
       renderCell: (item: ProductSaleRecordWithRelations) => {
         return (
-          <Link to={`/products-sale-record/${item.product_record_id}`}></Link>
+          <Link to={`/products-sale-record/${item.product_record_id}`}> <FaExternalLinkAlt /> </Link>
         );
       },
     },
@@ -192,9 +195,9 @@ export default function View_Product_Sale_Record() {
       <div className="mt-20">
         <Link
           to="create"
-          className=" bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
-          Create a new record
+          Create a new record <FaPlus/>
         </Link>
         <div className="mt-6">
           <CompactTable

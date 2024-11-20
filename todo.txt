@@ -2,7 +2,7 @@
 
 Next:
 add superrefine to validation of  clientTransaction
-create view,update and create section of product sale record
+In part3 of create form, make a pair of each product and its quantity. similar to part3 of salesrecord. 
 
 Fixes:
 

@@ -18,7 +18,10 @@ import Select, { OnChangeValue } from "react-select";
 import { FormType, MenuOption, PaymentModes } from "~/utils/types";
 import { fetchDeals, fetchServices } from "shared/utilityFunctions";
 import { findClientByMobile } from "~/utils/client/db.server";
-import { getAllPaymentMenuOptions } from "~/utils/functions";
+import {
+  getAllPaymentMenuOptions,
+  getSinglePaymentMenuOption,
+} from "~/utils/functions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const client_mobile_num = new URL(request.url).searchParams.get("mobile_num");
@@ -130,7 +133,6 @@ export default function Part2() {
 
   const service_options = fetchServices(deals);
 
-  const payment_options = getAllPaymentMenuOptions() 
 
   // handle Submit function which will run when the form submits
   const submit = useSubmit();
@@ -150,7 +152,9 @@ export default function Part2() {
       extractFormData(formData);
 
     // Determine the mode of payment
-    const mode_of_payment = getPaymentOption(payment_mode);
+    const mode_of_payment = getSinglePaymentMenuOption(
+      payment_mode as PaymentModes
+    );
 
     // Create formData object
     const formDataObj = {
@@ -186,19 +190,6 @@ export default function Part2() {
   function extractString(formData: FormData, fieldName: string): string {
     return formData.get(fieldName)?.toString() || "";
   }
-  // Helper function to get the selected payment option
-  function getPaymentOption(payment_mode: string) {
-    const default_payment = payment_options[0]; // default is {value: cash, label: Cash}
-
-    if (["cash", "bank_transfer", "card"].includes(payment_mode)) {
-      const selectedOption = payment_options.find(
-        (opt) => opt.value === payment_mode
-      );
-      return selectedOption ? selectedOption : default_payment;
-    }
-
-    return default_payment;
-  }
 
   const GoToPrevPage = () => {
     const form = formRef.current;
@@ -215,8 +206,10 @@ export default function Part2() {
       extractFormData(pageFormData);
 
     // Determine the mode of payment
-    const mode_of_payment = getPaymentOption(payment_mode);
 
+    const mode_of_payment = getSinglePaymentMenuOption(
+      payment_mode as PaymentModes
+    );
     // Create formData object
     const formDataObj = {
       deals,
@@ -375,7 +368,7 @@ export default function Part2() {
         )}
         <label htmlFor="payment_mode">Mode of Payment</label>
         <Select
-          options={payment_options}
+          options={getAllPaymentMenuOptions()}
           name="mode_of_payment"
           id="payment_mode"
           defaultValue={formData.mode_of_payment}

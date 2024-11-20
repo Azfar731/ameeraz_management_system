@@ -10,8 +10,7 @@ const capitalizeFirstLetter = (str: string) => {
 const getPaymentOptions = (): PaymentModes[] => {
   return ["cash", "bank_transfer", "card"];
 };
-
-const getAllPaymentMenuOptions = () => {
+const getAllPaymentMenuOptions = (): { value: PaymentModes, label: string }[] => {
   return [
     { value: "cash", label: "Cash" },
     { value: "bank_transfer", label: "Bank Transfer" },
@@ -19,7 +18,7 @@ const getAllPaymentMenuOptions = () => {
   ];
 };
 
-const getSinglePaymentMenuOption = (mode_of_payment: PaymentModes) => {
+const getSinglePaymentMenuOption = (mode_of_payment: PaymentModes): {value: PaymentModes, label: string} => {
   switch (mode_of_payment) {
     case "cash":
       return { value: "cash", label: "Cash" };

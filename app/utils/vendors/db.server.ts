@@ -87,10 +87,17 @@ const deleteVendor = async ({ vendor_id }: { vendor_id: string }) => {
     });
 };
 
+const findVendorByMobileNumber = async (mobile_num: string) => {
+    return await prisma_client.vendor.findFirst({
+        where: { vendor_mobile_num: mobile_num },
+    });
+};
+
 export {
     createVendor,
     deleteVendor,
     fetchVendors,
+    findVendorByMobileNumber,
     getAllVendors,
     getVendorFromId,
     updateVendor,

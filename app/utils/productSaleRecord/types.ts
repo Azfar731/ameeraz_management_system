@@ -1,5 +1,4 @@
-import { Prisma } from "@prisma/client";
-
+import { Payment, Prisma, TransactionType } from "@prisma/client";
 type ProductSaleRecordWithRelations = Prisma.Product_Sale_RecordGetPayload<{
     include:{
         client: true,
@@ -13,6 +12,17 @@ type ProductSaleRecordWithRelations = Prisma.Product_Sale_RecordGetPayload<{
     }
 }>
 
+
+type ProductSaleRecordCreateFormType = {
+    amount_charged: number;
+    amount_paid: number;
+    mobile_num: string;
+    transaction_type: TransactionType;
+    products: string[];
+    mode_of_payment: Payment;
+}
+
+
 type ProductSaleRecordFetchErrors = {
     start_date: string[];
     end_date: string[];
@@ -23,4 +33,4 @@ type ProductSaleRecordFetchErrors = {
 }
 
 
-export type {ProductSaleRecordWithRelations, ProductSaleRecordFetchErrors}
+export type { ProductSaleRecordCreateFormType, ProductSaleRecordFetchErrors, ProductSaleRecordWithRelations };

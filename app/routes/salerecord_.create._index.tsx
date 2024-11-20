@@ -5,8 +5,9 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
-import { prisma_client } from "~/.server/db";
+
 import { FormType } from "~/utils/types";
+import { findClientByMobile } from "~/utils/client/db.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -27,11 +28,8 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 //helper functions
-async function findClientByMobile(mobile_num: string) {
-  return prisma_client.client.findFirst({
-    where: { client_mobile_num: mobile_num },
-  });
-}
+
+
 
 export default function Part1() {
   const actionData = useActionData<{ msg: string }>();

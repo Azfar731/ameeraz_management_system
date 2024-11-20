@@ -66,7 +66,7 @@ const getProductSaleRecords = async ({
 // Fetch a single product sale record by ID
 const getProductSaleRecordById = async ({
   id,
-  includeRelations = true,
+  includeRelations = false,
 }: {
   id: string;
   includeRelations?: boolean;

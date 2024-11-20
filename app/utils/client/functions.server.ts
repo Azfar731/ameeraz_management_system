@@ -30,4 +30,5 @@ const fetchClientFromId = async (
     return client;
 };
 
-export { fetchClientFromId, getClientFormData };
+
+export { fetchClientFromId,  getClientFormData };

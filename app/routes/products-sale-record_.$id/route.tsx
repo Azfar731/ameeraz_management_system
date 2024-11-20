@@ -10,7 +10,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Error("Product sale record ID is required");
   }
-  const productSaleRecord = await getProductSaleRecordById(id);
+  const productSaleRecord = await getProductSaleRecordById({id,includeRelations: true});
   if (!productSaleRecord) {
     throw new Error("Product sale record not found");
   }

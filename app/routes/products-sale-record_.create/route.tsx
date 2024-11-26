@@ -10,6 +10,7 @@ export default function Product_Sale_Record_Create() {
     mobile_num: "",
     transaction_type: "sold",
     products: [],
+    products_quantity: [],
     mode_of_payment: "cash",
   });
 

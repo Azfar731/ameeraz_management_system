@@ -1,5 +1,5 @@
 import { Payment, Prisma, TransactionType } from "@prisma/client";
-import { MenuOption } from "../types";
+
 type ProductSaleRecordWithRelations = Prisma.Product_Sale_RecordGetPayload<{
     include:{
         client: true,
@@ -20,6 +20,7 @@ type ProductSaleRecordCreateFormType = {
     mobile_num: string;
     transaction_type: TransactionType;
     products: string[];
+    products_quantity: { product_id: string, quantity: number }[];
     mode_of_payment: Payment;
 }
 

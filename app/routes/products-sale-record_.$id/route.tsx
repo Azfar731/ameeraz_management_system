@@ -10,7 +10,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Error("Product sale record ID is required");
   }
-  const productSaleRecord = await getProductSaleRecordById({id,includeRelations: true});
+  const productSaleRecord = await getProductSaleRecordById({
+    id,
+    includeRelations: true,
+  });
   if (!productSaleRecord) {
     throw new Error("Product sale record not found");
   }
@@ -84,26 +87,25 @@ export default function View_Product_Sale_Record() {
             <h3 className="text-gray-600">{vendor.vendor_mobile_num}</h3>
           </>
         )}
-        <h3 className="font-medium text-gray-700">{productSaleRecord.transaction_type == "sold" ? "Total Amount Charged": "Total amount Paid"}</h3>
+        <h3 className="font-medium text-gray-700">
+          {productSaleRecord.transaction_type == "sold"
+            ? "Total Amount Charged"
+            : "Total amount Paid"}
+        </h3>
         <h3 className="text-gray-600">{productSaleRecord.total_amount}</h3>
 
         <h3 className="font-medium text-gray-700">Remaining Amount</h3>
         <h3 className="text-gray-600">
-          {productSaleRecord.total_amount - transactions.reduce(
-            (sum, transaction) => sum + transaction.amount_paid,
-            0
-          )}
+          {productSaleRecord.total_amount -
+            transactions.reduce(
+              (sum, transaction) => sum + transaction.amount_paid,
+              0
+            )}
         </h3>
         {generate_heading("Products", "Name", "Price")}
         {renderered_products}
         {generate_heading("Transactions", "Date", "Amount Paid")}
         {render_transactions()}
-        <Link
-          to="/products-sale-record"
-          className="text-blue-500 hover:text-blue-700 underline underline-offset-2 font-medium transition duration-300 col-span-2 pt-8"
-        >
-          Go Back to Home
-        </Link>
       </div>
     </div>
   );

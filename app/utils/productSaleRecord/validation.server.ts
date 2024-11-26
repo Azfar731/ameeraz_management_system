@@ -110,6 +110,10 @@ const productSaleRecordSchema = z.object({
     ),
 
     mode_of_payment: z.enum(["cash", "bank_transfer", "card"]),
+})
+.refine((data) => data.amount_paid <= data.amount_charged, {
+    message: "Amount paid must be less than or equal to amount charged",
+    path: ["amount_paid"],
 });
 
 export { productSaleRecordFetchSchema, productSaleRecordSchema };

@@ -94,15 +94,22 @@ const productSaleRecordFetchSchema = z.object({
     }
 });
 
-// .refine(
-//     (array): array is TransactionType[] => array?.every((val) => validTransactionTypes.includes(val)),
-//     {
-//         message: "Invalid Transaction Type provided"
-//     }
-// )
+const productSaleRecordSchema = z.object({
+    amount_charged: z.number().nonnegative(),
+    amount_paid: z.number().nonnegative(),
+    mobile_num: z
+        .string()
+        .regex(/^0\d{10}$/, "Mobile number must be 11 digits and start with 0."),
+    transaction_type: z.enum(["sold", "bought", "returned"]),
 
+    products_quantity: z.array(
+        z.object({
+            product_id: z.string(),
+            quantity: z.number().positive(),
+        }),
+    ),
 
+    mode_of_payment: z.enum(["cash", "bank_transfer", "card"]),
+});
 
-
-
-export { productSaleRecordFetchSchema };
+export { productSaleRecordFetchSchema, productSaleRecordSchema };

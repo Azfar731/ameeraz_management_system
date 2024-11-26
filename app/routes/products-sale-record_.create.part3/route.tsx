@@ -1,13 +1,15 @@
-import { Client, Product, Vendor } from "@prisma/client";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { Client, Payment, Product, Vendor } from "@prisma/client";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+
 import {
   Form,
+  replace,
   useLoaderData,
   useNavigate,
   useOutletContext,
   useSubmit,
 } from "@remix-run/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import { findClientByMobile } from "~/utils/client/db.server";
 import {
@@ -15,14 +17,16 @@ import {
   getSinglePaymentMenuOption,
 } from "~/utils/functions";
 import { getAllProducts } from "~/utils/products/db.server";
+import { createProductSaleRecord } from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
+import { productSaleRecordSchema } from "~/utils/productSaleRecord/validation.server";
 import { findVendorByMobileNumber } from "~/utils/vendors/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
   const mobile_num = searchParams.get("mobile_num");
-  if (!mobile_num)
-    throw new Error(`Client with mobile number: ${mobile_num} does not exist`);
+  if (!mobile_num) throw new Error(`Mobile number not provided in URL`);
+
   const transaction_type = searchParams.get("transaction_type");
   if (!transaction_type) {
     throw new Error(`Transaction type is required`);
@@ -31,13 +35,34 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let vendor;
   if (transaction_type === "bought") {
     vendor = await findVendorByMobileNumber(mobile_num);
+    if (!vendor) {
+      throw new Error(`Vendor with mobile number ${mobile_num} not found`);
+    }
   } else {
     client = await findClientByMobile(mobile_num);
+    if (!client)
+      throw new Error(`Client with mobile number ${mobile_num} not found`);
   }
   const products = await getAllProducts();
 
   return { products, client, vendor };
 }
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const data: ProductSaleRecordCreateFormType = await request.json();
+
+  console.log("Form Data:", data);
+
+  // Process the form data here
+  const validationResult = productSaleRecordSchema.safeParse(data);
+  if (!validationResult.success) {
+    return { errors: validationResult.error.flatten().fieldErrors };
+  }
+  // Save the data to the database
+  const record = await createProductSaleRecord(validationResult.data);
+
+  throw replace(`/products-sale-record/${record.product_record_id}`);
+};
 
 export default function Product_Sale_Record_Create_Part3() {
   const { products, client, vendor } = useLoaderData<{
@@ -54,8 +79,11 @@ export default function Product_Sale_Record_Create_Part3() {
       React.SetStateAction<ProductSaleRecordCreateFormType>
     >;
   }>();
-
+  const [productsQuantity, setProductsQuantity] = useState<
+    { product_id: string; quantity: number }[]
+  >(globalFormData.products_quantity);
   const formRef = useRef<HTMLFormElement>(null);
+  const isFirstRender = useRef(true);
   const product_options = products.map((product) => ({
     value: product.prod_id,
     label: product.prod_name,
@@ -65,57 +93,134 @@ export default function Product_Sale_Record_Create_Part3() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-
+    const payment_mode = formData.get("mode_of_payment")?.toString() || "";
     // Prepare form data
-    const formDatalocal = { ...globalFormData, ...formData };
+    const formDatalocal = {
+      ...globalFormData,
+      amount_charged: amounts.amountCharged,
+      amount_paid: amounts.amountPaid,
+      products_quantity: productsQuantity,
+      mode_of_payment: payment_mode as Payment,
+    };
     console.log("Final form data: ", formDatalocal);
 
     // Submit form
     submit(formDatalocal, { method: "post", encType: "application/json" });
   };
 
-  function extractFormData(formData: FormData) {
-    const amount_charged = Number(formData.get("amount_charged"));
-    const amount_paid = Number(formData.get("amount_paid"));
-    const quantity = Number(formData.get("quantity"));
-    const payment_mode = formData.get("mode_of_payment")?.toString() || "";
-    const products = formData
-      .getAll("products")
-      .map((prod_id) => prod_id.toString());
-    return { amount_charged, amount_paid, payment_mode, products, quantity };
-  }
-
   const GoToPrevPage = () => {
     const form = formRef.current;
     if (!form) return;
     const pageFormData = new FormData(form);
-    const formDataObj = extractFormData(pageFormData);
-    setFormData((prev) => ({ ...prev, ...formDataObj }));
+    const payment_mode = pageFormData.get("mode_of_payment")?.toString() || "";
+    // const formDataObj = extractFormData(pageFormData);
+    setFormData((prev) => ({
+      ...prev,
+      amount_charged: amounts.amountCharged,
+      amount_paid: amounts.amountPaid,
+      products_quantity: productsQuantity,
+      mode_of_payment: payment_mode as Payment,
+    }));
     navigate("/products-sale-record/create/part2");
   };
 
   //values for maninting amount state
   const [amounts, setAmounts] = useState({
     expectedAmount: 0,
-    amountCharged: 0,
-    amountPaid: 0,
+    amountCharged: globalFormData.amount_charged || 0,
+    amountPaid: globalFormData.amount_paid || 0,
   });
-  
+
   const onProductsChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
   ) => {
-    let tmp = 0;
-    newValue.forEach((entry) => {
-      const product = products.find((p) => p.prod_id === entry.value);
-      if (product) {
-        tmp += product.prod_price;
-      }
+    setProductsQuantity((prev) => {
+      //remove any deleted entries
+      const tmp = prev.filter((entry) => {
+        return newValue.find((p) => p.value === entry.product_id);
+      });
+      //add any new entries
+      return newValue.map((entry) => {
+        const prod_quantity_pair = tmp.find(
+          (p) => p.product_id === entry.value
+        );
+        return prod_quantity_pair
+          ? prod_quantity_pair
+          : { product_id: entry.value, quantity: 1 };
+      });
     });
-    setAmounts((prev) => ({ ...prev, expectedAmount: tmp }));
   };
 
+  const OnProductQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProductsQuantity((prev) =>
+      prev.map((prod) =>
+        prod.product_id === name ? { ...prod, quantity: Number(value) } : prod
+      )
+    );
+  };
+  const renderProductsQuantity = productsQuantity.map((prod, index) => {
+    return (
+      <div
+        key={prod.product_id}
+        className="mt-4 w-full flex justify-between items-center"
+      >
+        <label
+          htmlFor={`Prod-${index}`}
+          className="text-gray-700 text-sm font-bold mb-2 pr-4 w-1/3"
+        >
+          {}
+          {
+            products.find((product) => product.prod_id === prod.product_id)
+              ?.prod_name
+          }
+        </label>
+        <input
+          type="number"
+          id={`Prod-${index}`}
+          name={prod.product_id}
+          min={1}
+          defaultValue={prod.quantity}
+          onChange={OnProductQuantityChange}
+          required
+          placeholder="2"
+          className="px-3 py-2 border border-gray-300 rounded-md mb-4 w-2/3"
+        />
+      </div>
+    );
+  });
+
+  useEffect(() => {
+    const expectedAmount = productsQuantity.reduce((acc, curr) => {
+      const product = products.find((p) => p.prod_id === curr.product_id);
+      if (!product) {
+        throw new Error(`Product with id: ${curr.product_id} not found`);
+      }
+      return acc + product.prod_price * curr.quantity;
+    }, 0);
+    if (isFirstRender.current) {
+      setAmounts({
+        expectedAmount,
+        amountCharged: globalFormData.amount_charged || expectedAmount,
+        amountPaid: globalFormData.amount_paid || expectedAmount,
+      });
+      isFirstRender.current = false;
+    } else {
+      setAmounts({
+        expectedAmount,
+        amountCharged: expectedAmount,
+        amountPaid: expectedAmount,
+      });
+    }
+  }, [
+    productsQuantity,
+    products,
+    globalFormData.amount_charged,
+    globalFormData.amount_paid,
+  ]);
+
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-full m-4 overflow-hidden">
       <Form
         method="post"
         onSubmit={handleSubmit}
@@ -168,17 +273,20 @@ export default function Product_Sale_Record_Create_Part3() {
           name="products"
           options={product_options}
           onChange={onProductsChange}
-          defaultValue={globalFormData.products.map((id) => {
-            const product = products.find((p) => p.prod_id === id);
+          defaultValue={globalFormData.products_quantity.map((entry) => {
+            const product = products.find(
+              (p) => p.prod_id === entry.product_id
+            );
             if (!product) {
-              throw new Error(`Product with id: ${id} not found`);
+              throw new Error(`Product with id: ${entry.product_id} not found`);
             }
             return { value: product.prod_id, label: product.prod_name };
           })}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
         />
-        
+
+        {renderProductsQuantity}
 
         <div className="text-gray-700 mb-4">
           Expected Total Amount: {amounts.expectedAmount}

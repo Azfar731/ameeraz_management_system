@@ -4,6 +4,8 @@ Next:
 add superrefine to validation of  clientTransaction
 In part3 of create form, make a pair of each product and its quantity. similar to part3 of salesrecord. 
 
+Review everything related to product in part3 of the form.
+
 Fixes:
 
 

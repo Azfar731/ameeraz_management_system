@@ -141,27 +141,48 @@ const createProductSaleRecord = async ({
 // Update an existing product sale record
 const updateProductSaleRecord = async ({
   id,
-  client_id,
-  vendor_id,
+  mobile_num,
   transaction_type,
-  payment_cleared,
   total_amount,
+  isClient,
+  products_quantity,
 }: {
   id: string;
-  client_id?: string;
-  vendor_id?: string;
-  transaction_type?: TransactionType;
-  payment_cleared?: boolean;
-  total_amount?: number;
+  mobile_num: string;
+  transaction_type: TransactionType;
+  total_amount: number;
+  isClient: boolean;
+  products_quantity: { product_id: string; quantity: number }[];
 }) => {
+  const transactions = await prisma_client.product_Transaction.findMany({ where: { record_id: id } });
+  const paid_amount = transactions.reduce((acc, transaction) => acc + transaction.amount_paid, 0);
   return await prisma_client.product_Sale_Record.update({
     where: { product_record_id: id },
     data: {
-      client_id,
-      vendor_id,
+      client: isClient ? { connect: { client_mobile_num: mobile_num } } : undefined,
+      vendor: !isClient ? { connect: { vendor_mobile_num: mobile_num } } : undefined,
       transaction_type,
-      payment_cleared,
+      payment_cleared: paid_amount === total_amount,
       total_amount,
+      products: {
+        upsert: products_quantity.map((product) => ({
+          where: { record_id_prod_id: { record_id: id, prod_id: product.product_id } },
+          update: { 
+            quantity: product.quantity,
+            product: {
+              update: {
+                quantity: transaction_type === "sold"
+                  ? { decrement: product.quantity }
+                  : { increment: product.quantity },
+              },
+            },
+          },
+          create: {
+            product: { connect: { prod_id: product.product_id } },
+            quantity: product.quantity,
+          },
+        })),
+      },
     },
   });
 };

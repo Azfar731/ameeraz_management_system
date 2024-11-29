@@ -6,7 +6,7 @@ const getAllProducts = async () => {
 };
 
 const getProductFromId = async (
-    { id, includeRelations = false }: {
+    { id, includeRelations = false } : {
         id: string;
         includeRelations?: boolean;
     },

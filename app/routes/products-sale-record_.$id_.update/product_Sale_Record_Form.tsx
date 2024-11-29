@@ -6,13 +6,20 @@ import {
   getAllTransactionMenuOptions,
   getSingleTransactionMenuOption,
 } from "~/utils/functions";
-import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
+import {
+  ProductSaleRecordUpdateErrors,
+  ProductSaleRecordWithRelations,
+} from "~/utils/productSaleRecord/types";
+import { SerializeFrom } from "@remix-run/node";
+
 export default function Product_Sale_Record_Form({
   record,
   products,
+  errorMessages,
 }: {
-  record: Omit<ProductSaleRecordWithRelations, "transactions">;
+  record: SerializeFrom<Omit<ProductSaleRecordWithRelations, "transactions">>;
   products: Product[];
+  errorMessages?: ProductSaleRecordUpdateErrors;
 }) {
   const submit = useSubmit();
   const { products: products_record, client, vendor } = record;
@@ -58,6 +65,15 @@ export default function Product_Sale_Record_Form({
     });
   };
 
+  const OnProductQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProductsQuantity((prev) =>
+      prev.map((prod) =>
+        prod.product_id === name ? { ...prod, quantity: Number(value) } : prod
+      )
+    );
+  };
+
   const renderProductsQuantity = productsQuantity.map((prod, index) => {
     return (
       <div
@@ -89,15 +105,6 @@ export default function Product_Sale_Record_Form({
     );
   });
 
-  const OnProductQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setProductsQuantity((prev) =>
-      prev.map((prod) =>
-        prod.product_id === name ? { ...prod, quantity: Number(value) } : prod
-      )
-    );
-  };
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -109,7 +116,7 @@ export default function Product_Sale_Record_Form({
       transaction_type: formData.get("transaction_type")?.toString() || "",
       total_amount: formData.get("amount_charged")?.toString() || "0",
       products_quantity: productsQuantity,
-      mode_of_payment: formData.get("mode_of_payment")?.toString() || "",
+      isClient: client ? true : false,
     };
     console.log("Final form data: ", dataObject);
 
@@ -141,7 +148,11 @@ export default function Product_Sale_Record_Form({
           required
         />
       </>
-
+      {errorMessages?.mobile_num && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.mobile_num[0]}
+        </h2>
+      )}
       <label
         htmlFor="products"
         className="block text-gray-700 text-sm font-bold mb-2"
@@ -165,7 +176,11 @@ export default function Product_Sale_Record_Form({
       />
 
       {renderProductsQuantity}
-
+      {errorMessages?.products_quantity && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.products_quantity[0]}
+        </h2>
+      )}
       <div className="text-gray-700 mb-4">
         Expected Total Amount: {expectedAmount}
       </div>
@@ -185,7 +200,11 @@ export default function Product_Sale_Record_Form({
         min={0}
         required
       />
-
+      {errorMessages?.total_amount && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.total_amount[0]}
+        </h2>
+      )}
       <label
         htmlFor="transaction_type"
         className="block text-gray-700 text-sm font-bold mb-2"
@@ -193,7 +212,13 @@ export default function Product_Sale_Record_Form({
         Transaction Type
       </label>
       <Select
-        options={getAllTransactionMenuOptions()}
+        options={getAllTransactionMenuOptions().filter((type) => {
+          if (client) {
+            return type.value === "sold" || type.value === "returned";
+          } else {
+            return type.value === "bought" || type.value === "returned";
+          }
+        })}
         name="transaction_type"
         id="transaction_type"
         defaultValue={getSingleTransactionMenuOption(record.transaction_type)}
@@ -202,7 +227,13 @@ export default function Product_Sale_Record_Form({
         required
       />
 
-      <div className="flex justify-between items-center mt-6">
+      {errorMessages?.transaction_type && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.transaction_type[0]}
+        </h2>
+      )}
+     
+      <div className="flex justify-center items-center mt-6">
         <button
           type="submit"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

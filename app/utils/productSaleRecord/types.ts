@@ -32,8 +32,17 @@ type ProductSaleRecordFetchErrors = {
     vendor_mobile_num: string[];
 };
 
+type ProductSaleRecordUpdateErrors = {
+    total_amount: string[];
+
+    mobile_num: string[];
+    transaction_type: string[];
+    products_quantity: string[];
+};
+
 export type {
     ProductSaleRecordCreateFormType,
     ProductSaleRecordFetchErrors,
+    ProductSaleRecordUpdateErrors,
     ProductSaleRecordWithRelations,
 };

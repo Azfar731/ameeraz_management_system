@@ -2,9 +2,14 @@
 
 Next:
 add superrefine to validation of  clientTransaction
-In part3 of create form, make a pair of each product and its quantity. similar to part3 of salesrecord. 
+integrate form into product sale update
 
-Review everything related to product in part3 of the form.
+if transaction type is returned in create form, ask for whether the transaction is for a client or vendor in part2.
+
+Instead of editing product_sale_record, just delete it and other related entries and create a new one.
+
+Provide limited options in product_sale_record update.
+
 
 Fixes:
 
@@ -14,5 +19,6 @@ Improvements:
 Services:
 1. save search parameters when going from "/services" to "/services/$id"
 2. Disable buttons while form is submitting
+3. Figure out how to provide data to refine function messages in zod
 
 

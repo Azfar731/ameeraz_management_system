@@ -4,7 +4,7 @@ import { formatDate } from "shared/utilityFunctions";
 import { getProductSaleRecordById } from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import { generate_heading } from "~/utils/render_functions";
-import { FaLongArrowAltLeft } from "react-icons/fa";
+import { FaLongArrowAltLeft, FaEdit } from "react-icons/fa";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -106,6 +106,12 @@ export default function View_Product_Sale_Record() {
         {renderered_products}
         {generate_heading("Transactions", "Date", "Amount Paid")}
         {render_transactions()}
+        <Link
+          to={`update`}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        >
+          Edit <FaEdit />
+        </Link>
       </div>
     </div>
   );

@@ -103,39 +103,59 @@ const createProductSaleRecord = async ({
   mode_of_payment: Payment;
   products_quantity: { product_id: string; quantity: number }[];
 }) => {
-  return await prisma_client.product_Sale_Record.create({
-    data: {
-      client: transaction_type === "sold" || transaction_type === "returned"
-        ? {
-          connect: { client_mobile_num: mobile_num },
-        }
-        : undefined,
-      vendor: transaction_type === "bought"
-        ? {
-          connect: { vendor_mobile_num: mobile_num },
-        }
-        : undefined,
-      transaction_type,
-      payment_cleared: amount_charged === amount_paid,
-      total_amount: amount_charged,
-      transactions: {
-        create: [
-          {
-            mode_of_payment,
-            amount_paid,
-          },
-        ],
+  return await prisma_client.$transaction(async (prisma) => {
+    // Step 1: Create the product sale record and connect products
+    const productSaleRecord = await prisma.product_Sale_Record.create({
+      data: {
+        client: transaction_type === "sold" || transaction_type === "returned"
+          ? {
+              connect: { client_mobile_num: mobile_num },
+            }
+          : undefined,
+        vendor: transaction_type === "bought"
+          ? {
+              connect: { vendor_mobile_num: mobile_num },
+            }
+          : undefined,
+        transaction_type,
+        payment_cleared: amount_charged === amount_paid,
+        total_amount: amount_charged,
+        transactions: {
+          create: [
+            {
+              mode_of_payment,
+              amount_paid,
+            },
+          ],
+        },
+        products: {
+          create: products_quantity.map((product) => ({
+            product: {
+              connect: { prod_id: product.product_id },
+            },
+            quantity: product.quantity,
+          })),
+        },
       },
-      products: {
-        create: products_quantity.map((product) => ({
-          product: {
-            connect: { prod_id: product.product_id },
+    });
+  
+    // Step 2: Update product quantities based on the transaction type
+    await Promise.all(
+      products_quantity.map((product) =>
+        prisma.product.update({
+          where: { prod_id: product.product_id },
+          data: {
+            quantity: transaction_type === "sold"
+              ? { decrement: product.quantity }
+              : { increment: product.quantity },
           },
-          quantity: product.quantity,
-        })),
-      },
-    },
+        })
+      )
+    );
+  
+    return productSaleRecord; // Return the created product sale record
   });
+  
 };
 
 // Update an existing product sale record

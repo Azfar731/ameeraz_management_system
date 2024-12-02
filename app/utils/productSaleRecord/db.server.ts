@@ -187,7 +187,7 @@ const updateProductSaleRecord = async ({
         prisma.product.update({
           where: { prod_id: product_record.prod_id },
           data: {
-            quantity: transaction_type === "sold"
+            quantity: oldProductSaleRecord.transaction_type === "sold" || (oldProductSaleRecord.transaction_type === "returned" && !isClient)
               ? { increment: product_record.quantity }
               : { decrement: product_record.quantity },
           },
@@ -229,7 +229,7 @@ const updateProductSaleRecord = async ({
               quantity: product.quantity,
               product: {
                 update: {
-                  quantity: transaction_type === "sold"
+                  quantity: transaction_type === "sold" || (transaction_type === "returned" && !isClient)
                     ? { decrement: product.quantity }
                     : { increment: product.quantity },
                 },

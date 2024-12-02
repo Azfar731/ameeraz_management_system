@@ -3,7 +3,10 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import { printZodErrors } from "~/utils/functions.server";
 import { getAllProducts } from "~/utils/products/db.server";
-import { getProductSaleRecordById, getProductSaleRecordByIdWithRelations, updateProductSaleRecord } from "~/utils/productSaleRecord/db.server";
+import {
+  getProductSaleRecordByIdWithRelations,
+  updateProductSaleRecord
+} from "~/utils/productSaleRecord/db.server";
 import {
   ProductSaleRecordUpdateErrors,
   ProductSaleRecordWithRelations,
@@ -16,7 +19,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Error("Product sale record ID is required");
   }
   const productSaleRecord = await getProductSaleRecordByIdWithRelations({
-    id
+    id,
   });
   if (!productSaleRecord) {
     throw new Error("Product sale record not found");
@@ -36,33 +39,36 @@ type ActionDataObject = {
   isClient: boolean;
 };
 
-export async function action({ request,params }: ActionFunctionArgs) {
-  const {id} = params; 
-  if(!id){
+export async function action({ request, params }: ActionFunctionArgs) {
+  const { id } = params;
+  if (!id) {
     throw new Error("Product sale record ID is required");
   }
   const oldProductSaleRecord = await getProductSaleRecordByIdWithRelations({
-    id
-   
+    id,
   });
   if (!oldProductSaleRecord) {
     throw new Error("Product sale record not found");
   }
   const data = (await request.json()) as ActionDataObject;
   console.log("Data", data);
-  
-  const validationResult = await ProductSaleRecordUpdateSchema(oldProductSaleRecord as ProductSaleRecordWithRelations).safeParseAsync({...data,id});
+
+  const validationResult = await ProductSaleRecordUpdateSchema(
+    oldProductSaleRecord
+  ).safeParseAsync({ ...data, id });
   if (!validationResult.success) {
-    console.log("New errors found")
+    console.log("New errors found");
     const errors = validationResult.error.flatten().fieldErrors;
     printZodErrors(errors);
     return { errors };
   }
 
   //update the product sale record
-  await updateProductSaleRecord({...validationResult.data, id, oldProductSaleRecord });
-
-  
+  await updateProductSaleRecord({
+    ...validationResult.data,
+    id,
+    oldProductSaleRecord,
+  });
 
   throw replace(`/products-sale-record/${id}`);
 }

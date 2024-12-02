@@ -1,9 +1,8 @@
-import { Product_Sale_Record, TransactionType } from "@prisma/client";
+import { TransactionType } from "@prisma/client";
 import { z } from "zod";
 import { getTransactionOptions } from "../functions";
 import { findClientByMobile } from "../client/db.server";
 import { findVendorByMobileNumber } from "../vendors/db.server";
-import { prisma_client } from "~/.server/db";
 import { getProductFromId } from "../products/db.server";
 import { ProductSaleRecordWithRelations } from "./types";
 const validTransactionTypes: TransactionType[] = getTransactionOptions();
@@ -205,6 +204,28 @@ const ProductSaleRecordUpdateSchema = (old_product_sale_record: ProductSaleRecor
             //if product record already exists, revert the changes of old record
             if(old_product_quantity_record) {
                 if(old_product_sale_record.transaction_type === "sold") {
+                    product.quantity += old_product_quantity_record.quantity;
+                }else{
+                    product.quantity -= old_product_quantity_record.quantity;
+                }
+            }
+            //check quantity
+            if(product.quantity < new_product_quantity_record.quantity) {
+                return false;
+            }
+        }
+    } else if(data.transaction_type === "returned" && !data.isClient) {
+        //use case when returning product to vendor
+        const productRecords = old_product_sale_record.products;
+        for (const new_product_quantity_record of data.products_quantity) {
+            const product = await getProductFromId({id: new_product_quantity_record.product_id});
+            if(!product) {
+                throw new Error("Product not found in Product Sale Record Update validation")
+            }
+            const old_product_quantity_record = productRecords.find((record) => record.prod_id === new_product_quantity_record.product_id);
+            //if product record already exists, revert the changes of old record
+            if(old_product_quantity_record) {
+                if(old_product_sale_record.transaction_type === "returned") {
                     product.quantity += old_product_quantity_record.quantity;
                 }else{
                     product.quantity -= old_product_quantity_record.quantity;

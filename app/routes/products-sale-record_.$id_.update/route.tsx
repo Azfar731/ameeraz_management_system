@@ -3,7 +3,7 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import { printZodErrors } from "~/utils/functions.server";
 import { getAllProducts } from "~/utils/products/db.server";
-import { getProductSaleRecordById, updateProductSaleRecord } from "~/utils/productSaleRecord/db.server";
+import { getProductSaleRecordById, getProductSaleRecordByIdWithRelations, updateProductSaleRecord } from "~/utils/productSaleRecord/db.server";
 import {
   ProductSaleRecordUpdateErrors,
   ProductSaleRecordWithRelations,
@@ -15,9 +15,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Error("Product sale record ID is required");
   }
-  const productSaleRecord = await getProductSaleRecordById({
-    id,
-    includeRelations: true,
+  const productSaleRecord = await getProductSaleRecordByIdWithRelations({
+    id
   });
   if (!productSaleRecord) {
     throw new Error("Product sale record not found");
@@ -42,9 +41,9 @@ export async function action({ request,params }: ActionFunctionArgs) {
   if(!id){
     throw new Error("Product sale record ID is required");
   }
-  const oldProductSaleRecord = await getProductSaleRecordById({
-    id,
-    includeRelations: true,
+  const oldProductSaleRecord = await getProductSaleRecordByIdWithRelations({
+    id
+   
   });
   if (!oldProductSaleRecord) {
     throw new Error("Product sale record not found");
@@ -61,7 +60,7 @@ export async function action({ request,params }: ActionFunctionArgs) {
   }
 
   //update the product sale record
-  await updateProductSaleRecord({...validationResult.data, id, oldProductSaleRecord});
+  await updateProductSaleRecord({...validationResult.data, id, oldProductSaleRecord });
 
   
 

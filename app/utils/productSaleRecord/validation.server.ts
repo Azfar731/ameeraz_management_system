@@ -121,7 +121,20 @@ const productSaleRecordSchema = z.object({
     .refine((data) => data.amount_paid <= data.amount_charged, {
         message: "Amount paid must be less than or equal to amount charged",
         path: ["amount_paid"],
-    });
+    }).refine(async (data) => {
+        //check if products quantity is available.
+        if(data.transaction_type === "sold") {
+            for (const record of data.products_quantity) {
+                const product = await getProductFromId({id: record.product_id});
+                if(!product) {
+                    throw new Error("Product not found in Product Sale Record validation")
+                }
+                if(product.quantity < record.quantity) {
+                    return false;
+                }
+            }
+        }
+    }, {});
 
 const ProductSaleRecordUpdateSchema = (old_product_sale_record: ProductSaleRecordWithRelations) => {
     return z.object({

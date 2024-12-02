@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { formatDate } from "shared/utilityFunctions";
-import { getProductSaleRecordById } from "~/utils/productSaleRecord/db.server";
+import { getProductSaleRecordById, getProductSaleRecordByIdWithRelations } from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import { generate_heading } from "~/utils/render_functions";
 import { FaLongArrowAltLeft, FaEdit } from "react-icons/fa";
@@ -10,9 +10,9 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Error("Product sale record ID is required");
   }
-  const productSaleRecord = await getProductSaleRecordById({
+  const productSaleRecord = await getProductSaleRecordByIdWithRelations({
     id,
-    includeRelations: true,
+    
   });
   if (!productSaleRecord) {
     throw new Error("Product sale record not found");

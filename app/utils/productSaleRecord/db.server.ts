@@ -62,27 +62,25 @@ const getProductSaleRecords = async ({
 };
 
 // Fetch a single product sale record by ID
-const getProductSaleRecordById = async ({
-  id,
-  includeRelations = false,
-}: {
-  id: string;
-  includeRelations?: boolean;
-}) => {
+const getProductSaleRecordById = async ({id}: {id: string}) => {
   return await prisma_client.product_Sale_Record.findFirst({
     where: { product_record_id: id },
-    include: includeRelations
-      ? {
-        client: true,
-        vendor: true,
-        products: {
-          include: {
-            product: true,
-          },
+  });
+};
+
+const getProductSaleRecordByIdWithRelations = async ({id}: {id: string}) => {
+  return await prisma_client.product_Sale_Record.findFirst({
+    where: { product_record_id: id },
+    include: {
+      client: true,
+      vendor: true,
+      products: {
+        include: {
+          product: true,
         },
-        transactions: true,
-      }
-      : undefined,
+      },
+      transactions: true,
+    },
   });
 };
 
@@ -261,4 +259,5 @@ export {
   getProductSaleRecordById,
   getProductSaleRecords,
   updateProductSaleRecord,
+  getProductSaleRecordByIdWithRelations
 };

@@ -184,25 +184,29 @@ const ProductSaleRecordUpdateSchema = (old_product_sale_record: ProductSaleRecor
     if(data.transaction_type === "sold") {
         const productRecords = old_product_sale_record.products;
         for (const new_product_quantity_record of data.products_quantity) {
+            const product = await getProductFromId({id: new_product_quantity_record.product_id});
+            if(!product) {
+                throw new Error("Product not found in Product Sale Record Update validation")
+            }
             const old_product_quantity_record = productRecords.find((record) => record.prod_id === new_product_quantity_record.product_id);
-            if(old_product_quantity_record && old_product_sale_record.transaction_type === "sold") {
-                if((old_product_quantity_record.quantity + old_product_quantity_record.product.quantity)< new_product_quantity_record.quantity) {
-                    return false;
-                }
-            }else if(!old_product_quantity_record && old_product_sale_record.transaction_type === "sold") {
-                //fetch product and compare quantity
-                const product = await getProductFromId({id: new_product_quantity_record.product_id});
-                if(!product) {
-                    throw new Error("Product not found in Product Sale Record Update validation")
-                }
-                if(product.quantity < new_product_quantity_record.quantity){
-                    return false;
+            //if product record already exists, revert the changes of old record
+            if(old_product_quantity_record) {
+                if(old_product_sale_record.transaction_type === "sold") {
+                    product.quantity += old_product_quantity_record.quantity;
+                }else{
+                    product.quantity -= old_product_quantity_record.quantity;
                 }
             }
+            //check quantity
+            if(product.quantity < new_product_quantity_record.quantity) {
+                return false;
+            }
         }
-
     }
     return true;
+},{
+    message: "Product quantity not available. Please check the quantity of the products",
+    path: ["products_quantity"],
 })
 };
 export {

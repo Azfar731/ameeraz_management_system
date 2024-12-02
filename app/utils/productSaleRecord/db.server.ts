@@ -1,5 +1,6 @@
 import { Payment, TransactionType } from "@prisma/client";
 import { prisma_client } from "~/.server/db";
+import { ProductSaleRecordWithRelations } from "./types";
 
 // Fetch all product sale records with optional filters for client, vendor, or transaction_type
 const getProductSaleRecords = async ({
@@ -87,7 +88,6 @@ const getProductSaleRecordById = async ({
 
 // Create a new product sale record
 const createProductSaleRecord = async ({
-  
   mobile_num,
   transaction_type,
   mode_of_payment,
@@ -96,7 +96,7 @@ const createProductSaleRecord = async ({
   products_quantity,
 }: {
   mobile_num: string;
- 
+
   transaction_type: TransactionType;
   amount_charged: number;
   amount_paid: number;
@@ -146,6 +146,7 @@ const updateProductSaleRecord = async ({
   total_amount,
   isClient,
   products_quantity,
+  oldProductSaleRecord,
 }: {
   id: string;
   mobile_num: string;
@@ -153,37 +154,77 @@ const updateProductSaleRecord = async ({
   total_amount: number;
   isClient: boolean;
   products_quantity: { product_id: string; quantity: number }[];
+  oldProductSaleRecord: ProductSaleRecordWithRelations;
 }) => {
-  const transactions = await prisma_client.product_Transaction.findMany({ where: { record_id: id } });
-  const paid_amount = transactions.reduce((acc, transaction) => acc + transaction.amount_paid, 0);
-  return await prisma_client.product_Sale_Record.update({
-    where: { product_record_id: id },
-    data: {
-      client: isClient ? { connect: { client_mobile_num: mobile_num } } : undefined,
-      vendor: !isClient ? { connect: { vendor_mobile_num: mobile_num } } : undefined,
-      transaction_type,
-      payment_cleared: paid_amount === total_amount,
-      total_amount,
-      products: {
-        upsert: products_quantity.map((product) => ({
-          where: { record_id_prod_id: { record_id: id, prod_id: product.product_id } },
-          update: { 
-            quantity: product.quantity,
-            product: {
-              update: {
-                quantity: transaction_type === "sold"
-                  ? { decrement: product.quantity }
-                  : { increment: product.quantity },
+  const { transactions: old_transactions, products: old_products_record } =
+    oldProductSaleRecord;
+  const paid_amount = old_transactions.reduce(
+    (acc, transaction) => acc + transaction.amount_paid,
+    0,
+  );
+  return await prisma_client.$transaction(async (prisma) => {
+    //Step 1:revert the quantity changes of old product records
+    await Promise.all(
+      old_products_record.map((product_record) =>
+        prisma.product.update({
+          where: { prod_id: product_record.prod_id },
+          data: {
+            quantity: transaction_type === "sold"
+              ? { increment: product_record.quantity }
+              : { decrement: product_record.quantity },
+          },
+        })
+      ),
+    );
+
+    // Step 2: Delete associated records not present in products_quantity
+    await prisma.product_Record_JT.deleteMany({
+      where: {
+        record_id: id,
+        NOT: {
+          prod_id: {
+            in: products_quantity.map((product) => product.product_id),
+          },
+        },
+      },
+    });
+
+    // Step 3: Update or create records as required
+    return await prisma.product_Sale_Record.update({
+      where: { product_record_id: id },
+      data: {
+        client: isClient
+          ? { connect: { client_mobile_num: mobile_num } }
+          : undefined,
+        vendor: !isClient
+          ? { connect: { vendor_mobile_num: mobile_num } }
+          : undefined,
+        transaction_type,
+        payment_cleared: paid_amount === total_amount,
+        total_amount,
+        products: {
+          upsert: products_quantity.map((product) => ({
+            where: {
+              record_id_prod_id: { record_id: id, prod_id: product.product_id },
+            },
+            update: {
+              quantity: product.quantity,
+              product: {
+                update: {
+                  quantity: transaction_type === "sold"
+                    ? { decrement: product.quantity }
+                    : { increment: product.quantity },
+                },
               },
             },
-          },
-          create: {
-            product: { connect: { prod_id: product.product_id } },
-            quantity: product.quantity,
-          },
-        })),
+            create: {
+              product: { connect: { prod_id: product.product_id } },
+              quantity: product.quantity,
+            },
+          })),
+        },
       },
-    },
+    });
   });
 };
 

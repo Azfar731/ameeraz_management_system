@@ -61,7 +61,7 @@ export async function action({ request,params }: ActionFunctionArgs) {
   }
 
   //update the product sale record
-  await updateProductSaleRecord({...validationResult.data, id});
+  await updateProductSaleRecord({...validationResult.data, id, oldProductSaleRecord});
 
   
 

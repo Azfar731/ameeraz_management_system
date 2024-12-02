@@ -6,10 +6,7 @@ integrate form into product sale update
 
 if transaction type is returned in create form, ask for whether the transaction is for a client or vendor in part2.
 
-Instead of editing product_sale_record, just delete it and other related entries and create a new one.
-
-Provide limited options in product_sale_record update.
-
+make changes to produc sale record create, edit products quantity.
 
 Fixes:
 

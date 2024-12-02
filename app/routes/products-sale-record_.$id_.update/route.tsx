@@ -79,7 +79,7 @@ export default function Update_Product_Sale_Record() {
     products: Product[];
   }>();
   const actionData = useActionData<{ errors: ProductSaleRecordUpdateErrors }>();
-  const { client, products: product_records, vendor } = productSaleRecord;
+  
 
   return (
     <div className="flex justify-center items-center h-screen">

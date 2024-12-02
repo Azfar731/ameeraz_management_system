@@ -6,9 +6,12 @@ integrate form into product sale update
 
 if transaction type is returned in create form, ask for whether the transaction is for a client or vendor in part2.
 
-make changes to produc sale record create, edit products quantity.
+refactor product sale record create, to check whether it is for client or vendor if return type is "returned"
+in action/db function, use isClient boolean to verify whether it is for client or vendor
+
 
 Fixes:
+
 
 
 

@@ -11,7 +11,8 @@ export async function action({ request }: ActionFunctionArgs) {
   const transaction_type = formData.get("transaction_type")?.toString() || "";
   if(transaction_type === ""){
     throw new Error("Transaction type is required");
-}
+  }
+  
     throw replace("part2");
 }
 

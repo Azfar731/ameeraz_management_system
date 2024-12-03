@@ -107,7 +107,7 @@ const productSaleRecordSchema = z.object({
             "Mobile number must be 11 digits and start with 0.",
         ),
     transaction_type: z.enum(["sold", "bought", "returned"]),
-
+    isClient: z.boolean(),
     products_quantity: z.array(
         z.object({
             product_id: z.string(),
@@ -117,12 +117,34 @@ const productSaleRecordSchema = z.object({
 
     mode_of_payment: z.enum(["cash", "bank_transfer", "card"]),
 })
+    .refine(
+        //check if isClient value is compatible with transaction_type
+        (data) =>
+            data.isClient
+                ? data.transaction_type === "sold" || data.transaction_type === "returned"
+                : data.transaction_type === "bought" || data.transaction_type === "returned",
+        {
+            message: "Invalid transaction type",
+            path: ["transaction_type"],
+        },
+    )
+    .refine(async (data) => {
+        //verify client/vendor exists
+        if (data.isClient) {
+            return await findClientByMobile(data.mobile_num);
+        } else {
+            return await findVendorByMobileNumber(data.mobile_num);
+        }
+    }, {
+        message: `Invalid mobile number`,
+        path: ["mobile_num"],
+    })
     .refine((data) => data.amount_paid <= data.amount_charged, {
         message: "Amount paid must be less than or equal to amount charged",
         path: ["amount_paid"],
     }).refine(async (data) => {
         //check if products quantity is available.
-        if(data.transaction_type === "sold") {
+        if(data.transaction_type === "sold" || (data.transaction_type === "returned" && !data.isClient)) {
             for (const record of data.products_quantity) {
                 const product = await getProductFromId({id: record.product_id});
                 if(!product) {
@@ -133,7 +155,11 @@ const productSaleRecordSchema = z.object({
                 }
             }
         }
-    }, {});
+        return true
+    }, {
+        message: "Product quantity not available. Please check the quantity of the products",
+        path: ["products_quantity"],
+    });
 
 const ProductSaleRecordUpdateSchema = (old_product_sale_record: ProductSaleRecordWithRelations) => {
     return z.object({

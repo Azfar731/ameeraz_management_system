@@ -21,6 +21,7 @@ type ProductSaleRecordCreateFormType = {
 
     products_quantity: { product_id: string; quantity: number }[];
     mode_of_payment: Payment;
+    isClient: boolean;
 };
 
 type ProductSaleRecordFetchErrors = {
@@ -40,9 +41,22 @@ type ProductSaleRecordUpdateErrors = {
     products_quantity: string[];
 };
 
+type ProductSaleRecordCreateErrors = {
+    mobile_num: string[];
+    transaction_type: string[];
+    amount_charged: string[];
+    amount_paid: string[];
+    products_quantity: string[];
+    isClient: string[];
+    mode_of_payment: string[];
+
+}
+
 export type {
     ProductSaleRecordCreateFormType,
     ProductSaleRecordFetchErrors,
     ProductSaleRecordUpdateErrors,
     ProductSaleRecordWithRelations,
+    ProductSaleRecordCreateErrors
 };
+

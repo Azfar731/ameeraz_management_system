@@ -5,6 +5,7 @@ import {
   Form,
   replace,
   useLoaderData,
+  useActionData,
   useNavigate,
   useOutletContext,
   useSubmit,
@@ -18,7 +19,10 @@ import {
 } from "~/utils/functions";
 import { getAllProducts } from "~/utils/products/db.server";
 import { createProductSaleRecord } from "~/utils/productSaleRecord/db.server";
-import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
+import {
+  ProductSaleRecordCreateErrors,
+  ProductSaleRecordCreateFormType,
+} from "~/utils/productSaleRecord/types";
 import { productSaleRecordSchema } from "~/utils/productSaleRecord/validation.server";
 import { findVendorByMobileNumber } from "~/utils/vendors/db.server";
 
@@ -27,21 +31,19 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const mobile_num = searchParams.get("mobile_num");
   if (!mobile_num) throw new Error(`Mobile number not provided in URL`);
 
-  const transaction_type = searchParams.get("transaction_type");
-  if (!transaction_type) {
-    throw new Error(`Transaction type is required`);
-  }
+  const isClient = searchParams.get("isClient") === "true";
   let client;
   let vendor;
-  if (transaction_type === "bought") {
+  if (isClient) {
+    client = await findClientByMobile(mobile_num);
+    if (!client) {
+      throw new Error(`Client with mobile number ${mobile_num} not found`);
+    }
+  } else {
     vendor = await findVendorByMobileNumber(mobile_num);
     if (!vendor) {
       throw new Error(`Vendor with mobile number ${mobile_num} not found`);
     }
-  } else {
-    client = await findClientByMobile(mobile_num);
-    if (!client)
-      throw new Error(`Client with mobile number ${mobile_num} not found`);
   }
   const products = await getAllProducts();
 
@@ -54,13 +56,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   console.log("Form Data:", data);
 
   // Process the form data here
-  const validationResult = productSaleRecordSchema.safeParse(data);
+  const validationResult = await productSaleRecordSchema.safeParseAsync(data);
   if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors };
+    console.log("validation failed");
+    return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
   // Save the data to the database
   const record = await createProductSaleRecord(validationResult.data);
-
+  console.log("Record created: ", record);
   throw replace(`/products-sale-record/${record.product_record_id}`);
 };
 
@@ -70,7 +73,9 @@ export default function Product_Sale_Record_Create_Part3() {
     client: Client | undefined;
     vendor: Vendor | undefined;
   }>();
-
+  const actionData = useActionData<{
+    errorMessages: ProductSaleRecordCreateErrors;
+  }>();
   const submit = useSubmit();
   const navigate = useNavigate();
   const { formData: globalFormData, setFormData } = useOutletContext<{
@@ -287,7 +292,11 @@ export default function Product_Sale_Record_Create_Part3() {
         />
 
         {renderProductsQuantity}
-
+        {actionData?.errorMessages.products_quantity && (
+          <h2 className="text-red-500 font-semibold">
+            {actionData?.errorMessages.products_quantity[0]}
+          </h2>
+        )}
         <div className="text-gray-700 mb-4">
           Expected Total Amount: {amounts.expectedAmount}
         </div>
@@ -313,7 +322,11 @@ export default function Product_Sale_Record_Create_Part3() {
           min={0}
           required
         />
-
+        {actionData?.errorMessages.amount_charged && (
+          <h2 className="text-red-500 font-semibold">
+            {actionData?.errorMessages.amount_charged[0]}
+          </h2>
+        )}
         <label
           htmlFor="amount_paid"
           className="block text-gray-700 text-sm font-bold mb-2"
@@ -335,7 +348,11 @@ export default function Product_Sale_Record_Create_Part3() {
           min={0}
           required
         />
-
+        {actionData?.errorMessages.amount_paid && (
+          <h2 className="text-red-500 font-semibold">
+            {actionData?.errorMessages.amount_paid[0]}
+          </h2>
+        )}
         <label htmlFor="payment_mode">Mode of Payment</label>
         <Select
           options={getAllPaymentMenuOptions()}
@@ -345,6 +362,40 @@ export default function Product_Sale_Record_Create_Part3() {
             globalFormData.mode_of_payment
           )}
         />
+        {actionData?.errorMessages.products_quantity && (
+          <h2 className="text-red-500 font-semibold">
+            {actionData?.errorMessages.products_quantity[0]}
+          </h2>
+        )}
+        {
+          /* {Object.keys(actionData?.errorMessages || {}).map((key) => {
+          if (
+            key !== "amount_paid" &&
+            key !== "amount_charged" &&
+            key !== "mode_of_payment" &&
+            key !== "products_quantity"
+          ) {
+            return (
+              <h2 key={key} className="text-red-500 font-semibold">
+               {`${key}: ${actionData?.errorMessages[key as keyof ProductSaleRecordCreateErrors][0]}`}
+              </h2>
+            );
+          }
+          return null;
+        })} */
+          Object.keys(actionData?.errorMessages || {}).map((key) => {
+            return (
+              <h2 key={key} className="text-red-500 font-semibold">
+                {`${key}: ${
+                  actionData?.errorMessages[
+                    key as keyof ProductSaleRecordCreateErrors
+                  ][0]
+                }`}
+              </h2>
+            );
+          })
+        }
+
         <div className="flex justify-between items-center mt-6">
           <button
             type="button"

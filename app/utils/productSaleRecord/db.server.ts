@@ -92,9 +92,10 @@ const createProductSaleRecord = async ({
   amount_charged,
   amount_paid,
   products_quantity,
+  isClient
 }: {
   mobile_num: string;
-
+  isClient: boolean;
   transaction_type: TransactionType;
   amount_charged: number;
   amount_paid: number;
@@ -105,12 +106,12 @@ const createProductSaleRecord = async ({
     // Step 1: Create the product sale record and connect products
     const productSaleRecord = await prisma.product_Sale_Record.create({
       data: {
-        client: transaction_type === "sold" || transaction_type === "returned"
+        client: isClient
           ? {
               connect: { client_mobile_num: mobile_num },
             }
           : undefined,
-        vendor: transaction_type === "bought"
+        vendor: !isClient
           ? {
               connect: { vendor_mobile_num: mobile_num },
             }
@@ -143,7 +144,7 @@ const createProductSaleRecord = async ({
         prisma.product.update({
           where: { prod_id: product.product_id },
           data: {
-            quantity: transaction_type === "sold"
+            quantity: transaction_type === "sold" || (transaction_type === "returned" && !isClient)
               ? { decrement: product.quantity }
               : { increment: product.quantity },
           },

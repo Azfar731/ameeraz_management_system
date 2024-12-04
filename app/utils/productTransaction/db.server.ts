@@ -60,3 +60,26 @@ const getProductTransactions = async ({
         },
     });
 };
+
+const getProductTransactionWithRelationsFromId = async (
+    product_trans_id: string,
+) => {
+    return prisma_client.product_Transaction.findUnique({
+        where: { product_trans_id },
+        include: {
+            record: {
+                include: {
+                    client: true,
+                    vendor: true,
+                    products: {
+                        include: {
+                            product: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+};
+
+export { getProductTransactions, getProductTransactionWithRelationsFromId };

@@ -18,7 +18,7 @@ import {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
-  const formValues = FetchFormValues(searchParams);
+  const formValues = fetchFormValues(searchParams);
 
   const validationResult = clientTransactionFetchSchema.safeParse(formValues);
   if (!validationResult.success) {
@@ -29,7 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return { transactions, errors: {} };
 }
 
-const FetchFormValues = (searchParams: URLSearchParams) => {
+const fetchFormValues = (searchParams: URLSearchParams) => {
   const start_date = searchParams.get("start_date") || undefined;
   const end_date = searchParams.get("end_date") || undefined;
   const mobile_num = searchParams.get("mobile_num") || undefined;

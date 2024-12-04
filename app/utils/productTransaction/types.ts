@@ -1,0 +1,30 @@
+import { Prisma } from "@prisma/client";
+
+type ProudctTransactionWithRelations = Prisma.Product_TransactionGetPayload<{
+    include: {
+        record: {
+            include: {
+                client: true;
+                vendor: true;
+                products: {
+                    include: {
+                        product: true;
+                    };
+                };
+            };
+        };
+    };
+}>;
+
+type ProductTransactionFetchErrorData = {
+    start_date: string[];
+    end_date: string[];
+    client_mobile_num: string[];
+    vendor_mobile_num: string[];
+    transaction_types: string[];
+    products: string[];
+    payment_options: string[];
+    isClient: string[];
+}
+
+export type { ProudctTransactionWithRelations, ProductTransactionFetchErrorData };

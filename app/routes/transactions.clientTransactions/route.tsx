@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors, transactions: [] };
   }
-
+  console.log("Validation Result: ", validationResult.data);
   const transactions = await getClientTransactions(validationResult.data);
   return { transactions, errors: {} };
 }
@@ -283,14 +283,15 @@ export default function Client_Transactions() {
           className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
         />
         <label
-          htmlFor="employees"
+          htmlFor="payment_mode"
           className="block text-gray-700 text-sm font-bold mt-4"
         >
           Mode of Payment
         </label>
         <Select
           isMulti
-          name="employees"
+          id="payment_mode"
+          name="payment_mode"
           onChange={onPaymentOptionChange}
           options={getAllPaymentMenuOptions()}
           // defaultValue={def_emp}

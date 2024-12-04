@@ -6,6 +6,7 @@ integrate form into product sale update
 
 if transaction type is returned in create form, ask for whether the transaction is for a client or vendor in part2.
 
+change isClient to user = client/vendor
 
 update validation for create form of product sale record:
     check that isClient and transaction_type are comptabile

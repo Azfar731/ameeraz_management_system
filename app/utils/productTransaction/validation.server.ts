@@ -40,9 +40,9 @@ const productTransactionFetchSchema = z.object({
 
     transaction_types: z.array(z.enum(["sold", "bought", "returned"]))
         .optional(),
-    payment_modes: z.array(z.enum(["cash", "bank_transfer", "card"]))
+    payment_options: z.array(z.enum(["cash", "bank_transfer", "card"]))
         .optional(),
-    product_ids: z.array(z.string())
+    products: z.array(z.string())
         .optional(),
     isClient: z.string().transform((val) => val === "true")
         .optional(),
@@ -75,25 +75,33 @@ const productTransactionFetchSchema = z.object({
     message: "Client does not exist",
     path: ["client_mobile_num"],
 })
-.refine(async (data) => {
-    //check whether vendor exists
-    if (data.vendor_mobile_num) {
-        return await prisma_client.vendor.findFirst({
-            where: { vendor_mobile_num: data.vendor_mobile_num },
-        });
-    }
-    return true;
-}, {
-    message: "Vendor does not exist",
-    path: ["vendor_mobile_num"],
-}).refine((data) => {
-    if(data.start_date && data.end_date){
-        return data.end_date >= data.start_date;
-    }
-},{
-    message: "End date must be greater than start date",
-    path: ["end_date"],
-});
-
+    .refine(async (data) => {
+        //check whether vendor exists
+        if (data.vendor_mobile_num) {
+            return await prisma_client.vendor.findFirst({
+                where: { vendor_mobile_num: data.vendor_mobile_num },
+            });
+        }
+        return true;
+    }, {
+        message: "Vendor does not exist",
+        path: ["vendor_mobile_num"],
+    }).refine((data) => {
+        if (data.start_date && data.end_date) {
+            return data.end_date >= data.start_date;
+        }
+        return true;
+    }, {
+        message: "End date must be greater than start date",
+        path: ["end_date"],
+    }).superRefine((data) => {
+        if (
+            !(data.start_date || data.end_date || data.client_mobile_num ||
+                data.vendor_mobile_num || data.payment_options ||
+                data.products || data.isClient !== undefined)
+        ) {
+            data.start_date = new Date();
+        }
+    });
 
 export { productTransactionFetchSchema };

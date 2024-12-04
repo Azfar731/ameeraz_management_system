@@ -19,7 +19,7 @@ export default function Transactions() {
           Client Transactions
         </NavLink>
         <NavLink
-          to="productTransctions"
+          to="product-transactions"
           className={({ isActive }) =>
             `text-lg px-4 py-2 rounded-full transition-colors ${
               isActive

@@ -32,13 +32,13 @@ const getProductTransactions = async ({
                     : undefined,
                 client: client_mobile_num
                     ? { client_mobile_num: client_mobile_num }
-                    : isClient !== undefined && !isClient
-                    ? null
+                    : isClient !== undefined && isClient
+                    ? { isNot: null }
                     : undefined,
                 vendor: vendor_mobile_num
                     ? { vendor_mobile_num: vendor_mobile_num }
-                    : isClient !== undefined && isClient
-                    ? null
+                    : isClient !== undefined && !isClient
+                    ? { isNot: null }
                     : undefined,
                 products: products
                     ? {

@@ -22,11 +22,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const validationResult = clientTransactionFetchSchema.safeParse(formValues);
   if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors };
+    return { errors: validationResult.error.flatten().fieldErrors, transactions: [] };
   }
 
   const transactions = await getClientTransactions(validationResult.data);
-  return { transactions };
+  return { transactions, errors: {} };
 }
 
 const FetchFormValues = (searchParams: URLSearchParams) => {

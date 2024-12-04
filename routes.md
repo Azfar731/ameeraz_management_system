@@ -74,3 +74,13 @@
 - /cateogries/:id => categories_.$id.tsx
     - /transactions
     - /sales
+
+
+
+## Product Transactions:
+- /transactions/product-transactions => transactions.productTransactions
+- /transactions/product-transactions/id => tranasactions.productTransactions_.$id
+- /transactions/product-transactions/create => transaction.productTransactions_.create
+- /transactions/product-transactions/create/product-sale-record-id => transaction.productTransactions_.create_.$product-sale-record-id
+- /transactions/product-transactions/id/update => transactions.productTransactions_.$id_.update
+

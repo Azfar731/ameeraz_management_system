@@ -1,5 +1,6 @@
 import { Payment, TransactionType } from "@prisma/client";
 import { prisma_client } from "~/.server/db";
+import { getProductSaleRecordPendingAmount } from "./functions.server";
 
 const getProductTransactions = async ({
     start_date,
@@ -84,4 +85,29 @@ const getProductTransactionWithRelationsFromId = async (
     });
 };
 
-export { getProductTransactions, getProductTransactionWithRelationsFromId };
+const createProductTransaction = async ({amount_paid, mode_of_payment, product_record_id}: {amount_paid: number; mode_of_payment: Payment, product_record_id: string}) => {
+
+    //fetch product record
+    const new_remaining_amount = (await getProductSaleRecordPendingAmount(product_record_id)) - amount_paid;
+    
+    return await prisma_client.$transaction(async (tx) => {
+        const transaction = await tx.product_Transaction.create({
+            data: {
+                amount_paid,
+                mode_of_payment,
+                record_id: product_record_id,
+            },
+        });
+
+        if (new_remaining_amount === 0) {
+            await prisma_client.product_Sale_Record.update({
+                where: { product_record_id },
+                data: { payment_cleared: true },
+            });
+        }
+
+        return transaction;
+    });
+}
+
+export { getProductTransactions, getProductTransactionWithRelationsFromId, createProductTransaction };

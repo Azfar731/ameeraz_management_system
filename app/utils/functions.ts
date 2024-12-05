@@ -7,6 +7,10 @@ const capitalizeFirstLetter = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+const getPaymentOptionsAsStrings =() => {
+  return ["cash", "bank_transfer", "card"];
+};
+
 const getPaymentOptions = (): PaymentModes[] => {
   return ["cash", "bank_transfer", "card"];
 };
@@ -115,4 +119,5 @@ export {
   getSingleTransactionMenuOption,
   getTransactionOptions,
   setSearchParameters,
+  getPaymentOptionsAsStrings
 };

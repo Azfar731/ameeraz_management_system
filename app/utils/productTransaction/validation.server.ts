@@ -109,12 +109,27 @@ const productTransactionFetchSchema = z.object({
         data.start_date = new Date();
     }
 
-    if(data.start_date) {
+    if (data.start_date) {
         data.start_date.setHours(0, 0, 0, 0);
     }
-    if(data.end_date) {
+    if (data.end_date) {
         data.end_date.setHours(23, 59, 59, 999);
     }
 });
 
-export { productTransactionFetchSchema };
+const productTransactionSchema = (maxAmount: number) =>
+    z.object({
+        amount_paid: z
+            .string()
+            .transform((amount) => parseInt(amount))
+            .refine((amount) => amount > 0, {
+                message: "Amount paid must be greater than 0",
+            })
+            .refine((amount) => amount <= maxAmount, {
+                message:
+                    `Amount paid can not be greater than Pending Amount. Pending amount is ${maxAmount}`,
+            }),
+        mode_of_payment: z.enum(["cash", "bank_transfer", "card"]),
+    });
+
+export { productTransactionFetchSchema, productTransactionSchema };

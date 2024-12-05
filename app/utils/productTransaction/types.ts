@@ -17,6 +17,8 @@ type ProductTransactionWithRelations = Prisma.Product_TransactionGetPayload<{
     };
 }>;
 
+
+
 type ProductTransactionFetchErrorData = {
     start_date: string[];
     end_date: string[];
@@ -28,7 +30,15 @@ type ProductTransactionFetchErrorData = {
     userType: string[];
 };
 
+
+type ProductTransactionErrorData = {
+    amount_paid: string[];
+    mode_of_payment: string[];
+}
+
+
 export type {
     ProductTransactionFetchErrorData,
     ProductTransactionWithRelations,
+    ProductTransactionErrorData,
 };

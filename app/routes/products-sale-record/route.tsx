@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Product } from "@prisma/client";
 import { Link, useLoaderData } from "@remix-run/react";
 import FetchForm from "./FetchForm";
@@ -10,11 +9,8 @@ import {
   ProductSaleRecordFetchErrors,
   ProductSaleRecordWithRelations,
 } from "~/utils/productSaleRecord/types";
-import { formatDate } from "shared/utilityFunctions";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
-import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+import ProductSaleRecordTable from "./ProductSaleRecordTable";
 export async function loader({ request }: LoaderFunctionArgs) {
   const products = await getAllProducts();
   const searchParams = new URL(request.url).searchParams;
@@ -60,130 +56,6 @@ export default function View_Product_Sale_Record() {
     errors: ProductSaleRecordFetchErrors;
   }>();
 
-  //table values
-  //Creating a Table
-  //it throws an error, while passing service_records directly
-  const nodes = [...records];
-  const data = { nodes };
-
-  const [ids, setIds] = useState<string[]>([]);
-
-  const handleExpand = (item: ProductSaleRecordWithRelations) => {
-    if (ids.includes(item.product_record_id)) {
-      setIds(ids.filter((id) => id !== item.product_record_id));
-    } else {
-      setIds(ids.concat(item.product_record_id));
-    }
-  };
-
-  const ROW_PROPS = {
-    onClick: handleExpand,
-  };
-
-  const ROW_OPTIONS = {
-    renderAfterRow: (item: ProductSaleRecordWithRelations) => (
-      <>
-        {ids.includes(item.product_record_id) && (
-          <tr style={{ display: "flex", gridColumn: "1 / -1" }}>
-            <td style={{ flex: "1" }}>
-              <ul
-                style={{
-                  margin: "0",
-                  padding: "0",
-                  backgroundColor: "#e0e0e0",
-                }}
-              >
-                <li>
-                  <strong>Products</strong>
-                  {item.products.map((rec) => rec.product.prod_name).join(", ")}
-                </li>
-                <li>
-                  <strong>Client Mobile Number: </strong>{" "}
-                  {item.client?.client_mobile_num}
-                </li>
-                <li>
-                  <strong>Vendor Mobile Number: </strong>{" "}
-                  {item.vendor?.vendor_mobile_num}
-                </li>
-              </ul>
-            </td>
-          </tr>
-        )}
-      </>
-    ),
-  };
-
-  const COLUMNS = [
-    {
-      label: "Date",
-      renderCell: (item: ProductSaleRecordWithRelations) =>
-        formatDate(item.created_at),
-    },
-    {
-      label: "Client Name",
-      renderCell: (item: ProductSaleRecordWithRelations) => {
-        return item.client
-          ? `${item.client.client_fname} ${item.client.client_lname}`
-          : "N/A";
-      },
-    },
-    {
-      label: "Vendor Name",
-      renderCell: (item: ProductSaleRecordWithRelations) => {
-        return item.vendor
-          ? `${item.vendor.vendor_fname} ${item.vendor.vendor_lname}`
-          : "N/A";
-      },
-    },
-    {
-      label: "Total Amount",
-      renderCell: (item: ProductSaleRecordWithRelations) => item.total_amount,
-    },
-    {
-      label: "Paid Amount",
-      renderCell: (item: ProductSaleRecordWithRelations) =>
-        item.transactions.reduce(
-          (sum, transaction) => sum + transaction.amount_paid,
-          0
-        ),
-    },
-    {
-      label: "Products",
-      renderCell: (item: ProductSaleRecordWithRelations) =>
-        item.products.map((rec) => rec.product.prod_name).join(", "),
-    },
-    {
-      label: "Transaction Type",
-      renderCell: (item: ProductSaleRecordWithRelations) =>
-        item.transaction_type,
-    },
-    {
-      label: "Edit",
-      renderCell: (item: ProductSaleRecordWithRelations) => {
-        return (
-          <Link to={`/products-sale-record/${item.product_record_id}`}> <FaExternalLinkAlt /> </Link>
-        );
-      },
-    },
-  ];
-
-  const theme = useTheme([
-    getTheme(),
-    {
-      HeaderRow: `
-        background-color: #eaf5fd;
-      `,
-      Row: `
-        &:nth-of-type(odd) {
-          background-color: #d2e9fb;
-        }
-
-        &:nth-of-type(even) {
-          background-color: #eaf5fd;
-        }
-      `,
-    },
-  ]);
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
@@ -197,16 +69,10 @@ export default function View_Product_Sale_Record() {
           to="create"
           className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
-          Create a new record <FaPlus/>
+          Create a new record <FaPlus />
         </Link>
         <div className="mt-6">
-          <CompactTable
-            columns={COLUMNS}
-            data={data}
-            theme={theme}
-            rowProps={ROW_PROPS}
-            rowOptions={ROW_OPTIONS}
-          />
+          <ProductSaleRecordTable records={records} />
         </div>
       </div>
     </div>

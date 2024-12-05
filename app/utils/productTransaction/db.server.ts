@@ -66,7 +66,7 @@ const getProductTransactions = async ({
 const getProductTransactionWithRelationsFromId = async (
     product_trans_id: string,
 ) => {
-    return prisma_client.product_Transaction.findUnique({
+    return await prisma_client.product_Transaction.findUnique({
         where: { product_trans_id },
         include: {
             record: {
@@ -85,11 +85,26 @@ const getProductTransactionWithRelationsFromId = async (
     });
 };
 
-const createProductTransaction = async ({amount_paid, mode_of_payment, product_record_id}: {amount_paid: number; mode_of_payment: Payment, product_record_id: string}) => {
+const getProductTransactionFromId = async (
+    product_trans_id: string,
+) => {
+    return await prisma_client.product_Transaction.findUnique({
+        where: { product_trans_id },
+    });
+};
 
+const createProductTransaction = async (
+    { amount_paid, mode_of_payment, product_record_id }: {
+        amount_paid: number;
+        mode_of_payment: Payment;
+        product_record_id: string;
+    },
+) => {
     //fetch product record
-    const new_remaining_amount = (await getProductSaleRecordPendingAmount(product_record_id)) - amount_paid;
-    
+    const new_remaining_amount =
+        (await getProductSaleRecordPendingAmount(product_record_id)) -
+        amount_paid;
+
     return await prisma_client.$transaction(async (tx) => {
         const transaction = await tx.product_Transaction.create({
             data: {
@@ -108,6 +123,40 @@ const createProductTransaction = async ({amount_paid, mode_of_payment, product_r
 
         return transaction;
     });
-}
+};
 
-export { getProductTransactions, getProductTransactionWithRelationsFromId, createProductTransaction };
+const updateProductTransaction = async (
+    {
+        id,
+        amount_paid,
+        mode_of_payment,
+        new_remaining_amount,
+    }: {
+        id: string;
+        amount_paid: number;
+        mode_of_payment: Payment;
+        new_remaining_amount: number;
+    },
+) => {
+    return await prisma_client.product_Transaction.update({
+        where: { product_trans_id: id },
+        data: {
+            amount_paid,
+            mode_of_payment,
+            record: {
+                update: {
+                    payment_cleared: new_remaining_amount - amount_paid === 0,
+                },
+            },
+        },
+    });
+};
+
+export {
+    createProductTransaction,
+    getProductTransactionFromId,
+    getProductTransactions,
+    getProductTransactionWithRelationsFromId,
+    updateProductTransaction,
+};
+

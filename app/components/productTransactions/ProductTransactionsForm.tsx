@@ -28,7 +28,7 @@ export default function ProductTransactionForm({
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
       <div className="text-gray-700 mb-4">
-        {`${product_sale_record.client ? "Client" : "Vendor"} Name`}
+        {`${product_sale_record.client ? "Client" : "Vendor"} Name: `}
         {product_sale_record.client
           ? `${product_sale_record.client.client_fname} ${product_sale_record.client.client_lname}`
           : `${product_sale_record.vendor?.vendor_fname} ${product_sale_record.vendor?.vendor_lname}`}

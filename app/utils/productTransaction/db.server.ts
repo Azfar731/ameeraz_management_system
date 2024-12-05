@@ -71,6 +71,7 @@ const getProductTransactionWithRelationsFromId = async (
                 include: {
                     client: true,
                     vendor: true,
+                    transactions: true,
                     products: {
                         include: {
                             product: true,

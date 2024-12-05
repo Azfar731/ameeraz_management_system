@@ -1,11 +1,12 @@
 import { Prisma } from "@prisma/client";
 
-type ProudctTransactionWithRelations = Prisma.Product_TransactionGetPayload<{
+type ProductTransactionWithRelations = Prisma.Product_TransactionGetPayload<{
     include: {
         record: {
             include: {
                 client: true;
                 vendor: true;
+                transactions: true;
                 products: {
                     include: {
                         product: true;
@@ -25,6 +26,9 @@ type ProductTransactionFetchErrorData = {
     products: string[];
     payment_options: string[];
     userType: string[];
-}
+};
 
-export type { ProudctTransactionWithRelations, ProductTransactionFetchErrorData };
+export type {
+    ProductTransactionFetchErrorData,
+    ProductTransactionWithRelations,
+};

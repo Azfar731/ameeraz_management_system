@@ -57,7 +57,7 @@ const formValues = {
     transaction_types: transaction_types.length > 0 ? transaction_types : undefined,
     products: products.length > 0 ? products : undefined,
     payment_options: payment_options.length > 0 ? payment_options : undefined,
-    isClient: searchParams.get("isClient") || undefined,
+    userType: searchParams.get("userType") || undefined,
 };
   return formValues;
 };

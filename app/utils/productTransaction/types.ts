@@ -24,7 +24,7 @@ type ProductTransactionFetchErrorData = {
     transaction_types: string[];
     products: string[];
     payment_options: string[];
-    isClient: string[];
+    userType: string[];
 }
 
 export type { ProudctTransactionWithRelations, ProductTransactionFetchErrorData };

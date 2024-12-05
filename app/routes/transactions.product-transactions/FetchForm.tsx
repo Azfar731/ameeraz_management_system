@@ -81,33 +81,34 @@ export default function Product_Transaction_FetchForm({
         </h2>
       )}
       <label
-        htmlFor="isClient"
+        htmlFor="userType"
         className="block text-gray-700 text-sm font-bold mt-4"
       >
         User type
       </label>
       <Select
-        id="idClient"
-        name="isClient"
+        id="userType"
+        name="userType"
         options={[
-          { value: true.toString(), label: "Client" },
-          { value: false.toString(), label: "Vendor" },
+          { value: "client", label: "Client" },
+          { value: "vendor", label: "Vendor" },
+          {value: "", label: "None"},
         ]}
         defaultValue={
-          newSearchParams.get("isClient")
+          newSearchParams.get("userType")
             ? {
-                value: newSearchParams.get("isClient"),
+                value: newSearchParams.get("userType"),
                 label:
-                  newSearchParams.get("isClient") === "true"
+                  newSearchParams.get("userType") === "client"
                     ? "Client"
                     : "Vendor",
               }
             : undefined
         }
       />
-      {errorMessages?.isClient && (
+      {errorMessages?.userType && (
         <h2 className="text-red-500 font-semibold">
-          {errorMessages.isClient[0]}
+          {errorMessages.userType[0]}
         </h2>
       )}
       <label

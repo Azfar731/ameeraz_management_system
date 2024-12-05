@@ -9,7 +9,7 @@ const getProductTransactions = async ({
     transaction_types,
     products,
     payment_options,
-    isClient,
+    userType,
 }: {
     start_date?: Date;
     end_date?: Date;
@@ -18,7 +18,7 @@ const getProductTransactions = async ({
     payment_options?: Payment[];
     transaction_types?: TransactionType[];
     products?: string[];
-    isClient?: boolean;
+    userType?: "client" | "vendor";
 }) => {
     return await prisma_client.product_Transaction.findMany({
         where: {
@@ -32,12 +32,12 @@ const getProductTransactions = async ({
                     : undefined,
                 client: client_mobile_num
                     ? { client_mobile_num: client_mobile_num }
-                    : isClient !== undefined && isClient
+                    : userType === "client"
                     ? { isNot: null }
                     : undefined,
                 vendor: vendor_mobile_num
                     ? { vendor_mobile_num: vendor_mobile_num }
-                    : isClient !== undefined && !isClient
+                    : userType === "vendor"
                     ? { isNot: null }
                     : undefined,
                 products: products

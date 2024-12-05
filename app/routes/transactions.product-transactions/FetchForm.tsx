@@ -162,12 +162,12 @@ export default function Product_Transaction_FetchForm({
         id="payment_options"
         name="payment_options"
         options={getAllPaymentMenuOptions()}
-        // defaultValue={
-        //   newSearchParams
-        //     .getAll("payment_options")
-        //     ?.map((mode) => getSinglePaymentMenuOption(mode as Payment)) ||
-        //   undefined
-        // }
+        defaultValue={
+          newSearchParams
+            .getAll("payment_options").filter(val => val !== "")
+            ?.map((mode) => getSinglePaymentMenuOption(mode as Payment)) ||
+          undefined
+        }
         className="basic-multi-select mt-2"
         classNamePrefix="select"
       />

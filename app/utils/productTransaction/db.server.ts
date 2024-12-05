@@ -55,6 +55,7 @@ const getProductTransactions = async ({
                     vendor: true,
                     products: { include: { product: true } },
                     client: true,
+                    transactions: true,
                 },
             },
         },

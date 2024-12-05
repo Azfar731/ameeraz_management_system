@@ -10,6 +10,7 @@ const getProductSaleRecords = async ({
   start_date,
   end_date,
   products,
+  payment_status,
 }: {
   client_mobile_num?: string;
   vendor_mobile_num?: string;
@@ -17,6 +18,7 @@ const getProductSaleRecords = async ({
   start_date?: Date;
   end_date?: Date;
   products?: string[];
+  payment_status?: "cleared" | "pending";
 }) => {
   return await prisma_client.product_Sale_Record.findMany({
     where: {
@@ -44,6 +46,7 @@ const getProductSaleRecords = async ({
           },
         }
         : undefined,
+      payment_cleared: payment_status ? payment_status === "cleared" : undefined, 
     },
     include: {
       client: true,

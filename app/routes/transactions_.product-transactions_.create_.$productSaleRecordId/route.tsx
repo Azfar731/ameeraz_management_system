@@ -1,13 +1,14 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { replace, useLoaderData } from "@remix-run/react";
+import { replace, useActionData, useLoaderData } from "@remix-run/react";
+import ProductTransactionForm from "~/components/productTransactions/ProductTransactionsForm";
 import { getProductSaleRecordByIdWithRelations } from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
-import ProductTransactionForm from "~/components/productTransactions/ProductTransactionsForm";
+import { createProductTransaction } from "~/utils/productTransaction/db.server";
+import { getProductSaleRecordPendingAmount } from "~/utils/productTransaction/functions.server";
+import { ProductTransactionErrorData } from "~/utils/productTransaction/types";
 import {
     productTransactionSchema
 } from "~/utils/productTransaction/validation.server";
-import { getProductSaleRecordPendingAmount } from "~/utils/productTransaction/functions.server";
-import { createProductTransaction } from "~/utils/productTransaction/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { productSaleRecordId } = params;
   if (!productSaleRecordId) {
@@ -47,9 +48,10 @@ export default function Product_transaction_create_part2() {
     product_sale_record: ProductSaleRecordWithRelations;
   }>();
 
+  const actionData = useActionData<{errorMessages: ProductTransactionErrorData}>();
   return (
     <div className="flex justify-center items-center h-screen">
-      <ProductTransactionForm product_sale_record={product_sale_record} />
+      <ProductTransactionForm product_sale_record={product_sale_record} errorMessages={actionData?.errorMessages} />
     </div>
   );
 }

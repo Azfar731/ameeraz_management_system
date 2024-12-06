@@ -1,4 +1,6 @@
 import { prisma_client } from "~/.server/db";
+import { MenuOption } from "../types";
+import { Payment } from "@prisma/client";
 
 async function fetchServiceSaleRecords(
     {
@@ -43,4 +45,54 @@ async function fetchServiceSaleRecords(
     });
 }
 
-export {  fetchServiceSaleRecords };
+
+
+const createServiceSaleRecord = async (formData: {
+    amount_charged: number;
+    amount_paid: number;
+    mobile_num: string;
+    deals: MenuOption[];
+    services: MenuOption[];
+    employees: { id: string; work_share: number }[];
+    mode_of_payment: { value: Payment; label: string }
+}) => {
+    const {
+        amount_charged,
+        amount_paid,
+        mobile_num,
+        deals,
+        services,
+        employees,
+        mode_of_payment,
+    } = formData;
+
+    const all_deals = [...deals, ...services];
+
+    const record = await prisma_client.service_Sale_Record.create({
+        data: {
+            total_amount: amount_charged,
+            payment_cleared: amount_charged === amount_paid,
+            client: {
+                connect: { client_mobile_num: mobile_num },
+            },
+            deals: {
+                connect: all_deals.map((deal) => ({ deal_id: deal.value })),
+            },
+            transactions: {
+                create: [{
+                    amount_paid,
+                    mode_of_payment: mode_of_payment.value,
+                }],
+            },
+            employees: {
+                create: employees.map((employee) => ({
+                    emp_id: employee.id,
+                    work_share: employee.work_share,
+                })),
+            },
+        },
+    });
+    return record;
+};
+
+export {  fetchServiceSaleRecords, createServiceSaleRecord };

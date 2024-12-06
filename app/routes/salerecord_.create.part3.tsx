@@ -12,11 +12,11 @@ import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import { FormType } from "~/utils/types";
 import {
-  create_service_record,
   validate_data,
 } from "~/.server/utitlityFunctions";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { getEmployeeOptions } from "shared/utilityFunctions";
+import { createServiceSaleRecord } from "~/utils/serviceSaleRecord/db.server";
 
 export async function loader() {
   const employees = await prisma_client.employee.findMany();
@@ -45,7 +45,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const isNotValid = validate_data(formData);
   if (!isNotValid) {
     // Create the service record and redirect to the new record's page
-    const record = await create_service_record(formData);
+    const record = await createServiceSaleRecord(formData);
     return replace(`/salerecord/${record.service_record_id}`);
   } else {
     return isNotValid;

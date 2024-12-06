@@ -1,31 +1,29 @@
-import { useState, useRef } from "react";
-import type { MetaFunction } from "@remix-run/node";
-import {
-  Link,
-  useLoaderData,
-  Form,
-  useSearchParams,
-  useNavigate,
-} from "@remix-run/react";
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { prisma_client } from "~/.server/db";
 import { Category, Deal, Employee } from "@prisma/client";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
+import type { MetaFunction } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import {
+    Form,
+    Link,
+    useLoaderData,
+    useNavigate,
+    useSearchParams
+} from "@remix-run/react";
+import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import {
-  fetchDeals,
-  fetchServices,
-  formatDate,
-  formatDateToISO,
-  getCategoryOptions,
-  getEmployeeOptions,
+    fetchDeals,
+    fetchServices,
+    formatDate,
+    formatDateToISO,
+    getCategoryOptions,
+    getEmployeeOptions,
 } from "shared/utilityFunctions";
+import { prisma_client } from "~/.server/db";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import { fetchServiceSaleRecords } from "~/utils/serviceSaleRecord/db.server";
-import { ServiceSaleRecordFetchSchema } from "~/utils/serviceSaleRecord/validation.server";
 import { ServiceSaleRecordFetchErrors } from "~/utils/serviceSaleRecord/types";
+import { ServiceSaleRecordFetchSchema } from "~/utils/serviceSaleRecord/validation.server";
+import SalesRecordTable from "./SalesRecordTable";
 export const meta: MetaFunction = () => {
   return [
     { title: "Ameeraz Management" },
@@ -97,8 +95,9 @@ export default function Index() {
     return today.toISOString().split("T")[0]; // Formats the date to 'YYYY-MM-DD'
   });
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [formSubmitErrorMessage, setFormSubmitErrorMessage] = useState<string>("");
+  const navigate = useNavigate()
+  const [formSubmitErrorMessage, setFormSubmitErrorMessage] =
+    useState<string>("");
   //loader Data
   const { service_records, deals, employees, categories, errorMessages } =
     useLoaderData<{
@@ -156,135 +155,6 @@ export default function Index() {
       categories.find((cat) => cat.cat_id === id)?.cat_name ||
       "No Category exists",
   }));
-
-
-
-  //Creating a Table
-  //it throws an error, while passing service_records directly
-  const nodes = [...service_records];
-  const data = { nodes };
-
-  const [ids, setIds] = useState<string[]>([]);
-
-  const getEmployeeNames = (
-    item: ServiceSaleRecordWithRelations,
-    fullName?: boolean
-  ) => {
-    const emp_ids = item.employees.map((emp) => emp.emp_id);
-    const emp_entities = employees.filter((emp) =>
-      emp_ids.includes(emp.emp_id)
-    );
-    if (fullName) {
-      return emp_entities
-        .map((emp) => `${emp.emp_fname} ${emp.emp_lname}`)
-        .join(", ");
-    }
-    return emp_entities.map((emp) => emp.emp_fname).join(", ");
-  };
-
-  const handleExpand = (item: ServiceSaleRecordWithRelations) => {
-    if (ids.includes(item.service_record_id)) {
-      setIds(ids.filter((id) => id !== item.service_record_id));
-    } else {
-      setIds(ids.concat(item.service_record_id));
-    }
-  };
-
-  const ROW_PROPS = {
-    onClick: handleExpand,
-  };
-
-  const ROW_OPTIONS = {
-    renderAfterRow: (item: ServiceSaleRecordWithRelations) => (
-      <>
-        {ids.includes(item.service_record_id) && (
-          <tr style={{ display: "flex", gridColumn: "1 / -1" }}>
-            <td style={{ flex: "1" }}>
-              <ul
-                style={{
-                  margin: "0",
-                  padding: "0",
-                  backgroundColor: "#e0e0e0",
-                }}
-              >
-                <li>
-                  <strong>Deals/Services</strong>
-                  {item.deals.map((deal) => deal.deal_name).join(", ")}
-                </li>
-                <li>
-                  <strong>Employees</strong> {getEmployeeNames(item, true)}
-                </li>
-              </ul>
-            </td>
-          </tr>
-        )}
-      </>
-    ),
-  };
-
-  const COLUMNS = [
-    {
-      label: "Date",
-      renderCell: (item: ServiceSaleRecordWithRelations) =>
-        formatDate(item.created_at),
-    },
-    {
-      label: "Client Name",
-      renderCell: (item: ServiceSaleRecordWithRelations) =>
-        `${item.client.client_fname} ${item.client.client_lname}`,
-    },
-    {
-      label: "Total Amount",
-      renderCell: (item: ServiceSaleRecordWithRelations) => item.total_amount,
-    },
-    {
-      label: "Paid Amount",
-      renderCell: (item: ServiceSaleRecordWithRelations) =>
-        item.transactions.reduce(
-          (sum, transaction) => sum + transaction.amount_paid,
-          0
-        ),
-    },
-    {
-      label: "Deals/Services",
-      renderCell: (item: ServiceSaleRecordWithRelations) =>
-        item.deals.map((deal) => deal.deal_name).join(", "),
-    },
-    {
-      label: "Employees",
-      renderCell: getEmployeeNames,
-    },
-    {
-      label: "Edit",
-      renderCell: (item: ServiceSaleRecordWithRelations) => {
-        return (
-          <button
-            onClick={() => navigate(`/salerecord/${item.service_record_id}`)}
-          >
-            Edit
-          </button>
-        );
-      },
-    },
-  ];
-
-  const theme = useTheme([
-    getTheme(),
-    {
-      HeaderRow: `
-        background-color: #eaf5fd;
-      `,
-      Row: `
-        &:nth-of-type(odd) {
-          background-color: #d2e9fb;
-        }
-
-        &:nth-of-type(even) {
-          background-color: #eaf5fd;
-        }
-      `,
-    },
-  ]);
 
   const onDealsChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
@@ -360,7 +230,6 @@ export default function Index() {
     setSearchParams(params);
   };
 
-  
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -543,12 +412,10 @@ export default function Index() {
           Create a new record
         </Link>
         <div className="mt-6">
-          <CompactTable
-            columns={COLUMNS}
-            data={data}
-            theme={theme}
-            rowProps={ROW_PROPS}
-            rowOptions={ROW_OPTIONS}
+          <SalesRecordTable
+            serviceRecords={service_records}
+            employees={employees}
+            onEdit={(id) => navigate(`/salerecord/${id}`)}
           />
         </div>
       </div>

@@ -23,7 +23,9 @@ import {
   getEmployeeOptions,
 } from "shared/utilityFunctions";
 import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
-
+import { fetchServiceSaleRecords } from "~/utils/serviceSaleRecord/db.server";
+import { ServiceSaleRecordFetchSchema } from "~/utils/serviceSaleRecord/validation.server";
+import { ServiceSaleRecordFetchErrors } from "~/utils/serviceSaleRecord/types";
 export const meta: MetaFunction = () => {
   return [
     { title: "Ameeraz Management" },
@@ -43,125 +45,49 @@ type FormValues = {
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
 
-  // Extract dates
-  const { start_date, end_date, current_date } = extractDates(searchParams);
-
   // Extract filters
-  const { deal_ids, employee_ids, category_ids, client_mobile_num } =
-    extractFilters(searchParams);
-
-  // Validate dates
-  validateDates(current_date, start_date, end_date);
-
-  let service_records;
-  //if no search param is provided, only fetch the current date records
-  if (
-    start_date ||
-    end_date ||
-    deal_ids ||
-    employee_ids ||
-    category_ids ||
-    client_mobile_num
-  ) {
-    service_records = await fetchServiceRecords(
-      start_date,
-      end_date,
-      client_mobile_num,
-      deal_ids,
-      category_ids,
-      employee_ids
-    );
-  } else {
-    current_date.setHours(0, 0, 0);
-    service_records = await fetchServiceRecords(current_date);
-  }
-
-  // Fetch data
+  const formData = extractFilters(searchParams);
 
   const deals = await prisma_client.deal.findMany();
   const employees = await prisma_client.employee.findMany();
   const categories = await prisma_client.category.findMany();
 
+  const validationResult = await ServiceSaleRecordFetchSchema.safeParseAsync(
+    formData
+  );
+  if (!validationResult.success) {
+    return {
+      errorMessages: validationResult.error.flatten().fieldErrors,
+      service_records: [],
+      deals,
+      employees,
+      categories,
+    };
+  }
+
+  const service_records = await fetchServiceSaleRecords(validationResult.data);
+
   return { service_records, deals, employees, categories };
 }
 
-// Helper function to extract and format dates
-function extractDates(searchParams: URLSearchParams) {
-  const current_date = new Date(new Date().toISOString().slice(0, 10));
-  const start_date = searchParams.get("start_date")
-    ? new Date(searchParams.get("start_date")!)
-    : undefined;
-  const end_date = searchParams.get("end_date")
-    ? new Date(searchParams.get("end_date")!)
-    : undefined;
-
-  current_date.setHours(23, 59, 59);
-  if (end_date) {
-    end_date.setHours(23, 59, 59);
-  }
-
-  return { start_date, end_date, current_date };
-}
-
-// Helper function to extract filters from search parameters
+//Helper function to extract Filters from Search Params.
 function extractFilters(searchParams: URLSearchParams) {
+  const start_date = searchParams.get("start_date") || undefined;
+  const end_date = searchParams.get("end_date") || undefined;
+
   const deal_ids = searchParams.get("all_deals")?.split("|");
   const employee_ids = searchParams.get("employees")?.split("|");
   const category_ids = searchParams.get("categories")?.split("|");
   const client_mobile_num = searchParams.get("mobile_num") || undefined;
 
-  return { deal_ids, employee_ids, category_ids, client_mobile_num };
-}
-
-// Helper function to validate the dates
-function validateDates(
-  currentDate: Date,
-  startDate: Date | undefined,
-  endDate: Date | undefined
-) {
-  if (startDate && endDate && startDate > endDate) {
-    throw new Error("Start Date can not be greater than End Date");
-  }
-
-  if (endDate && endDate > currentDate) {
-    throw new Error("End Date cannot be greater than today's date");
-  }
-}
-
-// Helper function to fetch service records from Prisma
-async function fetchServiceRecords(
-  startDate: Date | undefined,
-  endDate?: Date | undefined,
-  client_mobile_num?: string | undefined,
-  deal_ids?: string[] | undefined,
-  category_ids?: string[] | undefined,
-  employee_ids?: string[] | undefined
-) {
-  return prisma_client.service_Sale_Record.findMany({
-    where: {
-      created_at: { gte: startDate, lte: endDate },
-      client: { client_mobile_num: client_mobile_num },
-      deals: {
-        some: {
-          deal_id: { in: deal_ids },
-          services: {
-            some: {
-              category: { cat_id: { in: category_ids } },
-            },
-          },
-        },
-      },
-      employees: {
-        some: { emp_id: { in: employee_ids } },
-      },
-    },
-    include: {
-      client: true,
-      transactions: true,
-      deals: true,
-      employees: true,
-    },
-  });
+  return {
+    deal_ids,
+    employee_ids,
+    category_ids,
+    client_mobile_num,
+    start_date,
+    end_date,
+  };
 }
 
 export default function Index() {
@@ -172,13 +98,16 @@ export default function Index() {
   });
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [formSubmitErrorMessage, setFormSubmitErrorMessage] = useState<string>("");
   //loader Data
-  const { service_records, deals, employees, categories } = useLoaderData<{
-    service_records: ServiceSaleRecordWithRelations[];
-    deals: Deal[];
-    employees: Employee[];
-    categories: Category[];
-  }>();
+  const { service_records, deals, employees, categories, errorMessages } =
+    useLoaderData<{
+      service_records: ServiceSaleRecordWithRelations[];
+      deals: Deal[];
+      employees: Employee[];
+      categories: Category[];
+      errorMessages: ServiceSaleRecordFetchErrors;
+    }>();
 
   //references
   const dealsRef = useRef<{ value: string; label: string }[]>([]);
@@ -228,8 +157,7 @@ export default function Index() {
       "No Category exists",
   }));
 
-  //other values
-  let errorMessage: string = "";
+
 
   //Creating a Table
   //it throws an error, while passing service_records directly
@@ -391,7 +319,14 @@ export default function Index() {
     const all_deals = [...deals, ...services];
     const employees = empRef.current?.map((emp) => emp.value);
     const categories = catRef.current?.map((cat) => cat.value);
-    if (start_date || end_date || mobile_num || employees.length > 0  || categories.length > 0 || all_deals.length > 0) {
+    if (
+      start_date ||
+      end_date ||
+      mobile_num ||
+      employees.length > 0 ||
+      categories.length > 0 ||
+      all_deals.length > 0
+    ) {
       return {
         start_date,
         end_date,
@@ -425,15 +360,17 @@ export default function Index() {
     setSearchParams(params);
   };
 
+  
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
     const formValues = fetchFormValues(formData);
     if (!formValues) {
-      errorMessage = "Atleast One vale must be selected";
+      setFormSubmitErrorMessage("Atleast One vale must be selected");
       return;
     }
+    setFormSubmitErrorMessage("");
     setSearchParameters(formValues);
   };
   return (
@@ -464,6 +401,11 @@ export default function Index() {
           max={currentDate}
           className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         />
+        {errorMessages?.start_date && (
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages.start_date[0]}
+          </h2>
+        )}
         <label
           htmlFor="end_date"
           className="block text-gray-700 text-sm font-bold mt-4"
@@ -479,6 +421,11 @@ export default function Index() {
           max={currentDate}
           className=" mt-2 border border-gray-300 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block p-2.5 w-full sm:text-sm"
         />
+        {errorMessages?.end_date && (
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages.end_date[0]}
+          </h2>
+        )}
         <label
           htmlFor="mobile_num"
           className="block text-gray-700 text-sm font-bold mt-4"
@@ -494,6 +441,11 @@ export default function Index() {
           defaultValue={searchParams.get("mobile_num") || undefined}
           className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
         />
+        {errorMessages?.client_mobile_num && (
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages.client_mobile_num[0]}
+          </h2>
+        )}
         <label
           htmlFor="services"
           className="block text-gray-700 text-sm font-bold mt-4"
@@ -525,6 +477,11 @@ export default function Index() {
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
+        {errorMessages?.deal_ids && (
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages.deal_ids[0]}
+          </h2>
+        )}
         <label
           htmlFor="employees"
           className="block text-gray-700 text-sm font-bold mt-4"
@@ -540,6 +497,11 @@ export default function Index() {
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
+        {errorMessages?.employee_ids && (
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages.employee_ids[0]}
+          </h2>
+        )}
         <label
           htmlFor="categories"
           className="block text-gray-700 text-sm font-bold mt-4"
@@ -555,15 +517,22 @@ export default function Index() {
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
-        {errorMessage ? (
-          <h2 className="text-red-500 font-semibold">{errorMessage}</h2>
-        ) : undefined}
+        {errorMessages?.category_ids && (
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages.category_ids[0]}
+          </h2>
+        )}
         <button
           type="submit"
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Fetch
         </button>
+        {formSubmitErrorMessage && (
+          <h2 className="text-red-500 font-semibold">
+            {formSubmitErrorMessage}
+          </h2>
+        )}
       </Form>
 
       <div className="mt-20">

@@ -1,15 +1,15 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link, useLocation } from "@remix-run/react";
-import { fetchClientFromId } from "~/utils/client/functions.server";
 import { ClientWithRelations } from "~/utils/client/types";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
+import { getClientFromId } from "~/utils/client/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Id not provided in URL");
   }
-  const client = await fetchClientFromId({ id, includeServices: true });
+  const client = await getClientFromId({ id, includeServices: true });
   if (!client) {
     throw new Error(`Client with id:${id} not found`);
   }
@@ -18,16 +18,17 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export default function View_Client() {
   const { client } = useLoaderData<{ client: ClientWithRelations }>();
-  const location = useLocation()
-  const getLocationState = ()=>{
-    const {sp_areas,sp_fname,sp_lname,sp_mobile_num}= location.state || {};
+  const location = useLocation();
+  const getLocationState = () => {
+    const { sp_areas, sp_fname, sp_lname, sp_mobile_num } =
+      location.state || {};
     const searchParamValues = {
       fname: sp_fname,
       lname: sp_lname,
       areas: sp_areas,
-      mobile_num: sp_mobile_num
-    }
-    let searchquery = "?"
+      mobile_num: sp_mobile_num,
+    };
+    let searchquery = "?";
     for (const [key, value] of Object.entries(searchParamValues)) {
       if (Array.isArray(value)) {
         if (value.length > 0) {
@@ -39,20 +40,19 @@ export default function View_Client() {
         searchquery += `${key}=${value}&`;
       }
     }
-    return searchquery.slice(0, -1)
-    
-  }
-  
+    return searchquery.slice(0, -1);
+  };
+
   const total_amount_spent = client.services.reduce((sum, service) => {
     return sum + service.total_amount;
   }, 0);
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <Link
-        to={{pathname: `/clients`, search: getLocationState()}}
+        to={{ pathname: `/clients`, search: getLocationState() }}
         className="bg-green-400 text-white font-semibold py-2 px-4 absolute top-4 left-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
       >
-        <FaLongArrowAltLeft className=""/>
+        <FaLongArrowAltLeft className="" />
         Go to Clients
       </Link>
       <div className="bg-white mt-14 p-8 rounded-lg shadow-md w-1/2 grid grid-cols-2 gap-4">

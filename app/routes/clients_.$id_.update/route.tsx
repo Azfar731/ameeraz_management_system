@@ -4,23 +4,18 @@ import {
   redirect,
 } from "@remix-run/node";
 import Client_Form from "~/components/clients/client_form";
-import { prisma_client } from "~/.server/db";
 import { useLoaderData, useActionData } from "@remix-run/react";
 import { Client } from "@prisma/client";
-import {
-  getClientFormData,
-  fetchClientFromId,
-} from "~/utils/client/functions.server";
+import { getClientFormData } from "~/utils/client/functions.server";
 import { clientSchema } from "~/utils/client/validation";
-import { ClientValues } from "~/utils/types";
 import { ClientErrorData } from "~/utils/client/types";
-import { capitalizeFirstLetter } from "~/utils/functions";
+import { getClientFromId, updateClient } from "~/utils/client/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Client id not provided for Client Update Page");
   }
-  const client = await fetchClientFromId({ id });
+  const client = await getClientFromId({ id });
   if (!client) {
     throw new Error(`No client with id:${id} found`);
   }
@@ -43,7 +38,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const { client_fname, client_lname, client_mobile_num, client_area } =
     validationResult.data;
 
-  const { updatedClient } = await update_client_fn({
+  const { updatedClient } = await updateClient({
     client_fname,
     client_lname,
     client_mobile_num,
@@ -53,27 +48,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
   console.log("Updated CLIent", updatedClient);
   throw redirect(`/clients/${updatedClient.client_id}`);
 }
-
-const update_client_fn = async ({
-  client_fname,
-  client_lname,
-  client_mobile_num,
-  client_area,
-  client_id,
-}: ClientValues) => {
-  const updatedClient = await prisma_client.client.update({
-    where: {
-      client_id, // The unique identifier for the client record you want to update
-    },
-    data: {
-      client_fname: capitalizeFirstLetter(client_fname.toLowerCase()),
-      client_lname: capitalizeFirstLetter(client_lname.toLowerCase()),
-      client_mobile_num,
-      client_area,
-    },
-  });
-  return { updatedClient };
-};
 
 export default function Update_Client() {
   const loaderData = useLoaderData<{ client: Client }>();

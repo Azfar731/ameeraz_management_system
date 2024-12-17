@@ -7,8 +7,18 @@ integrate form into product sale update
 
 Fixes:
 
+change schema to create a deals and service record joining table
+it will have deal_id, record_id and quantity
 
-edit the printZodErrors function to return jsx.
+
+refactor sale record create Part2
+merge deals and services into one
+fetch them using getAll(get rid of references)
+add render functionality to it(like employees, look productsSaleRecord for more recent version)
+modify formData, how it is saved, how it is retrieved.
+
+
+
 
 Improvements:
 Services:

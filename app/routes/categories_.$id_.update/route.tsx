@@ -7,10 +7,8 @@ import {
   LoaderFunctionArgs,
   replace,
 } from "@remix-run/node";
-import { prisma_client } from "~/.server/db";
 import { categorySchema } from "~/utils/category/validation";
 import { Category } from "@prisma/client";
-import { capitalizeFirstLetter } from "~/utils/functions";
 import { getCategoryFromId, updateCategory } from "~/utils/category/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;

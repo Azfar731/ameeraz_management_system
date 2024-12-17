@@ -1,16 +1,16 @@
 import { useLoaderData, Link } from "@remix-run/react";
-import { fetchDealFromId } from "~/utils/deal/functions.server";
 import { DealWithServices } from "~/utils/deal/types";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { formatDate } from "shared/utilityFunctions";
+import { getDealFromId } from "~/utils/deal/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Id not provided in the URL");
   }
-  const deal = await fetchDealFromId({ id, includeServices: true });
+  const deal = await getDealFromId({ id, includeServices: true });
   if (!deal) {
     throw new Error(`No deal with id: ${id} found`);
   }

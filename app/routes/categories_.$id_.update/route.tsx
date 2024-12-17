@@ -38,7 +38,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { cat_name } = validationResult.data;
 
-  const updated_cateogry = await updateCategory({ cat_name, id });
+  const updated_cateogry = await updateCategory({ cat_name, cat_id:id });
   throw replace(`/categories/${updated_cateogry.cat_id}`);
 }
 

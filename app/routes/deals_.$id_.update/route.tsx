@@ -1,22 +1,21 @@
-import { prisma_client } from "~/.server/db";
 import { Service } from "@prisma/client";
 import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
 import Deal_Form from "~/components/deals/deal_form";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
-  fetchDealFromId,
-  getDealFormData,
+  getDealFormData
 } from "~/utils/deal/functions.server";
 import { dealSchema } from "~/utils/deal/validation";
 import { getActiveServices } from "~/utils/service/db.server";
+import { getDealFromId, updateDeal } from "~/utils/deal/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Id parameter not found in URL");
   }
-  const deal = await fetchDealFromId({ id, includeServices: true });
+  const deal = await getDealFromId({ id, includeServices: true });
   if (!deal) {
     throw new Error(`No deal found with id: ${id}`);
   }
@@ -36,7 +35,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
 
-  const newDeal = await update_deal_fn({
+  const newDeal = await updateDeal({
     deal_id: id,
     ...validationResult.data,
   });
@@ -44,36 +43,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
   throw replace(`/deals/${newDeal.deal_id}`);
 }
 
-const update_deal_fn = async ({
-  deal_id,
-  deal_name,
-  deal_price,
-  activate_from,
-  activate_till,
-  services,
-}: {
-  deal_id: string;
-  deal_name: string;
-  deal_price: number;
-  activate_from: Date;
-  activate_till: Date;
-  services: string[];
-}) => {
-  const newDeal = await prisma_client.deal.update({
-    where: { deal_id },
-    data: {
-      deal_name,
-      deal_price,
-      activate_from,
-      activate_till,
-      services: {
-        set: services.map((serviceId) => ({ serv_id: serviceId })),
-      },
-    },
-  });
-
-  return newDeal;
-};
 export default function Update_Deal() {
   const loaderData = useLoaderData<{
     deal: DealWithServices;

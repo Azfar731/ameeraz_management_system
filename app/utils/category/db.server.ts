@@ -1,5 +1,5 @@
 import { prisma_client } from "~/.server/db";
-
+import { Category } from "@prisma/client";
 const getCategoryFromId = async (
     { id, include_services }: { id: string; include_services: boolean },
 ) => {
@@ -10,7 +10,7 @@ const getCategoryFromId = async (
     return category;
 };
 
-const createCategory = async ({ cat_name }: { cat_name: string }) => {
+const createCategory = async ({ cat_name }: Omit<Category, "cat_id">) => {
     const category = await prisma_client.category.create({
         data: {
             cat_name: (cat_name.toLowerCase()),
@@ -21,13 +21,10 @@ const createCategory = async ({ cat_name }: { cat_name: string }) => {
 
 const updateCategory = async ({
     cat_name,
-    id,
-}: {
-    cat_name: string;
-    id: string;
-}) => {
+    cat_id,
+}: Category) => {
     const category = await prisma_client.category.update({
-        where: { cat_id: id },
+        where: { cat_id },
         data: {
             cat_name: (cat_name.toLowerCase()),
         },

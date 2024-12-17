@@ -7,17 +7,17 @@ import Select, { OnChangeValue } from "react-select";
 
 import areasList from "../../components/clients/areas.json";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { fetchClients } from "./utilityFunctions.server";
 import { Client } from "@prisma/client";
 import { formatDate } from "shared/utilityFunctions";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 
 import { getSearchParams } from "~/utils/client/functions";
+import { getClients } from "~/utils/client/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
   const { mobile_num, fname, lname, areas } = getSearchParams(searchParams);
   if (mobile_num || fname || lname || areas) {
-    const clients = await fetchClients(mobile_num, fname, lname, areas);
+    const clients = await getClients(mobile_num, fname, lname, areas);
     return { clients };
   }
   return { clients: [] };

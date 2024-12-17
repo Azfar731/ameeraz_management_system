@@ -2,14 +2,14 @@ import { prisma_client } from "~/.server/db";
 import { Service } from "@prisma/client";
 import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors } from "~/utils/deal/types";
-import { fetchActiveServices } from "~/utils/service/functions.server";
 import Deal_Form from "~/components/deals/deal_form";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { getDealFormData } from "~/utils/deal/functions.server";
 import { dealSchema } from "~/utils/deal/validation";
+import { getActiveServices } from "~/utils/service/db.server";
 
 export async function loader() {
-  const services = await fetchActiveServices();
+  const services = await getActiveServices();
   return { services };
 }
 

@@ -1,5 +1,5 @@
 import { prisma_client } from "~/.server/db";
-
+import { Employee } from "@prisma/client";
 const getEmployeeFromId = async (id: string) => {
     const employee = await prisma_client.employee.findFirst({
         where: { emp_id: id },
@@ -13,13 +13,7 @@ const createEmployee = async ({
     emp_mobile_num,
     base_salary,
     percentage,
-}: {
-    emp_fname: string;
-    emp_lname: string;
-    emp_mobile_num: string;
-    base_salary: number;
-    percentage: number;
-}) => {
+}: Omit<Employee, "emp_id" | "emp_status" | "created_at">) => {
     const employee = await prisma_client.employee.create({
         data: {
             emp_fname: (emp_fname.toLowerCase()),
@@ -40,15 +34,7 @@ const updateEmployee = async ({
     base_salary,
     percentage,
     emp_status,
-}: {
-    emp_id: string;
-    emp_fname: string;
-    emp_lname: string;
-    emp_mobile_num: string;
-    base_salary: number;
-    percentage: number;
-    emp_status: boolean;
-}) => {
+}: Omit<Employee, "created_at">) => {
     const updated_employee = await prisma_client.employee.update({
         where: {
             emp_id,

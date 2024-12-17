@@ -54,7 +54,7 @@ const getVendorFromId = async (
 const createVendor = async (
     { vendor_fname, vendor_lname, vendor_mobile_num }: Omit<
         Vendor,
-        "vendor_id"
+        "vendor_id" | "created_at"
     >,
 ) => {
     return await prisma_client.vendor.create({
@@ -68,7 +68,7 @@ const createVendor = async (
 
 // Function to update an existing vendor
 const updateVendor = async (
-    { vendor_id, vendor_fname, vendor_lname, vendor_mobile_num }: Vendor,
+    { vendor_id, vendor_fname, vendor_lname, vendor_mobile_num }: Omit<Vendor, "created_at">,
 ) => {
     return await prisma_client.vendor.update({
         where: { vendor_id },

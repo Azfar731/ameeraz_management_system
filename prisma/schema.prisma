@@ -41,6 +41,7 @@ model Employee {
   base_salary Int
   percentage  Int
   emp_status  Boolean @default(true)
+  created_at    DateTime @default(now())
   records Employee_Record_JT[]
 } 
 
@@ -49,6 +50,7 @@ model Service {
   serv_name String
   serv_price Int
   serv_category String @db.Uuid
+  created_at    DateTime @default(now())
 
   category   Category @relation(fields: [serv_category], references: [cat_id]) 
   deals Deal[] @relation("Services_In_Deals")
@@ -79,6 +81,7 @@ model Product {
   prod_name String
   prod_price Int @default(0)  
   quantity Int @default(0)
+  created_at    DateTime @default(now())
 
   records Product_Record_JT[] 
 }
@@ -88,7 +91,7 @@ model Vendor {
   vendor_fname String
   vendor_lname String
   vendor_mobile_num String @unique
-
+  created_at    DateTime @default(now())
   records Product_Sale_Record[]
 }
 

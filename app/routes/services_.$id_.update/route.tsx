@@ -8,14 +8,11 @@ import {
 } from "@remix-run/node";
 import { prisma_client } from "~/.server/db";
 
-import { capitalizeFirstLetter } from "~/utils/functions";
 import { ServiceErrors, ServiceWithRelations } from "~/utils/service/types";
 import { Category } from "@prisma/client";
 import { serviceSchema } from "~/utils/service/validation.server";
-import {
-  fetchServiceFromId,
-  getServiceFormData,
-} from "~/utils/service/functions.server";
+import { getServiceFormData } from "~/utils/service/functions.server";
+import { getServiceFromId, updateService } from "~/utils/service/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
@@ -23,7 +20,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Error("No ID provided in the parameter");
   }
 
-  const service = await fetchServiceFromId({ id, includeCategory: true });
+  const service = await getServiceFromId({ id, includeCategory: true });
   if (!service) {
     throw new Error(`No Service found with id:${id}`);
   }
@@ -48,8 +45,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { serv_name, serv_category, serv_price, serv_status } =
     validationResult.data;
-  const updated_service = await update_service_fn({
-    id,
+  const updated_service = await updateService({
+    serv_id: id,
     serv_name,
     serv_category,
     serv_price,
@@ -58,52 +55,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
   throw replace(`/services/${updated_service.serv_id}`);
 }
 
-const update_service_fn = async ({
-  id,
-  serv_name,
-  serv_category,
-  serv_price,
-  serv_status,
-}: {
-  id: string;
-  serv_name: string;
-  serv_category: string;
-  serv_price: number;
-  serv_status: boolean;
-}) => {
-  const capitalized_name = capitalizeFirstLetter(serv_name.toLowerCase());
-  const current_date = new Date();
-  const service = await prisma_client.service.update({
-    where: { serv_id: id },
-    data: {
-      serv_name: capitalized_name,
-      serv_category,
-      serv_price,
-    },
-  });
-  const deal = await prisma_client.deal.findFirst({
-    where: {
-      services: {
-        some: {
-          serv_id: id,
-        },
-      },
-      auto_generated: true,
-    },
-  });
-  //if serv_status is false, it means that the service has been updated
-  // to be inactive, so we assign activate_till a value of current date
-  await prisma_client.deal.update({
-    where: { deal_id: deal?.deal_id },
-    data: {
-      deal_name: capitalized_name,
-      deal_price: serv_price,
-      activate_till: serv_status ? null : current_date,
-    },
-  });
-
-  return service;
-};
 
 export default function Update_Service() {
   const loaderData = useLoaderData<{

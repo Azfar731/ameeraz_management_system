@@ -1,14 +1,14 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { fetchServiceFromId } from "~/utils/service/functions.server";
 import { ServiceWithRelations } from "~/utils/service/types";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
+import { getServiceFromId } from "~/utils/service/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Id not provided in the URL");
   }
-  const service = await fetchServiceFromId({ id, includeCategory: true });
+  const service = await getServiceFromId({ id, includeCategory: true });
   if (!service) {
     throw new Error(`No service found with id: ${id}`);
   }

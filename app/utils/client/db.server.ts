@@ -1,5 +1,5 @@
 import { prisma_client } from "~/.server/db";
-
+import { Client } from "@prisma/client";
 async function findClientByMobile(mobile_num: string) {
     return prisma_client.client.findFirst({
         where: { client_mobile_num: mobile_num },
@@ -11,12 +11,7 @@ const createClient = async ({
     client_lname,
     client_mobile_num,
     client_area,
-}: {
-    client_fname: string;
-    client_lname: string;
-    client_mobile_num: string;
-    client_area: string;
-}) => {
+}: Omit<Client, "client_id" | "created_at" | "points">) => {
     const client = await prisma_client.client.create({
         data: {
             client_fname: (client_fname.toLowerCase()),
@@ -34,13 +29,7 @@ const updateClient = async ({
     client_mobile_num,
     client_area,
     client_id,
-}: {
-    client_fname: string;
-    client_lname: string;
-    client_mobile_num: string;
-    client_area: string;
-    client_id: string;
-}) => {
+}: Omit<Client, "created_at" | "points">) => {
     const updatedClient = await prisma_client.client.update({
         where: {
             client_id, // The unique identifier for the client record you want to update
@@ -72,8 +61,6 @@ const getClientFromId = async (
     return client;
 };
 
-
-
 const getClients = async (
     mobile_num: string | undefined,
     fname: string | undefined,
@@ -102,5 +89,10 @@ const getClients = async (
     }
 };
 
-
-export { createClient, findClientByMobile, updateClient,getClientFromId, getClients };
+export {
+    createClient,
+    findClientByMobile,
+    getClientFromId,
+    getClients,
+    updateClient,
+};

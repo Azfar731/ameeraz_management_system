@@ -2,7 +2,6 @@ import { prisma_client } from "~/.server/db";
 import { Service } from "@prisma/client";
 import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
-import { fetchActiveServices } from "~/utils/service/functions.server";
 import Deal_Form from "~/components/deals/deal_form";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
@@ -10,6 +9,7 @@ import {
   getDealFormData,
 } from "~/utils/deal/functions.server";
 import { dealSchema } from "~/utils/deal/validation";
+import { getActiveServices } from "~/utils/service/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
@@ -20,7 +20,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!deal) {
     throw new Error(`No deal found with id: ${id}`);
   }
-  const services = await fetchActiveServices();
+  const services = await getActiveServices();
   return { deal, services };
 }
 

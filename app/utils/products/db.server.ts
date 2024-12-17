@@ -20,7 +20,7 @@ const getProductFromId = async (
 };
 
 const createProduct = async (
-    { prod_name, quantity }: Omit<Product, "prod_id">,
+    { prod_name, quantity }: Omit<Product, "prod_id" | "created_at">,
 ) => {
     return await prisma_client.product.create({
         data: {
@@ -30,7 +30,9 @@ const createProduct = async (
     });
 };
 
-const updateProduct = async ({ prod_id, prod_name, quantity }: Product) => {
+const updateProduct = async (
+    { prod_id, prod_name, quantity }: Omit<Product, "created_at">,
+) => {
     return await prisma_client.product.update({
         where: { prod_id },
         data: {

@@ -56,6 +56,27 @@ export default function Product_Form({
           {errorMessages.quantity[0]}
         </h2>
       )}
+      <label
+        htmlFor="price"
+        className="block text-gray-700 text-sm font-bold mt-4"
+      >
+        Price
+      </label>
+      <input
+        type="number"
+        name="price"
+        id="price"
+        min={0}
+        defaultValue={product?.prod_price}
+        placeholder="1000"
+        className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
+        required
+      />
+      {errorMessages?.prod_price && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.prod_price[0]}
+        </h2>
+      )}
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"

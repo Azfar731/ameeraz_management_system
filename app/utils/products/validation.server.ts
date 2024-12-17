@@ -15,6 +15,12 @@ const ProductSchema = z.object({
         .refine((value) => !isNaN(value) && value > 0, {
             message: "Quantity must be greater than 0",
         }),
+    prod_price: z.string().transform((str) => parseInt(str)).refine(
+        (value) => !isNaN(value) && value > 0,
+        {
+            message: "Price must be greater than 0",
+        },
+    ),
 });
 
 export { ProductSchema };

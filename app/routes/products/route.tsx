@@ -1,11 +1,10 @@
-import { useLoaderData } from "@remix-run/react";
-import { getAllProducts } from "~/utils/products/db.server";
 import { Product } from "@prisma/client";
-import { Link } from "@remix-run/react";
-import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
+import { Link, useLoaderData } from "@remix-run/react";
+import { getTheme } from "@table-library/react-table-library/baseline";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
+import { FaExternalLinkAlt, FaPlus } from "react-icons/fa";
+import { getAllProducts } from "~/utils/products/db.server";
 
 export async function loader() {
   const products = await getAllProducts();
@@ -23,6 +22,10 @@ export default function Products() {
     {
       label: "Name",
       renderCell: (item: Product) => item.prod_name,
+    },
+    {
+      label: "Price",
+      renderCell: (item: Product) => `${item.prod_price}`,
     },
     {
       label: "Quantity",
@@ -69,11 +72,7 @@ export default function Products() {
           Create Product <FaPlus />
         </Link>
         <div className="mt-6">
-          <CompactTable
-            columns={COLUMNS}
-            data={data}
-            theme={theme}
-          />
+          <CompactTable columns={COLUMNS} data={data} theme={theme} />
         </div>
       </div>
     </div>

@@ -4,6 +4,8 @@ import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import { formatDate } from "shared/utilityFunctions";
 import { generate_heading } from "~/utils/render_functions";
 import { getServiceSaleRecordFromId } from "~/utils/saleRecord/db.server";
+import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
+
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -68,7 +70,14 @@ export default function Record() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 ">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative ">
+      <Link
+        to={`/transactions`}
+        className="bg-green-400 text-white font-semibold py-2 px-4 absolute top-4 left-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
+      >
+        <FaLongArrowAltLeft className="" />
+        Go to Service Sale Records
+      </Link>
       <div className="bg-white mt-14 p-8 rounded-lg shadow-md w-1/2 grid grid-cols-2 gap-4">
         <h1 className="text-2xl font-bold text-gray-800 mb-6 col-span-2 ">
           Service Record Details
@@ -86,10 +95,11 @@ export default function Record() {
 
         <h3 className="font-medium text-gray-700">Remaining amount</h3>
         <h3 className="text-gray-600">
-          {record.total_amount -   transactions.reduce(
-            (sum, transaction) => sum + transaction.amount_paid,
-            0
-          )}
+          {record.total_amount -
+            transactions.reduce(
+              (sum, transaction) => sum + transaction.amount_paid,
+              0
+            )}
         </h3>
         {generate_heading("Deals/Services Taken", "Name", "Price")}
         {renderered_deals}
@@ -99,12 +109,11 @@ export default function Record() {
 
         {generate_heading("Transactions", "Date", "Amount Paid")}
         {render_transactions()}
-
         <Link
-          to="/"
-          className="text-blue-500 hover:text-blue-700 underline underline-offset-2 font-medium transition duration-300 col-span-2 pt-8"
+          to={`update`}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
         >
-          Go Back to Home
+          Edit <FaEdit />
         </Link>
       </div>
     </div>

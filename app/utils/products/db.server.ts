@@ -6,7 +6,7 @@ const getAllProducts = async () => {
 };
 
 const getProductFromId = async (
-    { id, includeRelations = false } : {
+    { id, includeRelations = false }: {
         id: string;
         includeRelations?: boolean;
     },
@@ -19,25 +19,25 @@ const getProductFromId = async (
     });
 };
 
-
-const createProduct = async ({ prod_name, quantity }: Omit<Product, 'prod_id'>) => {
+const createProduct = async (
+    { prod_name, quantity }: Omit<Product, "prod_id">,
+) => {
     return await prisma_client.product.create({
         data: {
-            prod_name,
+            prod_name: prod_name.toLowerCase(),
             quantity,
         },
     });
 };
-
 
 const updateProduct = async ({ prod_id, prod_name, quantity }: Product) => {
     return await prisma_client.product.update({
         where: { prod_id },
         data: {
-            prod_name,
+            prod_name: prod_name.toLowerCase(),
             quantity,
         },
     });
 };
 
-export { getAllProducts, getProductFromId, updateProduct, createProduct };
+export { createProduct, getAllProducts, getProductFromId, updateProduct };

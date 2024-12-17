@@ -11,4 +11,14 @@ type ServiceSaleRecordFetchErrors = {
 }
 
 
-export type { ServiceSaleRecordFetchErrors }
+type ServiceSaleRecordCreateErrors = {
+    amount_charged: string[]
+    amount_paid: string[]
+    mobile_num: string[]
+    deals: string[]
+    services: string[]
+    employees: string[]
+    mode_of_payment: string[]
+}
+
+export type { ServiceSaleRecordFetchErrors, ServiceSaleRecordCreateErrors }

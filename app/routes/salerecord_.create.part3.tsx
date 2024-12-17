@@ -11,12 +11,14 @@ import {
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import { FormType } from "~/utils/types";
-import {
-  validate_data,
-} from "~/.server/utitlityFunctions";
+// import { validate_data } from "~/.server/utitlityFunctions";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { getEmployeeOptions } from "shared/utilityFunctions";
 import { createServiceSaleRecord } from "~/utils/serviceSaleRecord/db.server";
+import { ServiceSaleRecordSchema } from "~/utils/serviceSaleRecord/validation.server";
+// import { printZodErrors } from "~/utils/functions";
+import { ServiceSaleRecordCreateErrors } from "~/utils/serviceSaleRecord/types";
+import { renderZodErrors } from "~/utils/render_functions";
 
 export async function loader() {
   const employees = await prisma_client.employee.findMany();
@@ -25,56 +27,69 @@ export async function loader() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData: FormType = await request.json();
-  const employees = formData.employees;
+
+  const validationResult = ServiceSaleRecordSchema.safeParse(formData);
+  if (!validationResult.success) {
+    return {
+      errorMessages: validationResult.error.flatten().fieldErrors,
+    };
+  }
+
+  const new_record = await createServiceSaleRecord(validationResult.data);
+  return replace(`/salerecord/${new_record.service_record_id}`);
+
+  // const employees = formData.employees;
   // Calculate total work share of employees
-  if (employees.length < 1)
-    return { msg: "Atleast 1 employee must be selcted" };
+  // if (employees.length < 1)
+  //   return { msg: "Atleast 1 employee must be selcted" };
 
-  const total_work_share = calculateTotalWorkShare(employees);
+  // const total_work_share = calculateTotalWorkShare(employees);
 
-  // Validate if amount charged matches total work share
-  const validationError = validateWorkShare(
-    total_work_share,
-    formData.amount_charged
-  );
-  if (validationError) {
-    return { msg: validationError };
-  }
+  // // Validate if amount charged matches total work share
+  // const validationError = validateWorkShare(
+  //   total_work_share,
+  //   formData.amount_charged
+  // );
+  // if (validationError) {
+  //   return { msg: validationError };
+  // }
 
-  // Validate the entire form data
-  const isNotValid = validate_data(formData);
-  if (!isNotValid) {
-    // Create the service record and redirect to the new record's page
-    const record = await createServiceSaleRecord(formData);
-    return replace(`/salerecord/${record.service_record_id}`);
-  } else {
-    return isNotValid;
-  }
+  // // Validate the entire form data
+  // const isNotValid = validate_data(formData);
+  // if (!isNotValid) {
+  //   // Create the service record and redirect to the new record's page
+  //   const record = await createServiceSaleRecord(formData);
+  //   return replace(`/salerecord/${record.service_record_id}`);
+  // } else {
+  //   return isNotValid;
+  // }
 }
 
 // Helper function to calculate total work share of employees
-function calculateTotalWorkShare(
-  employees: { id: string; work_share: number }[]
-): number {
-  return employees.reduce((total, emp) => total + emp.work_share, 0);
-}
+// function calculateTotalWorkShare(
+//   employees: { id: string; work_share: number }[]
+// ): number {
+//   return employees.reduce((total, emp) => total + emp.work_share, 0);
+// }
 
-// Helper function to validate if amount charged matches total work share
-function validateWorkShare(
-  total_work_share: number,
-  amount_charged: number
-): string | null {
-  if (amount_charged !== total_work_share) {
-    return "Amount charged must match Employees total Work share";
-  }
-  return null;
-}
+// // Helper function to validate if amount charged matches total work share
+// function validateWorkShare(
+//   total_work_share: number,
+//   amount_charged: number
+// ): string | null {
+//   if (amount_charged !== total_work_share) {
+//     return "Amount charged must match Employees total Work share";
+//   }
+//   return null;
+// }
 
 // The validate_data and create_service_record functions remain unchanged.
 
 export default function Part3() {
   //action data
-  const actionData = useActionData<{ msg: string } | undefined>();
+  const actionData = useActionData<{
+    errorMessages: ServiceSaleRecordCreateErrors;
+  }>();
 
   //context data
   const { formData, setFormData } = useOutletContext<{
@@ -236,9 +251,7 @@ export default function Part3() {
           required
         />
         {empWorkShareList}
-        {actionData?.msg && (
-          <h2 className="text-red-500 font-semibold">{actionData.msg}</h2>
-        )}
+        {actionData && renderZodErrors(actionData.errorMessages)}
         <div className="flex justify-between items-center mt-6">
           <button
             type="button"

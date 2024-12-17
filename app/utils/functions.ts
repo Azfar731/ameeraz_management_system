@@ -2,19 +2,23 @@ import { FormValues } from "./category/types";
 import { useSearchParams } from "@remix-run/react";
 import { PaymentModes, TransactionModes } from "./types";
 
+
 const capitalizeFirstLetter = (str: string) => {
   if (str.length === 0) return str; // Return the string as is if it's empty
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const getPaymentOptionsAsStrings =() => {
+const getPaymentOptionsAsStrings = () => {
   return ["cash", "bank_transfer", "card"];
 };
 
 const getPaymentOptions = (): PaymentModes[] => {
   return ["cash", "bank_transfer", "card"];
 };
-const getAllPaymentMenuOptions = (): { value: PaymentModes, label: string }[] => {
+const getAllPaymentMenuOptions = (): {
+  value: PaymentModes;
+  label: string;
+}[] => {
   return [
     { value: "cash", label: "Cash" },
     { value: "bank_transfer", label: "Bank Transfer" },
@@ -22,7 +26,9 @@ const getAllPaymentMenuOptions = (): { value: PaymentModes, label: string }[] =>
   ];
 };
 
-const getSinglePaymentMenuOption = (mode_of_payment: PaymentModes): {value: PaymentModes, label: string} => {
+const getSinglePaymentMenuOption = (
+  mode_of_payment: PaymentModes,
+): { value: PaymentModes; label: string } => {
   switch (mode_of_payment) {
     case "cash":
       return { value: "cash", label: "Cash" };
@@ -109,15 +115,22 @@ const CreateSearchParamsString = (
   return params;
 };
 
+
+
+
+
+
 export {
   capitalizeFirstLetter,
   CreateSearchParamsString,
   getAllPaymentMenuOptions,
   getAllTransactionMenuOptions,
   getPaymentOptions,
+  getPaymentOptionsAsStrings,
   getSinglePaymentMenuOption,
   getSingleTransactionMenuOption,
   getTransactionOptions,
   setSearchParameters,
-  getPaymentOptionsAsStrings
+  
+  
 };

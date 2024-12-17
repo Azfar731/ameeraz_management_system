@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { findClientByMobile } from "../client/db.server";
+import { paymentOptions } from "../constant_values";
 
 //  deal_ids,
 // employee_ids,
@@ -81,4 +82,58 @@ const ServiceSaleRecordFetchSchema = z.object({
     }
 });
 
-export { ServiceSaleRecordFetchSchema };
+const ServiceSaleRecordSchema = z
+  .object({
+    amount_charged: z.number().nonnegative("Amount charged must be greater than 0."),
+    amount_paid: z.number().nonnegative("Amount paid cannot be negative."),
+    mobile_num: z
+      .string()
+      .regex(/^0\d{10}$/, "Mobile number must be 11 digits and start with 0."),
+    deals: z.array(z.object({ value: z.string(), label: z.string() })),
+    services: z.array(z.object({ value: z.string(), label: z.string() })),
+    employees: z
+      .array(
+        z.object({
+          id: z.string(),
+          work_share: z
+            .number()
+            .nonnegative("Employee's workshare can't be smaller than 0."),
+        })
+      )
+      .nonempty("At least one employee must be selected"),
+    mode_of_payment: z.object({
+      value: z.enum(paymentOptions, {
+        errorMap: () => ({ message: "Mode of Payment must be either cash, card, or bank_transfer" }),
+      }),
+      label: z.string(),
+    }),
+  })
+  .refine(
+    (data) => data.deals.length > 0 || data.services.length > 0,
+    {
+      message: "Select at least one service or deal.",
+      path: ["deals", "services"],
+    }
+  )
+  .refine(
+    (data) => data.amount_paid <= data.amount_charged,
+    {
+      message: "Amount paid cannot be greater than amount charged.",
+      path: ["amount_paid"],
+    }
+  )
+  .refine(
+    (data) => {
+      const totalWorkShare = data.employees.reduce(
+        (sum, employee) => sum + employee.work_share,
+        0
+      );
+      return data.amount_charged === totalWorkShare;
+    },
+    {
+      message: "Amount charged must equal the total of employees' work share.",
+      path: ["amount_charged"],
+    }
+  );
+
+export { ServiceSaleRecordFetchSchema, ServiceSaleRecordSchema };

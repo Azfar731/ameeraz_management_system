@@ -5,7 +5,7 @@ import { printZodErrors } from "~/utils/functions.server";
 import { getAllProducts } from "~/utils/products/db.server";
 import {
   getProductSaleRecordByIdWithRelations,
-  updateProductSaleRecord
+  updateProductSaleRecord,
 } from "~/utils/productSaleRecord/db.server";
 import {
   ProductSaleRecordUpdateErrors,
@@ -79,7 +79,6 @@ export default function Update_Product_Sale_Record() {
     products: Product[];
   }>();
   const actionData = useActionData<{ errors: ProductSaleRecordUpdateErrors }>();
-  
 
   return (
     <div className="flex justify-center items-center h-screen">

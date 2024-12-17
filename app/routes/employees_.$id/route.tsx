@@ -1,17 +1,15 @@
 import { Link, useLoaderData } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
-import { prisma_client } from "~/.server/db";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Employee } from "@prisma/client";
+import { getEmployeeFromId } from "~/utils/employee/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Id not provided in URL");
   }
-  const employee = await prisma_client.employee.findFirst({
-    where: { emp_id: id },
-  });
+  const employee = await getEmployeeFromId(id);
   if (!employee) {
     throw new Error(`Client with id:${id} not found`);
   }

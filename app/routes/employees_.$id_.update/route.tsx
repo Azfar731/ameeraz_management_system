@@ -1,26 +1,22 @@
 import Employee_Form from "~/components/employees/employee_form";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { EmployeeErrors, EmployeeValues } from "~/utils/employee/types";
+import { EmployeeErrors } from "~/utils/employee/types";
 import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   replace,
 } from "@remix-run/node";
-import {
-  fetchEmployeeFromId,
-  getEmployeeFormData,
-} from "~/utils/employee/functions.server";
+import { getEmployeeFormData } from "~/utils/employee/functions.server";
 import { Employee } from "@prisma/client";
 import { employeeSchema } from "~/utils/employee/validation";
 
-import { prisma_client } from "~/.server/db";
-import { capitalizeFirstLetter } from "~/utils/functions";
+import { getEmployeeFromId, updateEmployee } from "~/utils/employee/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Employee id not provided for Employee Update Page");
   }
-  const employee = await fetchEmployeeFromId(id);
+  const employee = await getEmployeeFromId(id);
   if (!employee) {
     throw new Error(`Employee with id ${id} not found`);
   }
@@ -49,7 +45,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     percentage,
   } = validationResult.data;
 
-  const updated_employee = await update_employee_fn({
+  const updated_employee = await updateEmployee({
     emp_id: id,
     emp_fname,
     emp_lname,
@@ -62,30 +58,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
   throw replace(`/employees/${updated_employee.emp_id}`);
 }
 
-const update_employee_fn = async ({
-  emp_id,
-  emp_fname,
-  emp_lname,
-  emp_mobile_num,
-  base_salary,
-  percentage,
-  emp_status,
-}: EmployeeValues) => {
-  const updated_employee = await prisma_client.employee.update({
-    where: {
-      emp_id,
-    },
-    data: {
-      emp_fname: capitalizeFirstLetter(emp_fname.toLowerCase()),
-      emp_lname: capitalizeFirstLetter(emp_lname.toLowerCase()),
-      emp_mobile_num,
-      base_salary,
-      percentage,
-      emp_status,
-    },
-  });
-  return updated_employee;
-};
 
 export default function Update_Employee() {
   const actionData = useActionData<{ errors: EmployeeErrors }>();

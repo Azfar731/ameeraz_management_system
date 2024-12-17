@@ -9,16 +9,16 @@ import {
 } from "@remix-run/node";
 import { prisma_client } from "~/.server/db";
 import { categorySchema } from "~/utils/category/validation";
-import { fetchCategoryFromId } from "~/utils/category/functions.server";
 import { Category } from "@prisma/client";
 import { capitalizeFirstLetter } from "~/utils/functions";
+import { getCategoryFromId, updateCategory } from "~/utils/category/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error(`No id provided in the URL`);
   }
 
-  const category = await fetchCategoryFromId({ id, include_services: false });
+  const category = await getCategoryFromId({ id, include_services: false });
   if (!category) {
     throw new Error(`No category found with id: ${id}`);
   }
@@ -40,25 +40,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { cat_name } = validationResult.data;
 
-  const updated_cateogry = await update_category_fn({ cat_name, id });
+  const updated_cateogry = await updateCategory({ cat_name, id });
   throw replace(`/categories/${updated_cateogry.cat_id}`);
 }
-
-const update_category_fn = async ({
-  cat_name,
-  id,
-}: {
-  cat_name: string;
-  id: string;
-}) => {
-  const category = await prisma_client.category.update({
-    where: { cat_id: id },
-    data: {
-      cat_name: capitalizeFirstLetter(cat_name.toLowerCase()),
-    },
-  });
-  return category;
-};
 
 export default function Update_Category() {
   const { category } = useLoaderData<{ category: Category }>();

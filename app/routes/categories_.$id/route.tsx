@@ -2,13 +2,13 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
 import { CategoryWithServices } from "~/utils/category/types";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
-import { fetchCategoryFromId } from "~/utils/category/functions.server";
+import { getCategoryFromId } from "~/utils/category/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
     throw new Error("Id not provided in the url");
   }
-  const category = await fetchCategoryFromId({id, include_services: true});
+  const category = await getCategoryFromId({id, include_services: true});
   if (!category) {
     throw new Error(`No category found with id: ${id}`);
   }

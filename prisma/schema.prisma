@@ -14,7 +14,7 @@ enum Payment {
 }
 
 
-enum TransactionType{
+enum TransactionType {
   sold
   bought
   returned
@@ -73,14 +73,14 @@ model Deal{
   auto_generated Boolean @default(false)
   
   services Service[] @relation("Services_In_Deals")
-  records Service_Sale_Record[] @relation("Deal_Record")
+  records Deal_ServiceSaleRecord_JT[] @relation("Deals_to_Record")
 }
 
 model Product {
   prod_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   prod_name String
-  prod_price Int @default(0)  
-  quantity Int @default(0)
+  prod_price Int 
+  quantity Int 
   created_at    DateTime @default(now())
 
   records Product_Record_JT[] 
@@ -94,7 +94,6 @@ model Vendor {
   created_at    DateTime @default(now())
   records Product_Sale_Record[]
 }
-
 model Service_Sale_Record {
   service_record_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   total_amount Int 
@@ -103,10 +102,21 @@ model Service_Sale_Record {
   payment_cleared Boolean
   client_id String @db.Uuid
   
-  deals Deal[] @relation("Deal_Record")
+  deal_records Deal_ServiceSaleRecord_JT[] @relation("Record_to_Deals")
   employees Employee_Record_JT[]
   transactions Client_Transaction[]
   client Client @relation(fields: [client_id],references: [client_id])
+}
+
+model Deal_ServiceSaleRecord_JT {
+  @@id([deal_id, record_id]) 
+
+  deal_id String @db.Uuid
+  record_id String @db.Uuid
+  quantity Int  
+
+  deal Deal @relation(fields: [deal_id], references: [deal_id], name: "Deals_to_Record")
+  record Service_Sale_Record @relation(fields: [record_id], references: [service_record_id], name: "Record_to_Deals")
 }
 
 model Employee_Record_JT {
@@ -124,7 +134,7 @@ model Client_Transaction {
   client_transaction_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   record_id String @db.Uuid
   amount_paid Int
-  mode_of_payment Payment @default(cash)
+  mode_of_payment Payment 
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
 

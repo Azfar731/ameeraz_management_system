@@ -6,11 +6,13 @@ integrate form into product sale update
 
 
 Fixes:
-Fix product, include price while creating
+Check product, include price while creating
+
 
 change schema to create a deals and service record joining table
 it will have deal_id, record_id and quantity
-
+also added created_at field in multiple models
+create a seed file
 
 refactor sale record create Part2
 merge deals and services into one

@@ -61,4 +61,9 @@ const updateDeal = async ({
     return newDeal;
 };
 
-export { createDeal, getDealFromId, updateDeal };
+const getAllDeals = async () => {
+    const deals = await prisma_client.deal.findMany();
+    return deals;
+};
+
+export { createDeal, getDealFromId, updateDeal, getAllDeals };

@@ -22,7 +22,9 @@ export default function SalesRecordTable({
 
   const handleExpand = (record: ServiceSaleRecordWithRelations) => {
     if (expandedIds.includes(record.service_record_id)) {
-      setExpandedIds(expandedIds.filter((id) => id !== record.service_record_id));
+      setExpandedIds(
+        expandedIds.filter((id) => id !== record.service_record_id)
+      );
     } else {
       setExpandedIds([...expandedIds, record.service_record_id]);
     }
@@ -60,7 +62,9 @@ export default function SalesRecordTable({
               >
                 <li>
                   <strong>Deals/Services:</strong>{" "}
-                  {record.deals.map((deal) => deal.deal_name).join(", ")}
+                  {record.deal_records
+                    .map((record) => record.deal.deal_name)
+                    .join(", ")}
                 </li>
                 <li>
                   <strong>Employees:</strong> {getEmployeeNames(record, true)}
@@ -86,7 +90,8 @@ export default function SalesRecordTable({
     },
     {
       label: "Total Amount",
-      renderCell: (record: ServiceSaleRecordWithRelations) => record.total_amount,
+      renderCell: (record: ServiceSaleRecordWithRelations) =>
+        record.total_amount,
     },
     {
       label: "Paid Amount",
@@ -99,7 +104,7 @@ export default function SalesRecordTable({
     {
       label: "Deals/Services",
       renderCell: (record: ServiceSaleRecordWithRelations) =>
-        record.deals.map((deal) => deal.deal_name).join(", "),
+        record.deal_records.map((record) => record.deal.deal_name).join(", "),
     },
     {
       label: "Employees",

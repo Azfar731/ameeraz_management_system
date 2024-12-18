@@ -32,4 +32,9 @@ const updateCategory = async ({
     return category;
 };
 
-export { createCategory, getCategoryFromId, updateCategory };
+const getAllCategories = async () => {
+    const categories = await prisma_client.category.findMany();
+    return categories;
+};
+
+export { createCategory, getAllCategories, getCategoryFromId, updateCategory };

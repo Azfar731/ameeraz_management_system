@@ -6,7 +6,7 @@ import {
   Link,
   useLoaderData,
   useNavigate,
-  useSearchParams
+  useSearchParams,
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
@@ -18,11 +18,16 @@ import {
   getCategoryOptions,
   getEmployeeOptions,
 } from "shared/utilityFunctions";
-import { prisma_client } from "~/.server/db";
 import { fetchServiceSaleRecords } from "~/utils/serviceSaleRecord/db.server";
-import { ServiceSaleRecordFetchErrors, ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
+import {
+  ServiceSaleRecordFetchErrors,
+  ServiceSaleRecordWithRelations,
+} from "~/utils/serviceSaleRecord/types";
 import { ServiceSaleRecordFetchSchema } from "~/utils/serviceSaleRecord/validation.server";
 import SalesRecordTable from "./SalesRecordTable";
+import { getAllEmployees } from "~/utils/employee/db.server";
+import { getAllDeals } from "~/utils/deal/db.server";
+import { getAllCategories } from "~/utils/category/db.server";
 export const meta: MetaFunction = () => {
   return [
     { title: "Ameeraz Management" },
@@ -45,9 +50,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // Extract filters
   const formData = extractFilters(searchParams);
 
-  const deals = await prisma_client.deal.findMany();
-  const employees = await prisma_client.employee.findMany();
-  const categories = await prisma_client.category.findMany();
+  const deals = await getAllDeals();
+  const employees = await getAllEmployees();
+  const categories = await getAllCategories();
 
   const validationResult = await ServiceSaleRecordFetchSchema.safeParseAsync(
     formData
@@ -94,9 +99,10 @@ export default function Index() {
     return today.toISOString().split("T")[0]; // Formats the date to 'YYYY-MM-DD'
   });
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [formSubmitErrorMessage, setFormSubmitErrorMessage] =
     useState<string>("");
+
   //loader Data
   const { service_records, deals, employees, categories, errorMessages } =
     useLoaderData<{

@@ -89,8 +89,8 @@ const ServiceSaleRecordSchema = z
     mobile_num: z
       .string()
       .regex(/^0\d{10}$/, "Mobile number must be 11 digits and start with 0."),
-    deals: z.array(z.object({ value: z.string(), label: z.string() })),
-    services: z.array(z.object({ value: z.string(), label: z.string() })),
+    deals: z.array(z.object({ id: z.string(), quantity: z.number().positive("Quantity can't be lower than 1") })),
+    services: z.array(z.object({ id: z.string(), quantity: z.number().positive("Quantity can't be lower than 1") })),
     employees: z
       .array(
         z.object({

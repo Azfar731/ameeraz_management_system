@@ -1,5 +1,4 @@
 import { prisma_client } from "~/.server/db";
-import { MenuOption } from "../types";
 import { Payment } from "@prisma/client";
 
 async function fetchServiceSaleRecords(
@@ -42,7 +41,7 @@ async function fetchServiceSaleRecords(
         include: {
             client: true,
             transactions: true,
-            deal_records: true,
+            deal_records: { include: { deal: true } },
             employees: true,
         },
     });
@@ -53,7 +52,7 @@ const createServiceSaleRecord = async (formData: {
     amount_paid: number;
     mobile_num: string;
     deals: { id: string; quantity: number }[];
-
+    services: { id: string; quantity: number }[];
     employees: { id: string; work_share: number }[];
     mode_of_payment: { value: Payment; label: string };
 }) => {
@@ -62,10 +61,12 @@ const createServiceSaleRecord = async (formData: {
         amount_paid,
         mobile_num,
         deals,
+        services,
         employees,
         mode_of_payment,
     } = formData;
 
+    const all_deals = [...deals, ...services];
     const record = await prisma_client.service_Sale_Record.create({
         data: {
             total_amount: amount_charged,
@@ -74,7 +75,7 @@ const createServiceSaleRecord = async (formData: {
                 connect: { client_mobile_num: mobile_num },
             },
             deal_records: {
-                create: deals.map((deal) => ({
+                create: all_deals.map((deal) => ({
                     deal_id: deal.id,
                     quantity: deal.quantity,
                 })),
@@ -132,7 +133,7 @@ const getServiceSaleRecordFromId = async ({
 
         include: {
             client: includeClient,
-            deal_records: includeDeals,
+            deal_records: includeDeals ? { include: { deal: true } } : false,
             employees: includeEmployees
                 ? { include: { employee: true } }
                 : false,

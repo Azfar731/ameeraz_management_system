@@ -63,7 +63,7 @@ export default function SalesRecordTable({
                 <li>
                   <strong>Deals/Services:</strong>{" "}
                   {record.deal_records
-                    .map((record) => record.deal.deal_name)
+                    .map((record) => `${record.deal.deal_name}(${record.quantity})`)
                     .join(", ")}
                 </li>
                 <li>

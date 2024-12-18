@@ -46,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // Validate selection of deals or services
-  if (json.deals.length < 1) {
+  if (json.deals.length < 1 && json.services.length < 1) {
     return { deals_msg: "At least one service or deal must be selected" };
   }
 

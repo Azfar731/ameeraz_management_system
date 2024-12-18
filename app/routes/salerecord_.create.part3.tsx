@@ -37,53 +37,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const new_record = await createServiceSaleRecord(validationResult.data);
   return replace(`/salerecord/${new_record.service_record_id}`);
-
-  // const employees = formData.employees;
-  // Calculate total work share of employees
-  // if (employees.length < 1)
-  //   return { msg: "Atleast 1 employee must be selcted" };
-
-  // const total_work_share = calculateTotalWorkShare(employees);
-
-  // // Validate if amount charged matches total work share
-  // const validationError = validateWorkShare(
-  //   total_work_share,
-  //   formData.amount_charged
-  // );
-  // if (validationError) {
-  //   return { msg: validationError };
-  // }
-
-  // // Validate the entire form data
-  // const isNotValid = validate_data(formData);
-  // if (!isNotValid) {
-  //   // Create the service record and redirect to the new record's page
-  //   const record = await createServiceSaleRecord(formData);
-  //   return replace(`/salerecord/${record.service_record_id}`);
-  // } else {
-  //   return isNotValid;
-  // }
 }
-
-// Helper function to calculate total work share of employees
-// function calculateTotalWorkShare(
-//   employees: { id: string; work_share: number }[]
-// ): number {
-//   return employees.reduce((total, emp) => total + emp.work_share, 0);
-// }
-
-// // Helper function to validate if amount charged matches total work share
-// function validateWorkShare(
-//   total_work_share: number,
-//   amount_charged: number
-// ): string | null {
-//   if (amount_charged !== total_work_share) {
-//     return "Amount charged must match Employees total Work share";
-//   }
-//   return null;
-// }
-
-// The validate_data and create_service_record functions remain unchanged.
 
 export default function Part3() {
   //action data

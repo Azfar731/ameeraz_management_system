@@ -11,8 +11,8 @@ import {
   ClientTransactionWithRelations,
 } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
-import { updateServiceSaleRecordDateTypes } from "~/utils/saleRecord/functions";
-import { getPendingAmount } from "~/utils/saleRecord/functions.server";
+import { updateServiceSaleRecordDateTypes } from "~/utils/serviceSaleRecord/functions";
+import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
 

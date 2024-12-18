@@ -3,7 +3,7 @@ import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { formatDate } from "shared/utilityFunctions";
-import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
+import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { Employee } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
 

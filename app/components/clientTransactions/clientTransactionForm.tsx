@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Form } from "@remix-run/react";
-import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
+import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import Select from "react-select";
 import {
   getAllPaymentMenuOptions,

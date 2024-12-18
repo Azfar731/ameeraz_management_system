@@ -2,26 +2,25 @@ import { Category, Deal, Employee } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import {
-    Form,
-    Link,
-    useLoaderData,
-    useNavigate,
-    useSearchParams
+  Form,
+  Link,
+  useLoaderData,
+  useNavigate,
+  useSearchParams
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import {
-    fetchDeals,
-    fetchServices,
-    formatDate,
-    formatDateToISO,
-    getCategoryOptions,
-    getEmployeeOptions,
+  fetchDeals,
+  fetchServices,
+  formatDate,
+  formatDateToISO,
+  getCategoryOptions,
+  getEmployeeOptions,
 } from "shared/utilityFunctions";
 import { prisma_client } from "~/.server/db";
-import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
 import { fetchServiceSaleRecords } from "~/utils/serviceSaleRecord/db.server";
-import { ServiceSaleRecordFetchErrors } from "~/utils/serviceSaleRecord/types";
+import { ServiceSaleRecordFetchErrors, ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { ServiceSaleRecordFetchSchema } from "~/utils/serviceSaleRecord/validation.server";
 import SalesRecordTable from "./SalesRecordTable";
 export const meta: MetaFunction = () => {

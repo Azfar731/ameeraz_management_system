@@ -1,10 +1,10 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Link } from "@remix-run/react";
-import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
+import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { formatDate } from "shared/utilityFunctions";
 import { generate_heading } from "~/utils/render_functions";
-import { getServiceSaleRecordFromId } from "~/utils/saleRecord/db.server";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
+import { getServiceSaleRecordFromId } from "~/utils/serviceSaleRecord/db.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
@@ -29,7 +29,7 @@ export default function Record() {
   const { record } = useLoaderData<{
     record: ServiceSaleRecordWithRelations;
   }>();
-  const { client, deals, employees, transactions } = record;
+  const { client, deal_records, employees, transactions } = record;
   const renderered_deals: JSX.Element[] = [];
 
   deals.forEach((deal, index) => {

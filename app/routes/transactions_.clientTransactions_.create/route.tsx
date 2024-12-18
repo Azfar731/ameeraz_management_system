@@ -1,12 +1,12 @@
 import { useLoaderData, Link } from "@remix-run/react";
 import { useState } from "react";
-import { getPendingServiceSaleRecords } from "~/utils/saleRecord/db.server";
-import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
+import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { formatDate } from "shared/utilityFunctions";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { getPendingServiceSaleRecords } from "~/utils/serviceSaleRecord/db.server";
 
 export async function loader() {
   const pending_records = await getPendingServiceSaleRecords();

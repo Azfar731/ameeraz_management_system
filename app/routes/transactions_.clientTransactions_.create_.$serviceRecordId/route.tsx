@@ -5,10 +5,10 @@ import { createClientTransaction } from "~/utils/clientTransaction/db.server";
 import { getClientTransactionFormData } from "~/utils/clientTransaction/functions";
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
-import { getServiceSaleRecordFromId } from "~/utils/saleRecord/db.server";
-import { updateServiceSaleRecordDateTypes } from "~/utils/saleRecord/functions";
-import { getPendingAmount } from "~/utils/saleRecord/functions.server";
-import { ServiceSaleRecordWithRelations } from "~/utils/saleRecord/types";
+import { updateServiceSaleRecordDateTypes } from "~/utils/serviceSaleRecord/functions";
+import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
+import { getServiceSaleRecordFromId } from "~/utils/serviceSaleRecord/db.server";
+import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { serviceRecordId } = params;
@@ -34,13 +34,14 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
   const formData = await request.formData();
   const formValues = getClientTransactionFormData(formData);
-  const remaining_amount = await getPendingAmount(serviceRecordId)
-  const validationResult = clientTransactionSchema(remaining_amount).safeParse(formValues);
-  
+  const remaining_amount = await getPendingAmount(serviceRecordId);
+  const validationResult =
+    clientTransactionSchema(remaining_amount).safeParse(formValues);
+
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
-  
+
   const new_transaction = await createClientTransaction({
     ...validationResult.data,
     service_record_id: serviceRecordId,
@@ -61,9 +62,10 @@ export default function Client_Transaction_Create_Part2() {
 
   const actionData = useActionData<{ errors: ClientTransactionErrors }>();
 
-  
   //converting the type of Date objects
-  const service_sale_record = updateServiceSaleRecordDateTypes(loaderData.service_sale_record)
+  const service_sale_record = updateServiceSaleRecordDateTypes(
+    loaderData.service_sale_record
+  );
   return (
     <div className="flex justify-center items-center h-screen">
       <ClientTransaction_Form

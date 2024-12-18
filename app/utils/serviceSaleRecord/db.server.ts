@@ -4,19 +4,20 @@ import { Payment } from "@prisma/client";
 
 async function fetchServiceSaleRecords(
     {
-       start_date,
-       end_date,
-       client_mobile_num,
-       deal_ids,
-       category_ids,
-       employee_ids, 
-    }:{
-    start_date?: Date | undefined,
-    end_date?: Date | undefined,
-    client_mobile_num?: string | undefined,
-    deal_ids?: string[] | undefined,
-    category_ids?: string[] | undefined,
-    employee_ids?: string[] | undefined,}
+        start_date,
+        end_date,
+        client_mobile_num,
+        deal_ids,
+        category_ids,
+        employee_ids,
+    }: {
+        start_date?: Date | undefined;
+        end_date?: Date | undefined;
+        client_mobile_num?: string | undefined;
+        deal_ids?: string[] | undefined;
+        category_ids?: string[] | undefined;
+        employee_ids?: string[] | undefined;
+    },
 ) {
     return prisma_client.service_Sale_Record.findMany({
         where: {
@@ -45,8 +46,6 @@ async function fetchServiceSaleRecords(
     });
 }
 
-
-
 const createServiceSaleRecord = async (formData: {
     amount_charged: number;
     amount_paid: number;
@@ -54,7 +53,7 @@ const createServiceSaleRecord = async (formData: {
     deals: MenuOption[];
     services: MenuOption[];
     employees: { id: string; work_share: number }[];
-    mode_of_payment: { value: Payment; label: string }
+    mode_of_payment: { value: Payment; label: string };
 }) => {
     const {
         amount_charged,
@@ -95,4 +94,54 @@ const createServiceSaleRecord = async (formData: {
     return record;
 };
 
-export {  fetchServiceSaleRecords, createServiceSaleRecord };
+const getPendingServiceSaleRecords = async () => {
+    return await prisma_client.service_Sale_Record.findMany({
+        where: {
+            payment_cleared: false,
+        },
+        include: {
+            client: true,
+            transactions: true,
+            deals: true,
+            employees: {
+                include: {
+                    employee: true,
+                },
+            },
+        },
+    });
+};
+
+const getServiceSaleRecordFromId = async ({
+    id,
+    includeClient = false,
+    includeDeals = false,
+    includeTransactions = false,
+    includeEmployees = false,
+}: {
+    id: string;
+    includeClient?: boolean;
+    includeTransactions?: boolean;
+    includeEmployees?: boolean;
+    includeDeals?: boolean;
+}) => {
+    return await prisma_client.service_Sale_Record.findFirst({
+        where: { service_record_id: id },
+
+        include: {
+            client: includeClient,
+            deals: includeDeals,
+            employees: includeEmployees
+                ? { include: { employee: true } }
+                : false,
+            transactions: includeTransactions,
+        },
+    });
+};
+
+export {
+    createServiceSaleRecord,
+    fetchServiceSaleRecords,
+    getPendingServiceSaleRecords,
+    getServiceSaleRecordFromId
+};

@@ -64,7 +64,6 @@ function validatePayment(amount_paid: number, amount_charged: number) {
   return null;
 }
 
-
 export default function Part2() {
   //context
   const { formData, setFormData } = useOutletContext<{
@@ -95,6 +94,10 @@ export default function Part2() {
     { id: string; quantity: number }[]
   >(formData.deals);
 
+  const [servicesQuantity, setServicesQuantity] = useState<
+    { id: string; quantity: number }[]
+  >(formData.services);
+
   const isFirstRender = useRef(true);
   const onDealsChange = (
     newValue: OnChangeValue<{ value: string; label: string }, true>
@@ -115,12 +118,42 @@ export default function Part2() {
     });
   };
 
+  const onServicesChange = (
+    newValue: OnChangeValue<{ value: string; label: string }, true>
+  ) => {
+    setServicesQuantity((prev) => {
+      //remove deleted entries
+      const tmp = prev.filter((entry) => {
+        return newValue.find((service) => service.value === entry.id);
+      });
+
+      //add any new entries
+      return newValue.map((entry) => {
+        const service_quantity_pair = tmp.find(
+          (service) => service.id === entry.value
+        );
+        return service_quantity_pair
+          ? service_quantity_pair
+          : { id: entry.value, quantity: 1 };
+      });
+    });
+  };
+
   //update quantity value for deals
   const OnDealsQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setDealsQuantity((prev) =>
       prev.map((deal) =>
         deal.id === name ? { ...deal, quantity: Number(value) } : deal
+      )
+    );
+  };
+
+  const OnServicesQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setServicesQuantity((prev) =>
+      prev.map((service) =>
+        service.id === name ? { ...service, quantity: Number(value) } : service
       )
     );
   };
@@ -158,46 +191,50 @@ export default function Part2() {
       );
     });
 
-  const renderServicesQuantity = dealsQuantity
-    .filter(
-      (rec) => deals.find((deal) => deal.deal_id === rec.id)?.auto_generated
-    )
-    .map((record, index) => {
-      return (
-        <div
-          key={record.id}
-          className="mt-4 w-full flex justify-between items-center"
+  const renderServicesQuantity = servicesQuantity.map((record, index) => {
+    return (
+      <div
+        key={record.id}
+        className="mt-4 w-full flex justify-between items-center"
+      >
+        <label
+          htmlFor={`Service-${index}`}
+          className="text-gray-700 text-sm font-bold mb-2 pr-4 w-1/3"
         >
-          <label
-            htmlFor={`Deal-${index}`}
-            className="text-gray-700 text-sm font-bold mb-2 pr-4 w-1/3"
-          >
-            {}
-            {deals.find((deal) => deal.deal_id === record.id)?.deal_name}
-          </label>
-          <input
-            type="number"
-            id={`Deal-${index}`}
-            name={record.id}
-            min={1}
-            defaultValue={record.quantity}
-            onChange={OnDealsQuantityChange}
-            required
-            placeholder="2"
-            className="px-3 py-2 border border-gray-300 rounded-md mb-4 w-2/3"
-          />
-        </div>
-      );
-    });
+          {}
+          {deals.find((deal) => deal.deal_id === record.id)?.deal_name}
+        </label>
+        <input
+          type="number"
+          id={`Service-${index}`}
+          name={record.id}
+          min={1}
+          defaultValue={record.quantity}
+          onChange={OnServicesQuantityChange}
+          required
+          placeholder="2"
+          className="px-3 py-2 border border-gray-300 rounded-md mb-4 w-2/3"
+        />
+      </div>
+    );
+  });
 
   useEffect(() => {
-    const expectedAmount = dealsQuantity.reduce((acc, curr) => {
-      const deal = deals.find((deal) => deal.deal_id === curr.id);
-      if (!deal) {
-        throw new Error(`Product with id: ${curr.id} not found`);
-      }
-      return acc + deal.deal_price * curr.quantity;
-    }, 0);
+    const expectedAmount =
+      dealsQuantity.reduce((acc, curr) => {
+        const deal = deals.find((deal) => deal.deal_id === curr.id);
+        if (!deal) {
+          throw new Error(`Product with id: ${curr.id} not found`);
+        }
+        return acc + deal.deal_price * curr.quantity;
+      }, 0) +
+      servicesQuantity.reduce((acc, curr) => {
+        const service = deals.find((deal) => deal.deal_id === curr.id);
+        if (!service) {
+          throw new Error(`Service with id: ${curr.id} not found`);
+        }
+        return acc + service.deal_price * curr.quantity;
+      }, 0);
 
     if (isFirstRender.current) {
       setAmounts({
@@ -213,7 +250,13 @@ export default function Part2() {
         amountPaid: expectedAmount,
       });
     }
-  }, [dealsQuantity, deals, formData.amount_charged, formData.amount_paid]);
+  }, [
+    dealsQuantity,
+    servicesQuantity,
+    deals,
+    formData.amount_charged,
+    formData.amount_paid,
+  ]);
 
   const formRef = useRef<HTMLFormElement>(null);
   //Parent Context
@@ -244,6 +287,7 @@ export default function Part2() {
     // Create formData object
     const formDataObj = {
       deals: dealsQuantity,
+      services: servicesQuantity,
       amount_charged,
       amount_paid,
       mode_of_payment,
@@ -282,6 +326,7 @@ export default function Part2() {
     // Create formData object
     const formDataObj = {
       deals: dealsQuantity,
+      services: servicesQuantity,
       amount_charged,
       amount_paid,
       mode_of_payment,
@@ -322,18 +367,14 @@ export default function Part2() {
         <Select
           isMulti
           name="services"
-          onChange={onDealsChange}
+          onChange={onServicesChange}
           options={service_options}
-          defaultValue={formData.deals
-            .filter(
-              (deal) => deals.find((d) => d.deal_id === deal.id)?.auto_generated
-            )
-            .map((deal) => ({
-              value: deal.id,
-              label:
-                deals.find((d) => d.deal_id === deal.id)?.deal_name ||
-                "No service found",
-            }))}
+          defaultValue={formData.services.map((deal) => ({
+            value: deal.id,
+            label:
+              deals.find((d) => d.deal_id === deal.id)?.deal_name ||
+              "No service found",
+          }))}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
         />
@@ -350,18 +391,12 @@ export default function Part2() {
           onChange={onDealsChange}
           id="deal"
           options={deal_options}
-          defaultValue={formData.deals
-            .filter(
-              (deal) =>
-                deals.find((d) => d.deal_id === deal.id)?.auto_generated ===
-                false
-            )
-            .map((deal) => ({
-              value: deal.id,
-              label:
-                deals.find((d) => d.deal_id === deal.id)?.deal_name ||
-                "No deal found",
-            }))}
+          defaultValue={formData.deals.map((deal) => ({
+            value: deal.id,
+            label:
+              deals.find((d) => d.deal_id === deal.id)?.deal_name ||
+              "No deal found",
+          }))}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
         />

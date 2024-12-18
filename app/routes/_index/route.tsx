@@ -8,8 +8,8 @@ import {
   useNavigate,
   useSearchParams,
 } from "@remix-run/react";
-import { useRef, useState } from "react";
-import Select, { OnChangeValue } from "react-select";
+import { useState } from "react";
+import Select from "react-select";
 import {
   fetchDeals,
   fetchServices,
@@ -33,15 +33,6 @@ export const meta: MetaFunction = () => {
     { title: "Ameeraz Management" },
     { name: "Sales Page", content: "This is the sales page of ameeraz" },
   ];
-};
-
-type FormValues = {
-  start_date: string;
-  end_date: string;
-  all_deals: string[];
-  mobile_num: string;
-  employees: string[];
-  categories: string[];
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -74,18 +65,36 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 //Helper function to extract Filters from Search Params.
 function extractFilters(searchParams: URLSearchParams) {
+  for (const [key, value] of searchParams.entries()) {
+    if (value === "") {
+      searchParams.delete(key);
+    }
+  }
+
   const start_date = searchParams.get("start_date") || undefined;
   const end_date = searchParams.get("end_date") || undefined;
 
-  const deal_ids = searchParams.get("all_deals")?.split("|");
-  const employee_ids = searchParams.get("employees")?.split("|");
-  const category_ids = searchParams.get("categories")?.split("|");
+  // const deal_ids = searchParams.get("all_deals")?.split("|");
+  // const employee_ids = searchParams.get("employees")?.split("|");
+  // const category_ids = searchParams.get("categories")?.split("|");
   const client_mobile_num = searchParams.get("mobile_num") || undefined;
 
+  const deals = searchParams.getAll("deals").filter((val) => val !== "");
+  const services = searchParams.getAll("services").filter((val) => val !== "");
+  const employee_ids = searchParams
+    .getAll("employees")
+    .filter((val) => val !== "");
+  const category_ids = searchParams
+    .getAll("categories")
+    .filter((val) => val !== "");
+
+  //const payment_options = searchParams.getAll("payment_options").filter(val => val !== "");
+  const deal_ids = [...deals, ...services];
+
   return {
-    deal_ids,
-    employee_ids,
-    category_ids,
+    deal_ids: deal_ids.length > 0 ? deal_ids : undefined,
+    employee_ids: employee_ids.length > 0 ? employee_ids : undefined,
+    category_ids: category_ids.length > 0 ? category_ids : undefined,
     client_mobile_num,
     start_date,
     end_date,
@@ -98,10 +107,8 @@ export default function Index() {
     const today = new Date();
     return today.toISOString().split("T")[0]; // Formats the date to 'YYYY-MM-DD'
   });
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [formSubmitErrorMessage, setFormSubmitErrorMessage] =
-    useState<string>("");
 
   //loader Data
   const { service_records, deals, employees, categories, errorMessages } =
@@ -112,12 +119,6 @@ export default function Index() {
       categories: Category[];
       errorMessages: ServiceSaleRecordFetchErrors;
     }>();
-
-  //references
-  const dealsRef = useRef<{ value: string; label: string }[]>([]);
-  const servicesRef = useRef<{ value: string; label: string }[]>([]);
-  const empRef = useRef<{ value: string; label: string }[]>([]);
-  const catRef = useRef<{ value: string; label: string }[]>([]);
 
   //search Parameter values
   const start_date = searchParams.get("startDate");
@@ -161,102 +162,12 @@ export default function Index() {
       "No Category exists",
   }));
 
-  const onDealsChange = (
-    newValue: OnChangeValue<{ value: string; label: string }, true>
-  ) => {
-    dealsRef.current = [...newValue];
-  };
-
-  const onServicesChange = (
-    newValue: OnChangeValue<{ value: string; label: string }, true>
-  ) => {
-    servicesRef.current = [...newValue];
-  };
-
-  const onEmployeeChange = (
-    newValue: OnChangeValue<{ value: string; label: string }, true>
-  ) => {
-    empRef.current = [...newValue];
-  };
-
-  const onCategoriesChange = (
-    newValue: OnChangeValue<{ value: string; label: string }, true>
-  ) => {
-    catRef.current = [...newValue];
-  };
-
-  const fetchFormValues = (formData: FormData) => {
-    const start_date: string = (formData.get("start_date") as string) || "";
-    const end_date: string = (formData.get("end_date") as string) || "";
-    const mobile_num: string = (formData.get("mobile_num") as string) || "";
-    const deals = dealsRef.current?.map((deal) => deal.value);
-    const services = servicesRef.current?.map((service) => service.value);
-    const all_deals = [...deals, ...services];
-    const employees = empRef.current?.map((emp) => emp.value);
-    const categories = catRef.current?.map((cat) => cat.value);
-    if (
-      start_date ||
-      end_date ||
-      mobile_num ||
-      employees.length > 0 ||
-      categories.length > 0 ||
-      all_deals.length > 0
-    ) {
-      return {
-        start_date,
-        end_date,
-        all_deals,
-        mobile_num,
-        employees,
-        categories,
-      };
-    } else {
-      return null;
-    }
-  };
-
-  const setSearchParameters = (formValues: FormValues) => {
-    const params = new URLSearchParams();
-
-    // Loop over the properties of formValues and append them to params
-    for (const [key, value] of Object.entries(formValues)) {
-      if (Array.isArray(value)) {
-        if (value.length > 0) {
-          // Join array values with commas and append
-          params.set(key, value.join("|"));
-        }
-      } else if (value) {
-        // Append non-empty string values
-        params.set(key, value);
-      }
-    }
-
-    // Set the search params in the URL
-    setSearchParams(params);
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const formValues = fetchFormValues(formData);
-    if (!formValues) {
-      setFormSubmitErrorMessage("Atleast One vale must be selected");
-      return;
-    }
-    setFormSubmitErrorMessage("");
-    setSearchParameters(formValues);
-  };
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
         <h1 className=" font-semibold text-6xl text-gray-700">Sales Page</h1>
       </div>
-      <Form
-        method="get"
-        className="bg-white rounded w-1/2"
-        onSubmit={handleSubmit}
-      >
+      <Form method="get" className="bg-white rounded w-1/2">
         <h2 className="text-3xl font-semibold text-gray-700 mt-6">
           Search Records
         </h2>
@@ -329,7 +240,6 @@ export default function Index() {
         <Select
           isMulti
           name="services"
-          onChange={onServicesChange}
           options={fetchServices(deals)}
           defaultValue={def_services}
           className="basic-multi-select mt-2"
@@ -344,7 +254,6 @@ export default function Index() {
         <Select
           isMulti
           name="deals"
-          onChange={onDealsChange}
           id="deal"
           options={fetchDeals(deals)}
           defaultValue={def_deals}
@@ -365,7 +274,6 @@ export default function Index() {
         <Select
           isMulti
           name="employees"
-          onChange={onEmployeeChange}
           options={getEmployeeOptions(employees)}
           defaultValue={def_emp}
           className="basic-multi-select mt-2"
@@ -385,7 +293,6 @@ export default function Index() {
         <Select
           isMulti
           name="categories"
-          onChange={onCategoriesChange}
           options={getCategoryOptions(categories)}
           defaultValue={def_categories}
           className="basic-multi-select mt-2"
@@ -402,11 +309,6 @@ export default function Index() {
         >
           Fetch
         </button>
-        {formSubmitErrorMessage && (
-          <h2 className="text-red-500 font-semibold">
-            {formSubmitErrorMessage}
-          </h2>
-        )}
       </Form>
 
       <div className="mt-20">

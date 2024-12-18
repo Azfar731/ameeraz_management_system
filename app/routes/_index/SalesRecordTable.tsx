@@ -9,7 +9,7 @@ import { SerializeFrom } from "@remix-run/node";
 
 interface SalesRecordTableProps {
   serviceRecords: SerializeFrom<ServiceSaleRecordWithRelations[]>;
-  employees: Employee[];
+  employees: SerializeFrom<Employee[]>;
   onEdit: (id: string) => void;
 }
 

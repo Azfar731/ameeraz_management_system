@@ -1,9 +1,8 @@
 
 
 Next:
-add superrefine to validation of  clientTransaction
-integrate form into product sale update
-
+fix the fetch functionality on sales record index.
+remove all onChange functions and submit form directly.
 
 Fixes:
 Check product, include price while creating

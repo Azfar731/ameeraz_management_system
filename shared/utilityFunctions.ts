@@ -1,4 +1,5 @@
 import { Category, Deal, Employee } from "@prisma/client";
+import { SerializeFrom } from "@remix-run/node";
 
 function formatDate(input: Date | string): string {
     let date: Date;
@@ -47,7 +48,7 @@ function fetchServices<
         });
 }
 
-function getEmployeeOptions(employees: Employee[]) {
+function getEmployeeOptions(employees: SerializeFrom<Employee[]>) {
     return employees.map((employee) => {
         return {
             value: employee.emp_id,

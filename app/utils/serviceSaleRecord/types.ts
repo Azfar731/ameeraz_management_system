@@ -22,7 +22,7 @@ type ServiceSaleRecordCreateErrors = {
 type ServiceSaleRecordWithRelations = Prisma.Service_Sale_RecordGetPayload<{
     include: {
         client: true;
-        deals: true;
+        deal_records: {include: { deal: true }};
         employees: { include: { employee: true } };
         transactions: true;
     };

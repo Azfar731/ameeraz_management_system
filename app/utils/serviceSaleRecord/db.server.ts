@@ -23,12 +23,14 @@ async function fetchServiceSaleRecords(
         where: {
             created_at: { gte: start_date, lte: end_date },
             client: { client_mobile_num },
-            deals: {
+            deal_records: {
                 some: {
-                    deal_id: { in: deal_ids },
-                    services: {
-                        some: {
-                            category: { cat_id: { in: category_ids } },
+                    deal: {
+                        deal_id: { in: deal_ids },
+                        services: {
+                            some: {
+                                category: { cat_id: { in: category_ids } },
+                            },
                         },
                     },
                 },
@@ -40,7 +42,7 @@ async function fetchServiceSaleRecords(
         include: {
             client: true,
             transactions: true,
-            deals: true,
+            deal_records: true,
             employees: true,
         },
     });
@@ -50,8 +52,8 @@ const createServiceSaleRecord = async (formData: {
     amount_charged: number;
     amount_paid: number;
     mobile_num: string;
-    deals: MenuOption[];
-    services: MenuOption[];
+    deals: { id: string; quantity: number }[];
+
     employees: { id: string; work_share: number }[];
     mode_of_payment: { value: Payment; label: string };
 }) => {
@@ -60,12 +62,9 @@ const createServiceSaleRecord = async (formData: {
         amount_paid,
         mobile_num,
         deals,
-        services,
         employees,
         mode_of_payment,
     } = formData;
-
-    const all_deals = [...deals, ...services];
 
     const record = await prisma_client.service_Sale_Record.create({
         data: {
@@ -74,8 +73,11 @@ const createServiceSaleRecord = async (formData: {
             client: {
                 connect: { client_mobile_num: mobile_num },
             },
-            deals: {
-                connect: all_deals.map((deal) => ({ deal_id: deal.value })),
+            deal_records: {
+                create: deals.map((deal) => ({
+                    deal_id: deal.id,
+                    quantity: deal.quantity,
+                })),
             },
             transactions: {
                 create: [{
@@ -102,7 +104,7 @@ const getPendingServiceSaleRecords = async () => {
         include: {
             client: true,
             transactions: true,
-            deals: true,
+            deal_records: true,
             employees: {
                 include: {
                     employee: true,
@@ -130,7 +132,7 @@ const getServiceSaleRecordFromId = async ({
 
         include: {
             client: includeClient,
-            deals: includeDeals,
+            deal_records: includeDeals,
             employees: includeEmployees
                 ? { include: { employee: true } }
                 : false,
@@ -143,5 +145,5 @@ export {
     createServiceSaleRecord,
     fetchServiceSaleRecords,
     getPendingServiceSaleRecords,
-    getServiceSaleRecordFromId
+    getServiceSaleRecordFromId,
 };

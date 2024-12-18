@@ -32,12 +32,14 @@ export default function Record() {
   const { client, deal_records, employees, transactions } = record;
   const renderered_deals: JSX.Element[] = [];
 
-  deals.forEach((deal, index) => {
-    renderered_deals.push(<h4 key={`deal${index} name`}>{deal.deal_name}</h4>);
+  deal_records.forEach((record, index) => {
     renderered_deals.push(
-      <h4 key={`deal${index} price`}>{deal.deal_price}</h4>
+      <h4 key={`deal${index} name`}>{record.deal.deal_name}</h4>
     );
-  });
+    renderered_deals.push(
+      <h4 key={`deal${index} price`}>{record.quantity}</h4>
+    );
+  })
 
   const renderered_emp: JSX.Element[] = [];
 
@@ -72,7 +74,7 @@ export default function Record() {
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative ">
       <Link
-        to={`/transactions`}
+        to={`/`}
         className="bg-green-400 text-white font-semibold py-2 px-4 absolute top-4 left-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
       >
         <FaLongArrowAltLeft className="" />
@@ -101,7 +103,7 @@ export default function Record() {
               0
             )}
         </h3>
-        {generate_heading("Deals/Services Taken", "Name", "Price")}
+        {generate_heading("Deals/Services Taken", "Name", "Quantity")}
         {renderered_deals}
 
         {generate_heading("Employees", "Name", "Work Share")}

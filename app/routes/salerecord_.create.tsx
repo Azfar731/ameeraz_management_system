@@ -8,7 +8,6 @@ export default function SaleRecord() {
     amount_paid: 0,
     mobile_num: "",
     deals: [],
-    services: [],
     employees: [],
     mode_of_payment: { value: "cash", label: "Cash" },
   });

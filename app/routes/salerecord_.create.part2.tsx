@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -15,7 +15,7 @@ import {
 import { prisma_client } from "~/.server/db";
 import { Client, Deal } from "@prisma/client";
 import Select, { OnChangeValue } from "react-select";
-import { FormType, MenuOption, PaymentModes } from "~/utils/types";
+import { FormType, PaymentModes } from "~/utils/types";
 import { fetchDeals, fetchServices } from "shared/utilityFunctions";
 import { findClientByMobile } from "~/utils/client/db.server";
 import {
@@ -46,9 +46,8 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // Validate selection of deals or services
-  const selectionError = validateDealsAndServices(json.deals, json.services);
-  if (selectionError) {
-    return selectionError;
+  if (json.deals.length < 1) {
+    return { deals_msg: "At least one service or deal must be selected" };
   }
 
   // Redirect to the next part if all is valid
@@ -65,15 +64,6 @@ function validatePayment(amount_paid: number, amount_charged: number) {
   return null;
 }
 
-// Helper function to validate that at least one deal or service is selected
-function validateDealsAndServices(deals: MenuOption[], services: MenuOption[]) {
-  if (deals.length < 1 && services.length < 1) {
-    return { deals_msg: "At least one service or deal must be selected" };
-  }
-  return null;
-}
-
-// Helper function to handle redirection
 
 export default function Part2() {
   //context
@@ -96,35 +86,135 @@ export default function Part2() {
     | undefined // In case there's no validation error
   >();
 
-  const calc_services_amount = () => {
-    let tmp_amount = 0;
-    formData.services.forEach((elem) => {
-      tmp_amount +=
-        deals.find((deal) => elem.id === deal.deal_id)?.deal_price || 0;
-    });
-    return tmp_amount;
-  };
-
-  const calc_deals_amount = () => {
-    let tmp_amount = 0;
-    formData.deals.forEach((elem) => {
-      tmp_amount +=
-        deals.find((deal) => elem.id === deal.deal_id)?.deal_price || 0;
-    });
-    return tmp_amount;
-  };
-
-  const [amount, setAmount] = useState({
-    services: calc_services_amount(),
-    deals: calc_deals_amount(),
-    charged: formData.amount_charged,
-    paid: formData.amount_paid,
+  const [amounts, setAmounts] = useState({
+    expectedAmount: 0,
+    amountCharged: formData.amount_charged || 0,
+    amountPaid: formData.amount_paid || 0,
   });
+  const [dealsQuantity, setDealsQuantity] = useState<
+    { id: string; quantity: number }[]
+  >(formData.deals);
 
-  const servicesRef = useRef<{ id: string; quantity: number }[]>(
-    formData.services
-  );
-  const dealsRef = useRef<{ id: string; quantity: number }[]>(formData.deals);
+  const isFirstRender = useRef(true);
+  const onDealsChange = (
+    newValue: OnChangeValue<{ value: string; label: string }, true>
+  ) => {
+    setDealsQuantity((prev) => {
+      //remove deleted entries
+      const tmp = prev.filter((entry) => {
+        return newValue.find((deal) => deal.value === entry.id);
+      });
+
+      //add any new entries
+      return newValue.map((entry) => {
+        const deal_quantity_pair = tmp.find((deal) => deal.id === entry.value);
+        return deal_quantity_pair
+          ? deal_quantity_pair
+          : { id: entry.value, quantity: 1 };
+      });
+    });
+  };
+
+  //update quantity value for deals
+  const OnDealsQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDealsQuantity((prev) =>
+      prev.map((deal) =>
+        deal.id === name ? { ...deal, quantity: Number(value) } : deal
+      )
+    );
+  };
+
+  const renderDealsQuantity = dealsQuantity
+    .filter(
+      (rec) =>
+        deals.find((deal) => deal.deal_id === rec.id)?.auto_generated === false
+    )
+    .map((record, index) => {
+      return (
+        <div
+          key={record.id}
+          className="mt-4 w-full flex justify-between items-center"
+        >
+          <label
+            htmlFor={`Deal-${index}`}
+            className="text-gray-700 text-sm font-bold mb-2 pr-4 w-1/3"
+          >
+            {}
+            {deals.find((deal) => deal.deal_id === record.id)?.deal_name}
+          </label>
+          <input
+            type="number"
+            id={`Deal-${index}`}
+            name={record.id}
+            min={1}
+            defaultValue={record.quantity}
+            onChange={OnDealsQuantityChange}
+            required
+            placeholder="2"
+            className="px-3 py-2 border border-gray-300 rounded-md mb-4 w-2/3"
+          />
+        </div>
+      );
+    });
+
+  const renderServicesQuantity = dealsQuantity
+    .filter(
+      (rec) => deals.find((deal) => deal.deal_id === rec.id)?.auto_generated
+    )
+    .map((record, index) => {
+      return (
+        <div
+          key={record.id}
+          className="mt-4 w-full flex justify-between items-center"
+        >
+          <label
+            htmlFor={`Deal-${index}`}
+            className="text-gray-700 text-sm font-bold mb-2 pr-4 w-1/3"
+          >
+            {}
+            {deals.find((deal) => deal.deal_id === record.id)?.deal_name}
+          </label>
+          <input
+            type="number"
+            id={`Deal-${index}`}
+            name={record.id}
+            min={1}
+            defaultValue={record.quantity}
+            onChange={OnDealsQuantityChange}
+            required
+            placeholder="2"
+            className="px-3 py-2 border border-gray-300 rounded-md mb-4 w-2/3"
+          />
+        </div>
+      );
+    });
+
+  useEffect(() => {
+    const expectedAmount = dealsQuantity.reduce((acc, curr) => {
+      const deal = deals.find((deal) => deal.deal_id === curr.id);
+      if (!deal) {
+        throw new Error(`Product with id: ${curr.id} not found`);
+      }
+      return acc + deal.deal_price * curr.quantity;
+    }, 0);
+
+    if (isFirstRender.current) {
+      setAmounts({
+        expectedAmount,
+        amountCharged: formData.amount_charged || expectedAmount,
+        amountPaid: formData.amount_paid || expectedAmount,
+      });
+      isFirstRender.current = false;
+    } else {
+      setAmounts({
+        expectedAmount,
+        amountCharged: expectedAmount,
+        amountPaid: expectedAmount,
+      });
+    }
+  }, [dealsQuantity, deals, formData.amount_charged, formData.amount_paid]);
+
   const formRef = useRef<HTMLFormElement>(null);
   //Parent Context
 
@@ -132,7 +222,6 @@ export default function Part2() {
   const deal_options = fetchDeals(deals);
 
   const service_options = fetchServices(deals);
-
 
   // handle Submit function which will run when the form submits
   const submit = useSubmit();
@@ -142,10 +231,6 @@ export default function Part2() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
-
-    // Get references to deals and services
-    const deals = dealsRef.current;
-    const services = servicesRef.current;
 
     // Extract relevant data from formData
     const { amount_charged, amount_paid, payment_mode } =
@@ -158,8 +243,7 @@ export default function Part2() {
 
     // Create formData object
     const formDataObj = {
-      deals,
-      services,
+      deals: dealsQuantity,
       amount_charged,
       amount_paid,
       mode_of_payment,
@@ -174,23 +258,17 @@ export default function Part2() {
 
   // Helper function to extract amount_charged, amount_paid, and payment_mode
   function extractFormData(formData: FormData) {
-   
     const amount_charged = Number(formData.get("amount_charged"));
     const amount_paid = Number(formData.get("amount_paid"));
-    const payment_mode = formData.get("mode_of_payment")?.toString() || ""
+    const payment_mode = formData.get("mode_of_payment")?.toString() || "";
     return { amount_charged, amount_paid, payment_mode };
   }
-
 
   const GoToPrevPage = () => {
     const form = formRef.current;
     if (!form) return;
 
     const pageFormData = new FormData(form);
-
-    // Get references to deals and services
-    const deals = dealsRef.current;
-    const services = servicesRef.current;
 
     // Extract relevant data from formData
     const { amount_charged, amount_paid, payment_mode } =
@@ -203,8 +281,7 @@ export default function Part2() {
     );
     // Create formData object
     const formDataObj = {
-      deals,
-      services,
+      deals: dealsQuantity,
       amount_charged,
       amount_paid,
       mode_of_payment,
@@ -216,48 +293,6 @@ export default function Part2() {
     // Navigate to the previous page
     navigate("../");
   };
-
-  const onServicesChange = (
-    newValue: OnChangeValue<{ value: string; label: string }, true>
-  ) => {
-    handleChange(newValue, "services");
-  };
-
-  const onDealsChange = (
-    newValue: OnChangeValue<{ value: string; label: string }, true>
-  ) => {
-    handleChange(newValue, "deals");
-  };
-
-  // Helper function to handle both services and deals changes
-  function handleChange(
-    newValue: OnChangeValue<{ value: string; label: string }, true>,
-    type: "services" | "deals"
-  ) {
-    let tmp_amount = 0;
-    const tmp_array: { value: string; label: string }[] = [];
-
-    newValue.forEach((element) => {
-      const deal = deals.find((deal) => deal.deal_id === element.value);
-      if (deal) {
-        tmp_amount += deal.deal_price;
-        tmp_array.push(element);
-      }
-    });
-
-    setAmount((prev) => ({
-      ...prev,
-      [type]: tmp_amount,
-      charged: prev[type === "services" ? "deals" : "services"] + tmp_amount,
-      paid: prev[type === "services" ? "deals" : "services"] + tmp_amount,
-    }));
-
-    if (type === "services") {
-      servicesRef.current = [...tmp_array];
-    } else if (type === "deals") {
-      dealsRef.current = [...tmp_array];
-    }
-  }
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -287,13 +322,22 @@ export default function Part2() {
         <Select
           isMulti
           name="services"
-          onChange={onServicesChange}
+          onChange={onDealsChange}
           options={service_options}
-          defaultValue={formData.services}
+          defaultValue={formData.deals
+            .filter(
+              (deal) => deals.find((d) => d.deal_id === deal.id)?.auto_generated
+            )
+            .map((deal) => ({
+              value: deal.id,
+              label:
+                deals.find((d) => d.deal_id === deal.id)?.deal_name ||
+                "No service found",
+            }))}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
         />
-
+        {renderServicesQuantity}
         <label
           htmlFor="deal"
           className="block text-gray-700 text-sm font-bold mb-2"
@@ -306,15 +350,27 @@ export default function Part2() {
           onChange={onDealsChange}
           id="deal"
           options={deal_options}
-          defaultValue={formData.deals}
+          defaultValue={formData.deals
+            .filter(
+              (deal) =>
+                deals.find((d) => d.deal_id === deal.id)?.auto_generated ===
+                false
+            )
+            .map((deal) => ({
+              value: deal.id,
+              label:
+                deals.find((d) => d.deal_id === deal.id)?.deal_name ||
+                "No deal found",
+            }))}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
         />
         {actionData?.deals_msg && (
           <h2 className="text-red-500 font-semibold">{actionData.deals_msg}</h2>
         )}
+        {renderDealsQuantity}
         <div className="text-gray-700 mb-4">
-          Expected Total Amount: {amount.services + amount.deals}
+          Expected Total Amount: {amounts.expectedAmount}
         </div>
 
         <label
@@ -328,10 +384,13 @@ export default function Part2() {
           name="amount_charged"
           id="amount_charged"
           className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
-          value={amount.charged}
+          value={amounts.amountCharged}
           min={0}
           onChange={(e) =>
-            setAmount((prev) => ({ ...prev, charged: Number(e.target.value) }))
+            setAmounts((prev) => ({
+              ...prev,
+              amountCharged: Number(e.target.value),
+            }))
           }
           required
         />
@@ -347,10 +406,13 @@ export default function Part2() {
           name="amount_paid"
           id="amount_paid"
           className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
-          value={amount.paid}
+          value={amounts.amountPaid}
           min={0}
           onChange={(e) =>
-            setAmount((prev) => ({ ...prev, paid: Number(e.target.value) }))
+            setAmounts((prev) => ({
+              ...prev,
+              amountPaid: Number(e.target.value),
+            }))
           }
           required
         />

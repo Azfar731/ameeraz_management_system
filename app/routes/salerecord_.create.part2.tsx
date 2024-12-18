@@ -100,7 +100,7 @@ export default function Part2() {
     let tmp_amount = 0;
     formData.services.forEach((elem) => {
       tmp_amount +=
-        deals.find((deal) => elem.value === deal.deal_id)?.deal_price || 0;
+        deals.find((deal) => elem.id === deal.deal_id)?.deal_price || 0;
     });
     return tmp_amount;
   };
@@ -109,7 +109,7 @@ export default function Part2() {
     let tmp_amount = 0;
     formData.deals.forEach((elem) => {
       tmp_amount +=
-        deals.find((deal) => elem.value === deal.deal_id)?.deal_price || 0;
+        deals.find((deal) => elem.id === deal.deal_id)?.deal_price || 0;
     });
     return tmp_amount;
   };
@@ -121,14 +121,14 @@ export default function Part2() {
     paid: formData.amount_paid,
   });
 
-  const servicesRef = useRef<{ value: string; label: string }[]>(
+  const servicesRef = useRef<{ id: string; quantity: number }[]>(
     formData.services
   );
-  const dealsRef = useRef<{ value: string; label: string }[]>(formData.deals);
+  const dealsRef = useRef<{ id: string; quantity: number }[]>(formData.deals);
   const formRef = useRef<HTMLFormElement>(null);
   //Parent Context
 
-  // Map the deals recieved from the action function to pass to react-select
+  // Map the deals recieved from the loader function to pass to react-select
   const deal_options = fetchDeals(deals);
 
   const service_options = fetchServices(deals);
@@ -174,22 +174,13 @@ export default function Part2() {
 
   // Helper function to extract amount_charged, amount_paid, and payment_mode
   function extractFormData(formData: FormData) {
-    const amount_charged = extractNumber(formData, "amount_charged");
-    const amount_paid = extractNumber(formData, "amount_paid");
-    const payment_mode = extractString(formData, "mode_of_payment");
-
+   
+    const amount_charged = Number(formData.get("amount_charged"));
+    const amount_paid = Number(formData.get("amount_paid"));
+    const payment_mode = formData.get("mode_of_payment")?.toString() || ""
     return { amount_charged, amount_paid, payment_mode };
   }
 
-  // Helper function to extract number values from form data
-  function extractNumber(formData: FormData, fieldName: string): number {
-    return Number(formData.get(fieldName));
-  }
-
-  // Helper function to extract string values from form data
-  function extractString(formData: FormData, fieldName: string): string {
-    return formData.get(fieldName)?.toString() || "";
-  }
 
   const GoToPrevPage = () => {
     const form = formRef.current;

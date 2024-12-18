@@ -1,4 +1,5 @@
 import { Payment, Product, TransactionType } from "@prisma/client";
+import { SerializeFrom } from "@remix-run/node";
 import { Form, useSearchParams } from "@remix-run/react";
 import Select from "react-select";
 import { formatDateToISO } from "shared/utilityFunctions";
@@ -13,7 +14,7 @@ export default function Product_Transaction_FetchForm({
   products,
   errorMessages,
 }: {
-  products: Product[];
+  products: SerializeFrom<Product[]>;
   errorMessages: ProductTransactionFetchErrorData;
 }) {
   const [searchParams] = useSearchParams();

@@ -87,6 +87,7 @@ export default function Product_Sale_Record_Create_Part3() {
   const [productsQuantity, setProductsQuantity] = useState<
     { product_id: string; quantity: number }[]
   >(globalFormData.products_quantity);
+  
   const formRef = useRef<HTMLFormElement>(null);
   const isFirstRender = useRef(true);
   const product_options = products.map((product) => ({

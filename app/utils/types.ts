@@ -8,8 +8,8 @@ type FormType = {
     amount_charged: number;
     amount_paid: number;
     mobile_num: string;
-    deals: MenuOption[];
-    services: MenuOption[];
+    deals: { id: string; quantity: number }[];
+    services: { id: string; quantity: number }[];
     employees: { id: string; work_share: number }[];
     mode_of_payment: { value: PaymentModes; label: string };
 };

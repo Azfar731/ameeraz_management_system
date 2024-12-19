@@ -91,7 +91,7 @@ const getClients = async (
 
 export {
     createClient,
-    findClientByMobile,
+    findClientByMobile as getClientByMobile,
     getClientFromId,
     getClients,
     updateClient,

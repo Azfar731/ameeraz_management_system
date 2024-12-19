@@ -8,7 +8,7 @@ import {
   useOutletContext,
   useSubmit,
 } from "@remix-run/react";
-import { findClientByMobile } from "~/utils/client/db.server";
+import { getClientByMobile } from "~/utils/client/db.server";
 import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
 import Select from "react-select";
 import { findVendorByMobileNumber } from "~/utils/vendors/db.server";
@@ -18,12 +18,12 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!mobile_num) {
     return { msg: "No mobile number received" };
   }
-  
+
   const isClient = formData.get("isClient")?.toString() === "true";
 
   if (isClient) {
     //fetch client if transaction type is not bought and isClient is true
-    const client = await findClientByMobile(mobile_num);
+    const client = await getClientByMobile(mobile_num);
     if (!client) {
       return { error: `No client with mobile number: ${mobile_num} found` };
     }
@@ -36,7 +36,10 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // Redirect to the next part of the process
-  const searchParams = new URLSearchParams({ mobile_num, isClient: isClient.toString() });
+  const searchParams = new URLSearchParams({
+    mobile_num,
+    isClient: isClient.toString(),
+  });
   throw replace(`../part3?${searchParams.toString()}`);
 }
 
@@ -108,14 +111,20 @@ export default function Product_Sale_Record_Create_Part2() {
                 required
               />
             </>
-          ): <input type="hidden" name="isClient" value={transaction_type === "sold" ? "true" : "false"} />
+          ) : (
+            <input
+              type="hidden"
+              name="isClient"
+              value={transaction_type === "sold" ? "true" : "false"}
+            />
+          )
         }
-        
+
         <label
           htmlFor="mobile_num"
           className="block text-gray-700 text-sm font-bold mb-2"
         >
-            {transaction_type === "bought"
+          {transaction_type === "bought"
             ? "Enter Vendor Mobile Number"
             : transaction_type === "sold"
             ? "Enter Client Mobile Number"

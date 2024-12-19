@@ -19,10 +19,12 @@ type ServiceSaleRecordCreateErrors = {
     mode_of_payment: string[];
 };
 
+type ServiceSaleRecordUpdateErrors = Omit<ServiceSaleRecordCreateErrors, "mode_of_payment">
+
 type ServiceSaleRecordWithRelations = Prisma.Service_Sale_RecordGetPayload<{
     include: {
         client: true;
-        deal_records: {include: { deal: true }};
+        deal_records: { include: { deal: true } };
         employees: { include: { employee: true } };
         transactions: true;
     };
@@ -31,5 +33,6 @@ type ServiceSaleRecordWithRelations = Prisma.Service_Sale_RecordGetPayload<{
 export type {
     ServiceSaleRecordCreateErrors,
     ServiceSaleRecordFetchErrors,
+    ServiceSaleRecordUpdateErrors,
     ServiceSaleRecordWithRelations,
 };

@@ -7,7 +7,7 @@ import {
 import { ActionFunctionArgs, replace } from "@remix-run/node";
 
 import { FormType } from "~/utils/types";
-import { findClientByMobile } from "~/utils/client/db.server";
+import { getClientByMobile } from "~/utils/client/db.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -17,7 +17,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   // Fetch the client
-  const client = await findClientByMobile(mobile_num);
+  const client = await getClientByMobile(mobile_num);
   if (!client) {
     return { msg: `No client with mobile number: ${mobile_num} found` };
   }
@@ -28,8 +28,6 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 //helper functions
-
-
 
 export default function Part1() {
   const actionData = useActionData<{ msg: string }>();

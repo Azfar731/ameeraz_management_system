@@ -18,7 +18,7 @@ export default function Product_Sale_Record_Form({
   errorMessages,
 }: {
   record: SerializeFrom<Omit<ProductSaleRecordWithRelations, "transactions">>;
-  products: Product[];
+  products: SerializeFrom<Product[]>;
   errorMessages?: ProductSaleRecordUpdateErrors;
 }) {
   const submit = useSubmit();

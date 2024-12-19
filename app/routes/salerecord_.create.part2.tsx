@@ -17,7 +17,7 @@ import { Client, Deal } from "@prisma/client";
 import Select, { OnChangeValue } from "react-select";
 import { FormType, PaymentModes } from "~/utils/types";
 import { fetchDeals, fetchServices } from "shared/utilityFunctions";
-import { findClientByMobile } from "~/utils/client/db.server";
+import { getClientByMobile } from "~/utils/client/db.server";
 import {
   getAllPaymentMenuOptions,
   getSinglePaymentMenuOption,
@@ -30,7 +30,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       `Client with mobile number: ${client_mobile_num} does not exist`
     );
 
-  const client = await findClientByMobile(client_mobile_num);
+  const client = await getClientByMobile(client_mobile_num);
   const deals = await prisma_client.deal.findMany();
 
   return { deals, client };

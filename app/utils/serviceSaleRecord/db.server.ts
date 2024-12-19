@@ -142,9 +142,52 @@ const getServiceSaleRecordFromId = async ({
     });
 };
 
+const updateServiceSaleRecord = async (formData: {
+    amount_charged: number;
+    amount_paid: number;
+    deals: { id: string; quantity: number }[];
+    services: { id: string; quantity: number }[];
+    employees: { id: string; work_share: number }[];
+    service_record_id: string;
+}) => {
+    const {
+        amount_charged,
+        amount_paid,
+        deals,
+        services,
+        employees,
+        service_record_id,
+    } = formData;
+
+    const all_deals = [...deals, ...services];
+    const record = await prisma_client.service_Sale_Record.update({
+        where: { service_record_id },
+        data: {
+            total_amount: amount_charged,
+            payment_cleared: amount_charged === amount_paid,
+            deal_records: {
+                deleteMany: {},
+                create: all_deals.map((deal) => ({
+                    deal_id: deal.id,
+                    quantity: deal.quantity,
+                })),
+            },
+            employees: {
+                deleteMany: {},
+                create: employees.map((employee) => ({
+                    emp_id: employee.id,
+                    work_share: employee.work_share,
+                })),
+            },
+        },
+    });
+    return record;
+};
+
 export {
     createServiceSaleRecord,
     fetchServiceSaleRecords,
     getPendingServiceSaleRecords,
     getServiceSaleRecordFromId,
+    updateServiceSaleRecord
 };

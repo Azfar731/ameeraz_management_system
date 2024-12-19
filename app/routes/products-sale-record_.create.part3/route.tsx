@@ -12,7 +12,7 @@ import {
 } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
-import { findClientByMobile } from "~/utils/client/db.server";
+import { getClientByMobile } from "~/utils/client/db.server";
 import {
   getAllPaymentMenuOptions,
   getSinglePaymentMenuOption,
@@ -35,7 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let client;
   let vendor;
   if (isClient) {
-    client = await findClientByMobile(mobile_num);
+    client = await getClientByMobile(mobile_num);
     if (!client) {
       throw new Error(`Client with mobile number ${mobile_num} not found`);
     }
@@ -87,7 +87,7 @@ export default function Product_Sale_Record_Create_Part3() {
   const [productsQuantity, setProductsQuantity] = useState<
     { product_id: string; quantity: number }[]
   >(globalFormData.products_quantity);
-  
+
   const formRef = useRef<HTMLFormElement>(null);
   const isFirstRender = useRef(true);
   const product_options = products.map((product) => ({

@@ -14,11 +14,28 @@ enum Payment {
 }
 
 
+enum Role {
+  admin
+  owner
+  manager
+  worker
+}
+
 enum TransactionType {
   sold
   bought
   returned
 }
+
+model User {
+  id       Int       @id @default(dbgenerated("gen_random_uuid()"))
+  userName String    @unique
+  password String
+  role     Role
+  created_at DateTime @default(now())
+  modified_at DateTime @updatedAt
+}
+
 
 model Client {
   client_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
@@ -47,7 +64,7 @@ model Employee {
 
 model Service {
   serv_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
-  serv_name String
+  serv_name String @unique
   serv_price Int
   serv_category String @db.Uuid
   created_at    DateTime @default(now())
@@ -78,7 +95,7 @@ model Deal{
 
 model Product {
   prod_id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
-  prod_name String
+  prod_name String @unique
   prod_price Int 
   quantity Int 
   created_at    DateTime @default(now())

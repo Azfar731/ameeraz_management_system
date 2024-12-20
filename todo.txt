@@ -1,8 +1,8 @@
 
 
 Next:
-fix the fetch functionality on sales record index.
-remove all onChange functions and submit form directly.
+Understand session, sessionStorage and cookies.
+continue with auth/functions.server.ts file to write authentication functions.
 
 Fixes:
 Check product, include price while creating

@@ -28,9 +28,11 @@ enum TransactionType {
 }
 
 model User {
-  id       Int       @id @default(dbgenerated("gen_random_uuid()"))
+  id       String    @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   userName String    @unique
   password String
+  fname String
+  lname String
   role     Role
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt

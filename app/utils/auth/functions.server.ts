@@ -1,6 +1,7 @@
 import { Role } from "@prisma/client";
 import { getUserFromUserName } from "../user/db.server";
 import argon2 from "argon2"
+
 export const ClearanceLevel = {
     Worker: 1,
     Manager: 2,
@@ -20,17 +21,17 @@ const getClearanceLevel =  (role: Role): number => {
         ClearanceLevel.Worker;
 };
 
-const login = async (
+const getUserIdFromCreds = async (
     { userName, password }: { userName: string; password: string },
 ) => {
     const user = await getUserFromUserName(userName)
-    if(!user) return false
+    if(!user) return ""
 
     if(await argon2.verify(user.password, password)){
-        return {id: user.id, role: user.role, }
+        return user.id
     }
-
+    return "";
 
 };
 
-export { getClearanceLevel };
+export { getClearanceLevel, getUserIdFromCreds  };

@@ -1,10 +1,10 @@
-import { PrismaClient, Service } from "@prisma/client";
+import { PrismaClient, Role, Service } from "@prisma/client";
 import { createCategory } from "~/utils/category/db.server";
 import { createClient } from "~/utils/client/db.server";
 import { createEmployee } from "~/utils/employee/db.server";
 import { createProduct } from "~/utils/products/db.server";
+import { createUser } from "~/utils/user/db.server";
 import { createVendor } from "~/utils/vendors/db.server";
-
 const prisma_client = new PrismaClient();
 
 async function create_clients() {
@@ -194,6 +194,9 @@ async function create_vendors() {
     return vendor_records;
 }
 
+
+
+
 async function create_products() {
     const products = [
         { prod_name: "Shampoo", prod_price: 250, quantity: 100 },
@@ -207,6 +210,16 @@ async function create_products() {
     return product_records;
 }
 
+async function create_users(){
+    const users=[{userName:"azfar",password:"astayuno",fname:"azfar",lname:"razzaq",role:"admin" as Role},
+        {userName:"lailma",password:"astayuno",fname:"lailma",lname:"razzaq",role:"owner" as Role},
+        {userName:"irha",password:"astayuno",fname:"irha",lname:"razzaq",role:"manager" as Role},
+        {userName: "haleemah", password: "bunny", fname: "haleemah", lname: "anwary", role: "worker" as Role}]
+    
+        const user_records = await Promise.all(users.map((user) => createUser(user)));
+        return user_records
+}
+
 async function main() {
     const clients = await create_clients();
     const employees = await create_employees();
@@ -215,7 +228,8 @@ async function main() {
     const deals = await create_deals();
     const vendors = await create_vendors();
     const products = await create_products();
-    console.log(clients, employees, categories, services, deals, vendors, products);
+    const users = await create_users();
+    console.log(clients, employees, categories, services, deals, vendors, products, users);
     prisma_client.$disconnect();
 }
 

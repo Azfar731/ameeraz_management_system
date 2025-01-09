@@ -1,7 +1,8 @@
 import { prisma_client } from "~/.server/db";
 import argon2 from "argon2";
 import { Role } from "@prisma/client";
-import { getClearanceLevel } from "../auth/functions.server";
+
+
 const createUser = async (
     {
         userName,
@@ -28,7 +29,6 @@ const createUser = async (
             role,
             fname,
             lname,
-            clearance_level: getClearanceLevel(role),
         },
     });
 };

@@ -34,7 +34,6 @@ model User {
   fname String
   lname String
   role     Role
-  clearance_level Int 
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
 }

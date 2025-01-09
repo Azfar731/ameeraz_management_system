@@ -29,3 +29,6 @@ Services:
 3. Figure out how to provide data to refine function messages in zod
 
 
+Authentication:
+- use form-strategy for authentication
+- use cookieSessionStorage to mange sessions

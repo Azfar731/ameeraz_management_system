@@ -161,6 +161,8 @@ const ServiceSaleRecordSchema = BaseServiceSaleRecordSchema.refine(
     },
   );
 
+
+  
 const serviceSaleRecordUpdateSchema = BaseServiceSaleRecordSchema.omit({
   mode_of_payment: true,
 }).refine(async (data) => {

@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Outlet } from "@remix-run/react";
 import { FormType } from "~/utils/types";
+import { authenticate } from "~/utils/auth/functions.server";
+import { LoaderFunctionArgs } from "@remix-run/node";
+
+
+export async function loader({request}: LoaderFunctionArgs){
+  await authenticate({request, requiredClearanceLevel: 1})
+  return null
+}
+
+
 
 export default function SaleRecord() {
   const [formData, setFormData] = useState<FormType>({

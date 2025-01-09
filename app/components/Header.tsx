@@ -1,5 +1,5 @@
+import { Form, Link } from "@remix-run/react";
 import { useState } from "react";
-import { Link } from "@remix-run/react";
 import Nav from "./Nav";
 const Header: React.FC = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -22,9 +22,9 @@ const Header: React.FC = () => {
 
       {/* Login link */}
       <div>
-        <Link to="/login" className="text-lg">
-          Login
-        </Link>
+        <Form action="/logout" method="post" className="text-lg">
+          <button  type="submit">Logout</button>
+        </Form>
       </div>
 
       {/* Navigation component */}

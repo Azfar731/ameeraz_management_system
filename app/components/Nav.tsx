@@ -4,7 +4,7 @@ interface NavProps {
   closeNav: () => void;
 }
 
-const Nav: React.FC<NavProps> = ({ closeNav }) => {
+const Nav: React.FC<NavProps> = ({ closeNav }: { closeNav: () => void }) => {
   return (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-80 z-50 flex">
       {/* Sidebar navigation taking up 1/3 of the screen */}

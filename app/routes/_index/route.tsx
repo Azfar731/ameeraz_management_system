@@ -28,6 +28,7 @@ import SalesRecordTable from "./SalesRecordTable";
 import { getAllEmployees } from "~/utils/employee/db.server";
 import { getAllDeals } from "~/utils/deal/db.server";
 import { getAllCategories } from "~/utils/category/db.server";
+import { authenticate } from "~/utils/auth/functions.server";
 export const meta: MetaFunction = () => {
   return [
     { title: "Ameeraz Management" },
@@ -36,6 +37,10 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  //authenticate user
+  await authenticate({request,requiredClearanceLevel: 1})
+  
+  
   const searchParams = new URL(request.url).searchParams;
 
   // Extract filters

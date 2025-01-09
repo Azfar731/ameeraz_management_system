@@ -5,8 +5,12 @@ import { formatDate } from "shared/utilityFunctions";
 import { generate_heading } from "~/utils/render_functions";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { getServiceSaleRecordFromId } from "~/utils/serviceSaleRecord/db.server";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request,params }: LoaderFunctionArgs) {
+  
+  await authenticate({request,requiredClearanceLevel: 1})
+  
   const { id } = params;
   if (!id) {
     throw new Error("No id Provided in the URL");

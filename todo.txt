@@ -6,7 +6,7 @@ continue with auth/functions.server.ts file to write authentication functions.
 
 Fixes:
 Check product, include price while creating
-
+Services being shown as Inactive when created through seed file, but not when created manually
 
 change schema to create a deals and service record joining table
 it will have deal_id, record_id and quantity

@@ -12,23 +12,27 @@ import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
 import { FormType } from "~/utils/types";
 // import { validate_data } from "~/.server/utitlityFunctions";
-import { ActionFunctionArgs, replace } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
 import { getEmployeeOptions } from "shared/utilityFunctions";
 import { createServiceSaleRecord } from "~/utils/serviceSaleRecord/db.server";
 import { ServiceSaleRecordSchema } from "~/utils/serviceSaleRecord/validation.server";
 // import { printZodErrors } from "~/utils/functions";
 import { ServiceSaleRecordCreateErrors } from "~/utils/serviceSaleRecord/types";
 import { renderZodErrors } from "~/utils/render_functions";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader() {
+export async function loader({request}: LoaderFunctionArgs) {
+  await authenticate({request,requiredClearanceLevel: 1})
   const employees = await prisma_client.employee.findMany();
   return { employees };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1})
+
   const formData: FormType = await request.json();
 
-  const validationResult = ServiceSaleRecordSchema.safeParse(formData);
+  const validationResult = await ServiceSaleRecordSchema.safeParseAsync(formData);
   if (!validationResult.success) {
     return {
       errorMessages: validationResult.error.flatten().fieldErrors,
@@ -158,8 +162,9 @@ export default function Part3() {
     // Update formData with employee work share
     setFormData((prev) => ({ ...prev, employees }));
 
+
     // Navigate to the previous page
-    navigate("../part2");
+    navigate(`../part2?mobile_num=${formData.mobile_num}`);
   };
 
   // Helper function to extract employee work share from the form

@@ -22,8 +22,11 @@ import {
   getAllPaymentMenuOptions,
   getSinglePaymentMenuOption,
 } from "~/utils/functions";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const client_mobile_num = new URL(request.url).searchParams.get("mobile_num");
   if (!client_mobile_num)
     throw new Error(

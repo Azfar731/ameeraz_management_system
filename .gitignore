@@ -4,4 +4,4 @@ node_modules
 /build
 .env
 commands.md
-todo
+todo.txt

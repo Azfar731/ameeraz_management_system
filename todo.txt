@@ -1,23 +1,14 @@
 
 
 Next:
-Understand session, sessionStorage and cookies.
-continue with auth/functions.server.ts file to write authentication functions.
+
+
 
 Fixes:
 Check product, include price while creating
 Services being shown as Inactive when created through seed file, but not when created manually
 
-change schema to create a deals and service record joining table
-it will have deal_id, record_id and quantity
-also added created_at field in multiple models
-create a seed file
 
-refactor sale record create Part2
-merge deals and services into one
-fetch them using getAll(get rid of references)
-add render functionality to it(like employees, look productsSaleRecord for more recent version)
-modify formData, how it is saved, how it is retrieved.
 
 
 

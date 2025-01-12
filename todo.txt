@@ -32,3 +32,13 @@ Services:
 Authentication:
 - use form-strategy for authentication
 - use cookieSessionStorage to mange sessions
+
+
+
+User Form:
+Username: 
+Fname:
+Lname:
+Role: 
+Password:
+Confirm Password

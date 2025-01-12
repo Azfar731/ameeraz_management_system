@@ -95,7 +95,7 @@
 
 
 Checks:
-/users => Can only be accessed by owner or admin
+/users => Can only be accessed by owner or admin. Only sends users, lower than the current user level.
 /users/:id => The user must be admin or higher level than the user they are viewing. If the user is viewing their own id, than they will be allowed to see it.
 /users/:id/update => can update their own info or for the users below them. 
 /users/create => owner is allowed to create accounts for manager or worker.

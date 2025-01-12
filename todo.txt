@@ -1,8 +1,8 @@
 
 
 Next:
-Understand session, sessionStorage and cookies.
-continue with auth/functions.server.ts file to write authentication functions.
+Create users remaining pages.
+Apply authentication checks on user pages.
 
 Fixes:
 Check product, include price while creating

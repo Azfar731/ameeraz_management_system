@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import Select from "react-select";
-import { ClearanceLevel } from "~/utils/auth/functions.server";
+import { ClearanceLevel } from "~/utils/auth/functions";
 import { UserErrorMessages } from "~/utils/user/types";
 
 export default function User_Form({
@@ -14,10 +14,13 @@ export default function User_Form({
   currentUserClearanceLevel: number;
   errorMessage?: UserErrorMessages;
 }) {
-  const role_options = [{value: "worker", label: "Worker"},{value: "manager", label: "Manager" }]
-  if(currentUserClearanceLevel === ClearanceLevel.Admin){
-    role_options.push({value: "admin", label: "admin"})
-  }  
+  const role_options = [
+    { value: "worker", label: "Worker" },
+    { value: "manager", label: "Manager" },
+  ];
+  if (currentUserClearanceLevel === ClearanceLevel.Admin) {
+    role_options.push({ value: "owner", label: "Owner" });
+  }
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
       <div className="w-full flex justify-center items-center">
@@ -43,7 +46,9 @@ export default function User_Form({
         required
       />
       {errorMessage?.userName && (
-        <h2 className="text-red-500 font-semibold">{errorMessage.userName[0]}</h2>
+        <h2 className="text-red-500 font-semibold">
+          {errorMessage.userName[0]}
+        </h2>
       )}
       <label
         htmlFor="fname"
@@ -81,35 +86,67 @@ export default function User_Form({
         required
       />
       {errorMessage?.lname && (
-        <h2 className="text-red-500 font-semibold">
-          {errorMessage.lname[0]}
-        </h2>
+        <h2 className="text-red-500 font-semibold">{errorMessage.lname[0]}</h2>
       )}
-      <label
-        htmlFor="role"
-        className="block text-gray-700 text-sm font-bold mt-4"
-      >
-        Client Area
-      </label>
-      <Select
-        name="role"
-        options={role_options}
-        className="basic-multi-select mt-2 z-10"
-        classNamePrefix="select"
-        defaultValue={
-          user
-            ? {
-                value: `${user.role}`,
-                label: `${user.role}`,
-              }
-            : undefined
-        }
-        required
-      />
-      {errorMessage?.role && (
-        <h2 className="text-red-500 font-semibold">
-          {errorMessage.role[0]}
-        </h2>
+      {!user && (
+        <>
+          <label
+            htmlFor="role"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            User Role
+          </label>
+          <Select
+            name="role"
+            options={role_options}
+            className="basic-multi-select mt-2 z-10"
+            classNamePrefix="select"
+            required
+          />
+
+          {errorMessage?.role && (
+            <h2 className="text-red-500 font-semibold">
+              {errorMessage.role[0]}
+            </h2>
+          )}
+          <label
+            htmlFor="role"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            User Role
+          </label>
+        </>
+      )}
+      {user && user.role !== "admin" && (
+        <>
+          <label
+            htmlFor="account_status"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            User Account Status
+          </label>
+          <Select
+            id="account_status"
+            name="account_status"
+            options={[
+              { value: "active", label: "Active" },
+              { value: "inActive", label: "InActive" },
+            ]}
+            defaultValue={
+              user.account_status === "active"
+                ? { value: "active", label: "Active" }
+                : { value: "inActive", label: "InActive" }
+            }
+            className="basic-multi-select mt-2 z-10"
+            classNamePrefix="select"
+            required
+          />
+           {errorMessage?.account_status && (
+            <h2 className="text-red-500 font-semibold">
+              {errorMessage.account_status[0]}
+            </h2>
+          )}
+        </>
       )}
       <div className="w-full flex justify-center items-center">
         <button

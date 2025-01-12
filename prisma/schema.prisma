@@ -27,6 +27,11 @@ enum TransactionType {
   returned
 }
 
+enum Account_Status {
+  active
+  inActive
+}
+
 model User {
   id       String    @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   userName String    @unique
@@ -34,6 +39,7 @@ model User {
   fname String
   lname String
   role     Role
+  account_status  Account_Status @default(active)
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
 }

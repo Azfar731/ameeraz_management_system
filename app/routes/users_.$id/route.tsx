@@ -42,9 +42,12 @@ export default function User_Details() {
 
         <h3 className="font-medium text-gray-700">Role</h3>
         <h3 className="text-gray-600">{user.role}</h3>
-
+        <h3 className="font-medium text-gray-700">Account Status</h3>
+        <h3 className="text-gray-600">{user.account_status}</h3>
         <h3 className="font-medium text-gray-700">Created On</h3>
         <h3 className="text-gray-600">{formatDate(user.created_at)}</h3>
+        <h3 className="font-medium text-gray-700">Modified At</h3>
+        <h3 className="text-gray-600">{formatDate(user.modified_at)}</h3>
         <Link
           to={`update`}
           className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"

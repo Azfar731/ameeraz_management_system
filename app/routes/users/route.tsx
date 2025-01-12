@@ -22,19 +22,23 @@ export default function Users() {
   const COLUMNS = [
     {
       label: "User Name",
-      renderCell: (item: User) => item.userName,
+      renderCell: (item: User) => item.userName
     },
     {
       label: "First Name",
-      renderCell: (item: User) => `${item.fname}`,
+      renderCell: (item: User) => item.fname
     },
     {
       label: "Last Name",
-      renderCell: (item: User) => `${item.lname}`,
+      renderCell: (item: User) => item.lname
     },
     {
       label: "Role",
-      renderCell: (item: User) => `${item.role}`,
+      renderCell: (item: User) => item.role
+    },
+    {
+      label: "Account Status",
+      renderCell: (item: User) => item.account_status
     },
     {
       label: "Registrated On",

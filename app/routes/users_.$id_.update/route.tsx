@@ -1,10 +1,11 @@
 import { User } from "@prisma/client";
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { useActionData, useLoaderData } from "@remix-run/react";
-import { getUserFromId } from "~/utils/user/db.server";
-import User_Form from "~/components/users/user_form"
-import { getClearanceLevel } from "~/utils/auth/functions.server";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { replace, useActionData, useLoaderData } from "@remix-run/react";
+import { getUserFromId, updateUser } from "~/utils/user/db.server";
+import User_Form from "~/components/users/user_form";
+import { getClearanceLevel } from "~/utils/auth/functions";
 import { UserErrorMessages } from "~/utils/user/types";
+import { UpdateUserValidation } from "~/utils/user/validation.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -17,11 +18,33 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return { user };
 }
 
+export async function action({params,request}: ActionFunctionArgs){
+
+  const { id } = params;
+  if (!id) {
+    throw new Error("No Id found in URL");
+  }
+  const user = await getUserFromId(id);
+  if (!user) {
+    throw new Error(`No user found with id ${id}`);
+  }
+  const formData =  await request.formData()
+  const dataObject = Object.fromEntries(formData.entries());
+  console.log("Form Object: ",dataObject)
+  const validationResult = UpdateUserValidation({loggedInUserClearance: getClearanceLevel("admin"), currentUserAccountClearance: getClearanceLevel(user.role), sameUser: false}).safeParse(dataObject)
+  if(!validationResult.success){
+    return {errorMessages: validationResult.error.flatten().fieldErrors}
+  }
+  const updated_user = await updateUser({id, updates: validationResult.data})
+  throw replace (`/users/${updated_user.id}`)
+}
+
+
 export default function Update_User() {
   const { user } = useLoaderData<{ user: User }>();
   const actionData = useActionData<{errorMessages: UserErrorMessages }>()
   return (
   <div className="flex justify-center items-center h-screen">
-    <User_Form currentUserClearanceLevel={getClearanceLevel(user.role)} user={user} errorMessage={actionData?.errorMessages}   />
+    <User_Form currentUserClearanceLevel={getClearanceLevel(user.role)} user={user} errorMessage={actionData?.errorMessages} />
   </div>);
 }

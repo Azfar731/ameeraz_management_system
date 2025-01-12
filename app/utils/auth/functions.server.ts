@@ -1,15 +1,9 @@
-import { Role } from "@prisma/client";
 import { getUserFromId, getUserFromUserName } from "../user/db.server";
 import argon2 from "argon2"
 import { getSession, commitSession } from "~/sessions";
 import { redirect } from "@remix-run/react";
+import { getClearanceLevel } from "./functions";
 
-export const ClearanceLevel = {
-    Worker: 1,
-    Manager: 2,
-    Owner: 3,
-    Admin: 4,
-} as const;
 
 
 const authenticate = async({request, requiredClearanceLevel}: {request: Request, requiredClearanceLevel: number}) => {
@@ -37,18 +31,6 @@ const authenticate = async({request, requiredClearanceLevel}: {request: Request,
 
 
 
-const getClearanceLevel =  (role: Role): number => {
-    const clearanceLevels = {
-        admin: ClearanceLevel.Admin,
-        owner: ClearanceLevel.Owner,
-        manager: ClearanceLevel.Manager,
-        worker: ClearanceLevel.Worker,
-    };
-
-    return clearanceLevels[role as keyof typeof clearanceLevels] ||
-        ClearanceLevel.Worker;
-};
-
 const getUserIdFromCreds = async (
     { userName, password }: { userName: string; password: string },
 ) => {
@@ -61,4 +43,4 @@ const getUserIdFromCreds = async (
     return "";
 };
 
-export { authenticate, getClearanceLevel, getUserIdFromCreds  };
+export { authenticate, getUserIdFromCreds  };

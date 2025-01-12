@@ -35,10 +35,14 @@ Authentication:
 
 
 
-User Form:
-Username: 
-Fname:
-Lname:
-Role: 
-Password:
-Confirm Password
+
+Update logic:
+- users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner
+- profile page => Can update password too.
+Owner can update manager and worker information and also disbale their accounts.
+Admin can update every role information or disbale account.
+
+
+Create a seperate route for updating password. 
+    - ask for old password
+    - ask for new password

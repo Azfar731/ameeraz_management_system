@@ -1,6 +1,6 @@
 import { prisma_client } from "~/.server/db";
 import argon2 from "argon2";
-import { Role } from "@prisma/client";
+import { Account_Status, Role } from "@prisma/client";
 
 const createUser = async (
     {
@@ -40,6 +40,7 @@ const updateUser = async (
             password?: string;
             fname?: string;
             lname?: string;
+            account_status?: Account_Status;
         };
     },
 ) => {
@@ -65,6 +66,7 @@ const getAllUsers = async () => {
             fname: true,
             lname: true,
             role: true,
+            account_status: true,
             created_at: true,
             modified_at: true,
         },
@@ -80,6 +82,7 @@ const getUserFromId = async (id: string) => {
             fname: true,
             lname: true,
             role: true,
+            account_status: true,
             created_at: true,
             modified_at: true,
         },

@@ -24,7 +24,10 @@ export async function action({ params, request }: ActionFunctionArgs) {
   if (!id) {
     throw new Error("No Id found in URL");
   }
-
+  const user = await getUserFromId(id);
+  if (!user) {
+    throw new Error(`No user found with id ${id}`);
+  }
   const formData = await request.formData();
   const dataObject = Object.fromEntries(formData.entries());
   console.log("Form Object: ", dataObject);

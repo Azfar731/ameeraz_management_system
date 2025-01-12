@@ -1,12 +1,15 @@
 
 
-type UserErrorMessages = {
+type BaseUserErrorMessages = {
     fname: string[];
     lname: string[];
     userName: string[];
+    account_status: string[];
     role: string[];
-    account_status: string[]
+    password: string[];
 }
 
+type UpdateUserErrorMessages = Omit<BaseUserErrorMessages, "password" | "role">
 
-export type { UserErrorMessages}
+type CreateUserErrorMessages = Omit<BaseUserErrorMessages, "account_status">
+export type { UpdateUserErrorMessages, CreateUserErrorMessages}

@@ -20,7 +20,7 @@ const BaseUserValidation = z.object({
     password: z.string().min(5, "Password must be Atleast 5 characters long"),
 });
 
-const NewUserValidation = (loggedInUserClearance: number) => {
+const NewUserValidation = ({loggedInUserClearance}: {loggedInUserClearance: number}) => {
     return BaseUserValidation
         .refine((data) => {
             if (data.role === "owner") {
@@ -28,24 +28,36 @@ const NewUserValidation = (loggedInUserClearance: number) => {
             } else {
                 return loggedInUserClearance >= ClearanceLevel.Owner;
             }
+        }, {
+            message:
+                "You don't have permission to create an account of this type",
+            path: ["role"],
         });
 };
 
-const UpdateUserValidation = ({loggedInUserClearance, currentUserAccountClearance, sameUser}:{loggedInUserClearance: number, currentUserAccountClearance: number, sameUser: boolean}  ) =>{
-    
+const UpdateUserValidation = (
+    { loggedInUserClearance, currentUserAccountClearance, sameUser }: {
+        loggedInUserClearance: number;
+        currentUserAccountClearance: number;
+        sameUser: boolean;
+    },
+) => {
     return BaseUserValidation.omit({
         role: true,
-        password: true
+        password: true,
     }).extend({
         account_status: z.enum(["active", "inActive"]),
-    }).refine( () => {
-        if(sameUser) return true
-        else if(loggedInUserClearance === ClearanceLevel.Admin){
-            return true
-        }else{
-            loggedInUserClearance > currentUserAccountClearance
+    }).refine(() => {
+        if (sameUser) return true;
+        else if (loggedInUserClearance === ClearanceLevel.Admin) {
+            return true;
+        } else {
+            loggedInUserClearance > currentUserAccountClearance;
         }
-    })
-}
+    }, {
+        message: "You don't have permission to create an account of this type",
+        path: ["role"],
+    });
+};
 
-export {  NewUserValidation, UpdateUserValidation };
+export { NewUserValidation, UpdateUserValidation };

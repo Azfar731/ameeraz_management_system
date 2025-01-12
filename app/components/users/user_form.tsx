@@ -1,28 +1,67 @@
 import { User } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useSubmit } from "@remix-run/react";
+import { useState } from "react";
 import Select from "react-select";
 import { ClearanceLevel } from "~/utils/auth/functions";
-import { UserErrorMessages } from "~/utils/user/types";
+import {
+  CreateUserErrorMessages,
+  UpdateUserErrorMessages,
+} from "~/utils/user/types";
+
+type UserFormProps =
+  | {
+      user: SerializeFrom<User>;
+      currentUserClearanceLevel: number;
+      errorMessages?: UpdateUserErrorMessages; // Type when `user` is present
+    }
+  | {
+      user?: undefined;
+      currentUserClearanceLevel: number;
+      errorMessages?: CreateUserErrorMessages; // Type when `user` is not present
+    };
 
 export default function User_Form({
   user,
   currentUserClearanceLevel,
-  errorMessage,
-}: {
-  user?: SerializeFrom<User>;
-  currentUserClearanceLevel: number;
-  errorMessage?: UserErrorMessages;
-}) {
+  errorMessages,
+}: UserFormProps) {
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const submit = useSubmit();
+
   const role_options = [
     { value: "worker", label: "Worker" },
     { value: "manager", label: "Manager" },
   ];
+
   if (currentUserClearanceLevel === ClearanceLevel.Admin) {
     role_options.push({ value: "owner", label: "Owner" });
   }
+
+  const handleFormSubmition = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    if (!user) {
+      const password = formData.get("password");
+      const confirm_password = formData.get("confirm_password");
+      if (password !== confirm_password) {
+        setPasswordsMatch(false);
+        return;
+      }
+      setPasswordsMatch(true);
+    }
+    submit(formData, { method: "post" });
+  };
+
   return (
-    <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
+    <Form
+      method="post"
+      onSubmit={handleFormSubmition}
+      className="bg-white mt-14 p-6 rounded shadow-md w-80 "
+    >
       <div className="w-full flex justify-center items-center">
         <h1 className="block text-gray-700 text-2xl font-bold mt-4">
           {user ? "Update User" : "Register User"}
@@ -45,9 +84,9 @@ export default function User_Form({
         defaultValue={user?.userName}
         required
       />
-      {errorMessage?.userName && (
+      {errorMessages?.userName && (
         <h2 className="text-red-500 font-semibold">
-          {errorMessage.userName[0]}
+          {errorMessages.userName[0]}
         </h2>
       )}
       <label
@@ -66,8 +105,8 @@ export default function User_Form({
         defaultValue={user?.fname}
         required
       />
-      {errorMessage?.fname && (
-        <h2 className="text-red-500 font-semibold">{errorMessage.fname[0]}</h2>
+      {errorMessages?.fname && (
+        <h2 className="text-red-500 font-semibold">{errorMessages.fname[0]}</h2>
       )}
       <label
         htmlFor="lname"
@@ -85,8 +124,8 @@ export default function User_Form({
         defaultValue={user?.lname}
         required
       />
-      {errorMessage?.lname && (
-        <h2 className="text-red-500 font-semibold">{errorMessage.lname[0]}</h2>
+      {errorMessages?.lname && (
+        <h2 className="text-red-500 font-semibold">{errorMessages.lname[0]}</h2>
       )}
       {!user && (
         <>
@@ -104,17 +143,47 @@ export default function User_Form({
             required
           />
 
-          {errorMessage?.role && (
+          {errorMessages?.role && (
             <h2 className="text-red-500 font-semibold">
-              {errorMessage.role[0]}
+              {errorMessages.role[0]}
             </h2>
           )}
           <label
-            htmlFor="role"
+            htmlFor="password"
             className="block text-gray-700 text-sm font-bold mt-4"
           >
-            User Role
+            Password
           </label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
+            required
+          />
+          {errorMessages?.role && (
+            <h2 className="text-red-500 font-semibold">
+              {errorMessages.role[0]}
+            </h2>
+          )}
+          <label
+            htmlFor="confirm_password"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            name="confirm_password"
+            id="confirm_password"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
+            required
+          />
+          {!passwordsMatch && (
+            <h2 className="text-red-500 font-semibold">
+              Passwords do not Match
+            </h2>
+          )}
         </>
       )}
       {user && user.role !== "admin" && (
@@ -141,9 +210,9 @@ export default function User_Form({
             classNamePrefix="select"
             required
           />
-           {errorMessage?.account_status && (
+          {errorMessages?.account_status && (
             <h2 className="text-red-500 font-semibold">
-              {errorMessage.account_status[0]}
+              {errorMessages.account_status[0]}
             </h2>
           )}
         </>

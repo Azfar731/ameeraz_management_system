@@ -1,4 +1,5 @@
 import { User } from "@prisma/client";
+import { SerializeFrom } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import Select from "react-select";
 import { ClearanceLevel } from "~/utils/auth/functions.server";
@@ -9,7 +10,7 @@ export default function User_Form({
   currentUserClearanceLevel,
   errorMessage,
 }: {
-  user?: User;
+  user?: SerializeFrom<User>;
   currentUserClearanceLevel: number;
   errorMessage?: UserErrorMessages;
 }) {
@@ -21,7 +22,7 @@ export default function User_Form({
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
       <div className="w-full flex justify-center items-center">
         <h1 className="block text-gray-700 text-2xl font-bold mt-4">
-          {user ? "Update Client" : "Register Client"}
+          {user ? "Update User" : "Register User"}
         </h1>
       </div>
 

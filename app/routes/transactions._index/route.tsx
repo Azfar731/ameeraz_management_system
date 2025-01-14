@@ -24,7 +24,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors, transactions: [] };
   }
-  console.log("Validation Result: ", validationResult.data);
   const transactions = await getClientTransactions(validationResult.data);
   return { transactions, errors: {} };
 }

@@ -1,14 +1,14 @@
 
 
 Things to do:
-- create an ALl transaction page
-- add elements in navbar
-- make clientTransactions the default in transactions
+- create an All transaction page
+
 
 
 Done:
 - fixed issues in CLientTransaction caused due to change in Service Sale Record schema
-
+- add elements in navbar
+- make clientTransactions the default in transactions
 
 Improvements:
 Services:

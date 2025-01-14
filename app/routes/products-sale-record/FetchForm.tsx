@@ -41,11 +41,17 @@ export default function FetchForm({
   const fetchFormData = (formData: FormData) => {
     const start_date = formData.get("start_date") as string;
     const end_date = formData.get("end_date") as string;
-    const products = formData.getAll("product").map((value) => String(value)).filter(val => val.trim() !== "");
-    const transaction_types = formData.getAll("transaction_type").map((value) => String(value)).filter(val => val.trim() !== "");
+    const products = formData
+      .getAll("product")
+      .map((value) => String(value))
+      .filter((val) => val.trim() !== "");
+    const transaction_types = formData
+      .getAll("transaction_type")
+      .map((value) => String(value))
+      .filter((val) => val.trim() !== "");
     const client_mobile_num = formData.get("client_mobile_num") as string;
     const vendor_mobile_num = formData.get("vendor_mobile_num") as string;
-  
+    const payment_cleared = formData.get("payment_cleared") as string;
     return {
       start_date,
       end_date,
@@ -53,18 +59,17 @@ export default function FetchForm({
       transaction_types,
       client_mobile_num,
       vendor_mobile_num,
+      payment_cleared
     };
   };
-  
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const formValues = fetchFormData(formData)
+    const formValues = fetchFormData(formData);
 
-
-    setSearchParameters(formValues,setSearchParams);
+    setSearchParameters(formValues, setSearchParams);
   };
 
   return (
@@ -200,6 +205,28 @@ export default function FetchForm({
       {errorMessages.transaction_types && (
         <h2 className="text-red-500 font-semibold">
           {errorMessages.transaction_types[0]}
+        </h2>
+      )}
+      <label
+        htmlFor="payment_cleared"
+        className="block text-gray-700 text-sm font-bold mt-4"
+      >
+        Payment Status
+      </label>
+      <Select
+        id="payment_cleared"
+        name="payment_cleared"
+        options={[
+          { value: "paid", label: "Paid" },
+          { value: "pending", label: "Pending" },
+          { value: undefined, label: "Any"}
+        ]}
+        className="basic-multi-select mt-2"
+        classNamePrefix="select"
+      />
+      {errorMessages.products && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.products[0]}
         </h2>
       )}
       <button

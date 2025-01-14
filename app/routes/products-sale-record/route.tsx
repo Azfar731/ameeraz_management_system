@@ -38,6 +38,7 @@ const fetchsearchParams = (searchParams: URLSearchParams) => {
   const transaction_types = searchParams.get("transaction_types") || undefined;
   const client_mobile_num = searchParams.get("client_mobile_num") || undefined;
   const vendor_mobile_num = searchParams.get("vendor_mobile_num") || undefined;
+  const payment_cleared = searchParams.get("payment_cleared") || undefined;
 
   return {
     start_date,
@@ -46,6 +47,7 @@ const fetchsearchParams = (searchParams: URLSearchParams) => {
     transaction_types,
     client_mobile_num,
     vendor_mobile_num,
+    payment_cleared,
   };
 };
 

@@ -73,6 +73,7 @@ const productSaleRecordFetchSchema = z.object({
             message: "Products can't be an empty string ",
         })
         .optional(),
+    payment_cleared: z.enum(["paid", "pending"]).transform(str => str === "paid" ? true: false).optional()
 }).refine(
     (data) => {
         // Only perform the comparison if both dates are defined
@@ -90,7 +91,7 @@ const productSaleRecordFetchSchema = z.object({
     if (
         !(data.start_date || data.end_date || data.products ||
             data.transaction_types || data.client_mobile_num ||
-            data.vendor_mobile_num)
+            data.vendor_mobile_num || (data.payment_cleared  !== undefined))
     ) {
         data.start_date = new Date();
         data.start_date.setHours(0, 0, 0, 0);

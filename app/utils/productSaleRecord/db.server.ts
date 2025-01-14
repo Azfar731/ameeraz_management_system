@@ -10,7 +10,8 @@ const getProductSaleRecords = async ({
   start_date,
   end_date,
   products,
-  payment_status,
+
+  payment_cleared,
 }: {
   client_mobile_num?: string;
   vendor_mobile_num?: string;
@@ -18,7 +19,7 @@ const getProductSaleRecords = async ({
   start_date?: Date;
   end_date?: Date;
   products?: string[];
-  payment_status?: "cleared" | "pending";
+  payment_cleared?: boolean;
 }) => {
   return await prisma_client.product_Sale_Record.findMany({
     where: {
@@ -46,7 +47,7 @@ const getProductSaleRecords = async ({
           },
         }
         : undefined,
-      payment_cleared: payment_status ? payment_status === "cleared" : undefined, 
+      payment_cleared: payment_cleared,
     },
     include: {
       client: true,
@@ -65,13 +66,15 @@ const getProductSaleRecords = async ({
 };
 
 // Fetch a single product sale record by ID
-const getProductSaleRecordById = async ({id}: {id: string}) => {
+const getProductSaleRecordById = async ({ id }: { id: string }) => {
   return await prisma_client.product_Sale_Record.findFirst({
     where: { product_record_id: id },
   });
 };
 
-const getProductSaleRecordByIdWithRelations = async ({id}: {id: string}) => {
+const getProductSaleRecordByIdWithRelations = async (
+  { id }: { id: string },
+) => {
   return await prisma_client.product_Sale_Record.findFirst({
     where: { product_record_id: id },
     include: {
@@ -95,7 +98,7 @@ const createProductSaleRecord = async ({
   amount_charged,
   amount_paid,
   products_quantity,
-  isClient
+  isClient,
 }: {
   mobile_num: string;
   isClient: boolean;
@@ -111,13 +114,13 @@ const createProductSaleRecord = async ({
       data: {
         client: isClient
           ? {
-              connect: { client_mobile_num: mobile_num },
-            }
+            connect: { client_mobile_num: mobile_num },
+          }
           : undefined,
         vendor: !isClient
           ? {
-              connect: { vendor_mobile_num: mobile_num },
-            }
+            connect: { vendor_mobile_num: mobile_num },
+          }
           : undefined,
         transaction_type,
         payment_cleared: amount_charged === amount_paid,
@@ -140,24 +143,25 @@ const createProductSaleRecord = async ({
         },
       },
     });
-  
+
     // Step 2: Update product quantities based on the transaction type
     await Promise.all(
       products_quantity.map((product) =>
         prisma.product.update({
           where: { prod_id: product.product_id },
           data: {
-            quantity: transaction_type === "sold" || (transaction_type === "returned" && !isClient)
-              ? { decrement: product.quantity }
-              : { increment: product.quantity },
+            quantity:
+              transaction_type === "sold" ||
+                (transaction_type === "returned" && !isClient)
+                ? { decrement: product.quantity }
+                : { increment: product.quantity },
           },
         })
-      )
+      ),
     );
-  
+
     return productSaleRecord; // Return the created product sale record
   });
-  
 };
 
 // Update an existing product sale record
@@ -191,9 +195,12 @@ const updateProductSaleRecord = async ({
         prisma.product.update({
           where: { prod_id: product_record.prod_id },
           data: {
-            quantity: oldProductSaleRecord.transaction_type === "sold" || (oldProductSaleRecord.transaction_type === "returned" && !isClient)
-              ? { increment: product_record.quantity }
-              : { decrement: product_record.quantity },
+            quantity:
+              oldProductSaleRecord.transaction_type === "sold" ||
+                (oldProductSaleRecord.transaction_type === "returned" &&
+                  !isClient)
+                ? { increment: product_record.quantity }
+                : { decrement: product_record.quantity },
           },
         })
       ),
@@ -233,9 +240,11 @@ const updateProductSaleRecord = async ({
               quantity: product.quantity,
               product: {
                 update: {
-                  quantity: transaction_type === "sold" || (transaction_type === "returned" && !isClient)
-                    ? { decrement: product.quantity }
-                    : { increment: product.quantity },
+                  quantity:
+                    transaction_type === "sold" ||
+                      (transaction_type === "returned" && !isClient)
+                      ? { decrement: product.quantity }
+                      : { increment: product.quantity },
                 },
               },
             },
@@ -261,7 +270,7 @@ export {
   createProductSaleRecord,
   deleteProductSaleRecord,
   getProductSaleRecordById,
+  getProductSaleRecordByIdWithRelations,
   getProductSaleRecords,
   updateProductSaleRecord,
-  getProductSaleRecordByIdWithRelations
 };

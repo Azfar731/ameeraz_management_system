@@ -31,6 +31,7 @@ type ProductSaleRecordFetchErrors = {
     transaction_types: string[];
     client_mobile_num: string[];
     vendor_mobile_num: string[];
+    payment_cleaared: string[];
 };
 
 type ProductSaleRecordUpdateErrors = {

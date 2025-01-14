@@ -224,9 +224,9 @@ export default function FetchForm({
         className="basic-multi-select mt-2"
         classNamePrefix="select"
       />
-      {errorMessages.products && (
+      {errorMessages.payment_cleaared && (
         <h2 className="text-red-500 font-semibold">
-          {errorMessages.products[0]}
+          {errorMessages.payment_cleaared[0]}
         </h2>
       )}
       <button

@@ -82,12 +82,18 @@ const productSaleRecordFetchSchema = z.object({
         }
         // If one or both dates are undefined, consider it valid
         return true;
-    },
-    {
+        },
+        {
         message: "End date must be greater than start date",
         path: ["end_date"],
-    },
-).superRefine((data) => {
+        },
+    ).refine(
+        (data) => !(data.client_mobile_num && data.vendor_mobile_num),
+        {
+        message: "Client mobile number and vendor mobile number can't be passed together",
+        path: ["client_mobile_num", "vendor_mobile_num"],
+        }
+    ).superRefine((data) => {
     if (
         !(data.start_date || data.end_date || data.products ||
             data.transaction_types || data.client_mobile_num ||

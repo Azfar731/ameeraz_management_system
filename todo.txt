@@ -14,7 +14,7 @@ Done:
 - fix form overlapping navbar by changing h-screen to min-h-screen so that if the forms or anything else exceeds the screen height, it doesn't overlap with navbar
 - seperated Client Transactions and Operational Expenses route form and table logic into seperate components
 - create an All transaction page
-
+- added pending value param to product sale record fetch form
 
 Improvements:
 Services:

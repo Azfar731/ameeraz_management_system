@@ -9,12 +9,13 @@ import {
   setSearchParameters,
 } from "~/utils/functions";
 import { ProductSaleRecordFetchErrors } from "~/utils/productSaleRecord/types";
+import { SerializeFrom } from "@remix-run/node";
 
 export default function FetchForm({
   products: allProducts,
   errorMessages,
 }: {
-  products: Product[];
+  products: SerializeFrom<Product>[];
   errorMessages: ProductSaleRecordFetchErrors;
 }) {
   //searchParam values

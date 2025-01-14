@@ -1,7 +1,6 @@
 
 
 Things to do:
-- create an All transaction page
 
 
 Done:
@@ -13,6 +12,8 @@ Done:
 - add payment cleared parameter to sale record page
 - added show all employees functionality in employees page
 - fix form overlapping navbar by changing h-screen to min-h-screen so that if the forms or anything else exceeds the screen height, it doesn't overlap with navbar
+- seperated Client Transactions and Operational Expenses route form and table logic into seperate components
+- create an All transaction page
 
 
 Improvements:

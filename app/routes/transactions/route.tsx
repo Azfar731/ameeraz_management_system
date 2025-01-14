@@ -44,7 +44,7 @@ export default function Transactions() {
           Operational Expenses
         </NavLink>
         <NavLink
-          to="all"
+          to="all-transactions"
           className={({ isActive }) =>
             `text-lg px-4 py-2 rounded-full transition-colors ${
               isActive

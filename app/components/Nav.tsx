@@ -95,6 +95,15 @@ const Nav: React.FC<NavProps> = ({ closeNav }: { closeNav: () => void }) => {
           >
             Vendors
           </NavLink>
+          <NavLink
+            to="/users"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Users
+          </NavLink>
         </nav>
       </div>
 

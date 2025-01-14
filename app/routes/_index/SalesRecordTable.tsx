@@ -6,6 +6,7 @@ import { formatDate } from "shared/utilityFunctions";
 import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { Employee } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 interface SalesRecordTableProps {
   serviceRecords: SerializeFrom<ServiceSaleRecordWithRelations[]>;
@@ -63,7 +64,9 @@ export default function SalesRecordTable({
                 <li>
                   <strong>Deals/Services:</strong>{" "}
                   {record.deal_records
-                    .map((record) => `${record.deal.deal_name}(${record.quantity})`)
+                    .map(
+                      (record) => `${record.deal.deal_name}(${record.quantity})`
+                    )
                     .join(", ")}
                 </li>
                 <li>
@@ -111,9 +114,11 @@ export default function SalesRecordTable({
       renderCell: getEmployeeNames,
     },
     {
-      label: "Edit",
+      label: "View",
       renderCell: (record: ServiceSaleRecordWithRelations) => (
-        <button onClick={() => onEdit(record.service_record_id)}>Edit</button>
+        <button onClick={() => onEdit(record.service_record_id)}>
+          <FaExternalLinkAlt />
+        </button>
       ),
     },
   ];

@@ -2,13 +2,14 @@
 
 Things to do:
 - create an All transaction page
-
+- fix params issue in sales record page
 
 
 Done:
 - fixed issues in CLientTransaction caused due to change in Service Sale Record schema
 - add elements in navbar
 - make clientTransactions the default in transactions
+- added icons to sale record page.
 
 Improvements:
 Services:

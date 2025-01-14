@@ -109,7 +109,7 @@ export default function Client_Transactions() {
                 </li>
                 <li>
                   <strong>Deals/Services: </strong>
-                  {item.record.deals.map((deal) => deal.deal_name).join(", ")}
+                  {item.record.deal_records.map((rec) => rec.deal.deal_name).join(", ")}
                 </li>
               </ul>
             </td>
@@ -147,7 +147,7 @@ export default function Client_Transactions() {
     {
       label: "Deals/Services",
       renderCell: (item: ClientTransactionWithRelations) =>
-        item.record.deals.map((deal) => deal.deal_name).join(", "),
+        item.record.deal_records.map((rec) => rec.deal.deal_name).join(", "),
     },
 
     {

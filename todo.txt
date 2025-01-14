@@ -1,25 +1,13 @@
 
 
-Next:
-Create users remaining pages.
-Apply authentication checks on user pages.
-
-Fixes:
-Check product, include price while creating
-Services being shown as Inactive when created through seed file, but not when created manually
-
-change schema to create a deals and service record joining table
-it will have deal_id, record_id and quantity
-also added created_at field in multiple models
-create a seed file
-
-refactor sale record create Part2
-merge deals and services into one
-fetch them using getAll(get rid of references)
-add render functionality to it(like employees, look productsSaleRecord for more recent version)
-modify formData, how it is saved, how it is retrieved.
+Things to do:
+- create an ALl transaction page
+- add elements in navbar
+- make clientTransactions the default in transactions
 
 
+Done:
+- fixed issues in CLientTransaction caused due to change in Service Sale Record schema
 
 
 Improvements:
@@ -27,13 +15,6 @@ Services:
 1. save search parameters when going from "/services" to "/services/$id"
 2. Disable buttons while form is submitting
 3. Figure out how to provide data to refine function messages in zod
-
-
-Authentication:
-- use form-strategy for authentication
-- use cookieSessionStorage to mange sessions
-
-
 
 
 Update logic:

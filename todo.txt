@@ -2,7 +2,7 @@
 
 Things to do:
 - create an All transaction page
-- fix form overlapping navbar
+
 
 Done:
 - fixed issues in CLientTransaction caused due to change in Service Sale Record schema
@@ -12,7 +12,7 @@ Done:
 - fix params issue in sales record page
 - add payment cleared parameter to sale record page
 - added show all employees functionality in employees page
-
+- fix form overlapping navbar by changing h-screen to min-h-screen so that if the forms or anything else exceeds the screen height, it doesn't overlap with navbar
 
 
 Improvements:

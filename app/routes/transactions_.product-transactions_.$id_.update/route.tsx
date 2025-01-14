@@ -2,14 +2,14 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import ProductTransactionForm from "~/components/productTransactions/ProductTransactionsForm";
 import {
-    getProductTransactionFromId,
-    getProductTransactionWithRelationsFromId,
-    updateProductTransaction,
+  getProductTransactionFromId,
+  getProductTransactionWithRelationsFromId,
+  updateProductTransaction,
 } from "~/utils/productTransaction/db.server";
 import { getProductSaleRecordPendingAmount } from "~/utils/productTransaction/functions.server";
 import {
-    ProductTransactionErrorData,
-    ProductTransactionWithRelations,
+  ProductTransactionErrorData,
+  ProductTransactionWithRelations,
 } from "~/utils/productTransaction/types";
 import { productTransactionSchema } from "~/utils/productTransaction/validation.server";
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -61,7 +61,7 @@ export default function Product_transaction_update() {
     errorMessages: ProductTransactionErrorData;
   }>();
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <ProductTransactionForm
         product_sale_record={transaction.record}
         transaction={transaction}

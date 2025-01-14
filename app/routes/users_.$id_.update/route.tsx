@@ -49,7 +49,7 @@ export default function Update_User() {
     errorMessages: UpdateUserErrorMessages;
   }>();
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <User_Form
         currentUserClearanceLevel={1}
         user={user}

@@ -19,7 +19,6 @@ export default function View_Service() {
   const { service } = useLoaderData<{ service: ServiceWithRelations }>();
   console.log(service);
 
-  
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <Link

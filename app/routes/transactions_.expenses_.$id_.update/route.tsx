@@ -23,8 +23,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return { expense };
 }
 
-export async function action({ request,params }: ActionFunctionArgs) {
-    const { id } = params;
+export async function action({ request, params }: ActionFunctionArgs) {
+  const { id } = params;
   if (!id) {
     throw new Error("Id not provided in URL");
   }
@@ -36,7 +36,10 @@ export async function action({ request,params }: ActionFunctionArgs) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
 
-  const updated_expense = await updateOperationalExpense({id,...validationResult.data});
+  const updated_expense = await updateOperationalExpense({
+    id,
+    ...validationResult.data,
+  });
 
   throw replace(`/transactions/expenses/${updated_expense.expense_id}`);
 }
@@ -49,10 +52,10 @@ export default function Create_Expense() {
   const expense = {
     ...loaderData.expense,
     created_at: new Date(loaderData.expense.created_at),
-    modified_at: new Date(loaderData.expense.modified_at)
-  }
+    modified_at: new Date(loaderData.expense.modified_at),
+  };
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Expense_Form expense={expense} errorMessages={actionData?.errors} />
     </div>
   );

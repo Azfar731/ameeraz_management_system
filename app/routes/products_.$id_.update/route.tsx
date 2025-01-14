@@ -44,9 +44,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function Update_Products() {
   const { product } = useLoaderData<{ product: Product }>();
   const actionData = useActionData<{ errors: ProductErrors }>();
-  
+
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Product_Form product={product} errorMessages={actionData?.errors} />
     </div>
   );

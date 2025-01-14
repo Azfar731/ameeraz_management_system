@@ -58,7 +58,7 @@ export default function Update_Client() {
     created_at: new Date(loaderData.client.created_at), // Convert the created_at string back to a Date object
   };
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Client_Form client={client} errorMessage={actionData?.errors} />
     </div>
   );

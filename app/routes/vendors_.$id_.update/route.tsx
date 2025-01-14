@@ -2,10 +2,7 @@ import { Vendor } from "@prisma/client";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Vendor_Form from "~/components/vendors/Vendor_Form";
-import {
-    getVendorFromId,
-    updateVendor
-} from "~/utils/vendors/db.server";
+import { getVendorFromId, updateVendor } from "~/utils/vendors/db.server";
 import { getVendorFormData } from "~/utils/vendors/functions.server";
 import { VendorErrors } from "~/utils/vendors/types";
 import { vendorSchema } from "~/utils/vendors/validations.server";
@@ -48,7 +45,7 @@ export default function Update_Vendor() {
   const actionData = useActionData<{ errors: VendorErrors }>();
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Vendor_Form vendor={vendor} errorMessages={actionData?.errors} />
     </div>
   );

@@ -24,7 +24,7 @@ export default function Create_Expense() {
   const actionData = useActionData<{ errors: ExpenseErrors }>();
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Expense_Form errorMessages={actionData?.errors} />
     </div>
   );

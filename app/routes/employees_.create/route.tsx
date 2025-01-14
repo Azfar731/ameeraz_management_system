@@ -28,12 +28,11 @@ export async function action({ request }: ActionFunctionArgs) {
   throw replace(`/employees/${employee.emp_id}`);
 }
 
-
 export default function Create_Employee() {
   const actionData = useActionData<{ errors: EmployeeErrors }>();
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Employee_Form errorMessage={actionData?.errors} />
     </div>
   );

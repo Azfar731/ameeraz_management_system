@@ -67,7 +67,7 @@ export default function Client_Transaction_Create_Part2() {
     loaderData.service_sale_record
   );
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <ClientTransaction_Form
         service_sale_record={service_sale_record}
         errorMessages={actionData?.errors}

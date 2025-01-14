@@ -88,7 +88,7 @@ export default function ClientTransaction_Update() {
   const actionData = useActionData<{ errors: ClientTransactionErrors }>();
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <ClientTransaction_Form
         service_sale_record={service_sale_record}
         transaction={transaction}

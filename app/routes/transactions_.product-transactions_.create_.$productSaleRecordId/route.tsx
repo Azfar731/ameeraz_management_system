@@ -6,9 +6,7 @@ import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types"
 import { createProductTransaction } from "~/utils/productTransaction/db.server";
 import { getProductSaleRecordPendingAmount } from "~/utils/productTransaction/functions.server";
 import { ProductTransactionErrorData } from "~/utils/productTransaction/types";
-import {
-    productTransactionSchema
-} from "~/utils/productTransaction/validation.server";
+import { productTransactionSchema } from "~/utils/productTransaction/validation.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { productSaleRecordId } = params;
   if (!productSaleRecordId) {
@@ -31,27 +29,38 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
-  const maxAmount = await getProductSaleRecordPendingAmount(productSaleRecordId);
+  const maxAmount = await getProductSaleRecordPendingAmount(
+    productSaleRecordId
+  );
   const validationResult =
     productTransactionSchema(maxAmount).safeParse(formValues);
   if (!validationResult.success) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
-  const new_transaction = await createProductTransaction({...validationResult.data, product_record_id: productSaleRecordId});
-  
-  throw replace(`/transactions/product-transactions/${new_transaction.product_trans_id}`);
-}
+  const new_transaction = await createProductTransaction({
+    ...validationResult.data,
+    product_record_id: productSaleRecordId,
+  });
 
+  throw replace(
+    `/transactions/product-transactions/${new_transaction.product_trans_id}`
+  );
+}
 
 export default function Product_transaction_create_part2() {
   const { product_sale_record } = useLoaderData<{
     product_sale_record: ProductSaleRecordWithRelations;
   }>();
 
-  const actionData = useActionData<{errorMessages: ProductTransactionErrorData}>();
+  const actionData = useActionData<{
+    errorMessages: ProductTransactionErrorData;
+  }>();
   return (
-    <div className="flex justify-center items-center h-screen">
-      <ProductTransactionForm product_sale_record={product_sale_record} errorMessages={actionData?.errorMessages} />
+    <div className="flex justify-center items-center min-h-screen">
+      <ProductTransactionForm
+        product_sale_record={product_sale_record}
+        errorMessages={actionData?.errorMessages}
+      />
     </div>
   );
 }

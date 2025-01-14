@@ -8,19 +8,17 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Error("Id not provided in the url");
   }
-  const category = await getCategoryFromId({id, include_services: true});
+  const category = await getCategoryFromId({ id, include_services: true });
   if (!category) {
     throw new Error(`No category found with id: ${id}`);
   }
   return { category };
 }
 
-
 export default function View_Category() {
   const { category } = useLoaderData<{ category: CategoryWithServices }>();
 
-//   const services = category.services
-  
+  //   const services = category.services
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
@@ -39,7 +37,7 @@ export default function View_Category() {
         <h3 className="text-gray-600">{category.cat_name}</h3>
 
         <h3 className="font-medium text-gray-700">Attached Services</h3>
-        
+
         <Link
           to={`update`}
           className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"

@@ -2,11 +2,12 @@ import { Form } from "@remix-run/react";
 import { Employee } from "@prisma/client";
 import { EmployeeErrors } from "~/utils/employee/types";
 import Select from "react-select";
+import { SerializeFrom } from "@remix-run/node";
 export default function Employee_Form({
   employee,
   errorMessage,
 }: {
-  employee?: Employee;
+  employee?:  SerializeFrom<Employee>;
   errorMessage?: EmployeeErrors;
 }) {
   return (

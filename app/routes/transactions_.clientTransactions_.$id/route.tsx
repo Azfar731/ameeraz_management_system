@@ -26,7 +26,6 @@ export default function View_Client_Transaction() {
   }>();
   const client = transaction.record.client;
   const deals = transaction.record.deals;
-  
 
   const render_transactions = () => {
     const rendered_transactions: JSX.Element[] = [];

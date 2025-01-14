@@ -7,10 +7,9 @@ import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { getServiceSaleRecordFromId } from "~/utils/serviceSaleRecord/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ request,params }: LoaderFunctionArgs) {
-  
-  await authenticate({request,requiredClearanceLevel: 1})
-  
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const { id } = params;
   if (!id) {
     throw new Error("No id Provided in the URL");
@@ -43,7 +42,7 @@ export default function Record() {
     renderered_deals.push(
       <h4 key={`deal${index} price`}>{record.quantity}</h4>
     );
-  })
+  });
 
   const renderered_emp: JSX.Element[] = [];
 

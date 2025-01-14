@@ -6,7 +6,6 @@ import { getProductTransactionWithRelationsFromId } from "~/utils/productTransac
 import { ProductTransactionWithRelations } from "~/utils/productTransaction/types";
 import { generate_heading } from "~/utils/render_functions";
 
-
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -26,8 +25,7 @@ export default function View_Product_Transaction() {
   const render_transactions = () => {
     const rendered_transactions: JSX.Element[] = [];
     const related_transactions = transaction.record.transactions.filter(
-      (trans) =>
-        trans.product_trans_id !== transaction.product_trans_id
+      (trans) => trans.product_trans_id !== transaction.product_trans_id
     );
     related_transactions.forEach((trans, index) => {
       rendered_transactions.push(
@@ -86,26 +84,32 @@ export default function View_Product_Transaction() {
         <h3 className="font-medium text-gray-700">Total Amount Paid</h3>
         <h3 className="text-gray-600">{transaction.amount_paid}</h3>
 
-
         <h3 className="font-medium text-gray-700">Mode of Payment</h3>
         <h3 className="text-gray-600">{transaction.mode_of_payment}</h3>
 
         <h2 className="col-span-2 text-xl font-semibold text-gray-800 mt-4 border-b pb-2">
           Service Record Details
-        </h2>   
+        </h2>
         <h3 className="font-medium text-gray-700">View</h3>
-        <Link to={`/products-sale-record/${transaction.record_id}`} target="_blank" rel="noopener noreferrer"><FaExternalLinkAlt/></Link>
-        
+        <Link
+          to={`/products-sale-record/${transaction.record_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FaExternalLinkAlt />
+        </Link>
+
         <h3 className="font-medium text-gray-700">Transaction Type</h3>
         <h3 className="text-gray-600">{transaction.record.transaction_type}</h3>
-
 
         <h3 className="font-medium text-gray-700">Total Amount Charged</h3>
         <h3 className="text-gray-600">{transaction.record.total_amount}</h3>
 
         <h3 className="font-medium text-gray-700">Products</h3>
         <h3 className="text-gray-600">
-          {transaction.record.products.map((record) => record.product.prod_name).join(",")}
+          {transaction.record.products
+            .map((record) => record.product.prod_name)
+            .join(",")}
         </h3>
         {transaction.record.transactions.length > 1 && (
           <>

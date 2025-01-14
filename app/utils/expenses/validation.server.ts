@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+//this schema is also used by all-transactions route loader
 const expensesFetchSchema = z.object({
     start_date: z
         .string()

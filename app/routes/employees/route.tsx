@@ -1,7 +1,7 @@
 import { prisma_client } from "~/.server/db";
 import { Employee } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
@@ -9,7 +9,7 @@ import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
-  const getAll = searchParams.get("getAll");
+  const getAll = searchParams.get("getAllEmployees");
   let employees;
   if (getAll && getAll === "true") {
     employees = await prisma_client.employee.findMany();
@@ -22,8 +22,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Employees() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const { employees } = useLoaderData<{ employees: Employee[] }>();
-  console.log(employees);
 
   //table values
   const nodes = [...employees];
@@ -82,26 +83,44 @@ export default function Employees() {
     },
   ]);
 
+  const handleEmployees = () => {
+    setSearchParams((prevParams) => {
+      const params = new URLSearchParams(prevParams);
+
+      if (params.get("getAllEmployees")) {
+        params.delete("getAllEmployees");
+      } else {
+        params.set("getAllEmployees", "true");
+      }
+
+      return params;
+    });
+  };
+
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
         <h1 className=" font-semibold text-6xl text-gray-700">Employees</h1>
       </div>
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
-        >
-          Register Employee <FaPlus />
-        </Link>
+        <div className="w-full flex justify-between items-center">
+          <Link
+            to="create"
+            className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+          >
+            Register Employee <FaPlus />
+          </Link>
+          <button
+            onClick={handleEmployees}
+            className="w-60 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          >
+            {searchParams.get("getAllEmployees")
+              ? "Hide Incactive Employees"
+              : "Show Inactive Employees"}
+          </button>
+        </div>
         <div className="mt-6">
-          <CompactTable
-            columns={COLUMNS}
-            data={data}
-            theme={theme}
-            // rowProps={ROW_PROPS}
-            // rowOptions={ROW_OPTIONS}
-          />
+          <CompactTable columns={COLUMNS} data={data} theme={theme} />
         </div>
       </div>
     </div>

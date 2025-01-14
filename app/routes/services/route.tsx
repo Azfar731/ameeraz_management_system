@@ -36,7 +36,7 @@ export default function Services() {
   console.log(deals);
 
   // other values
-  const current_date = new Date();
+  // const current_date = new Date();
   //table values
   const nodes = [...deals];
   const data = { nodes };

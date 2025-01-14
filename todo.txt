@@ -36,3 +36,23 @@ Create a seperate route for updating password.
 
 Forms overlapping with navbar:
 - update employee
+
+
+
+ const fetchFormValues = (formData: FormData) => {
+    const start_date: string = (formData.get("start_date") as string) || "";
+    const end_date: string = (formData.get("end_date") as string) || "";
+    const mobile_num: string = (formData.get("mobile_num") as string) || "";
+    const payment_options = payment_option_ref.current?.map((opt) => opt.value);
+
+    if (start_date || end_date || mobile_num || payment_options.length > 0) {
+      return {
+        start_date,
+        end_date,
+        payment_options,
+        mobile_num,
+      };
+    } else {
+      return null;
+    }
+  };

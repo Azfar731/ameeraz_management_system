@@ -41,11 +41,3 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return new Response("Internal Server Error", { status: 500 });
   }
 };
-
-export default function Webhook() {
-  return (
-    <div>
-      <h1>This is the webhooks page</h1>
-    </div>
-  );
-}

@@ -15,7 +15,7 @@ export async function action() {
   if (!recipient) {
     throw new Error("Recipient env variable not found");
   }
-  const wp_message_body = getInstaTemplateMessageInput({ recipient, imageUrl: "https://drive.google.com/file/d/1-6mfnFUZaqmYKEOLYGBuyXFpzAKd_UwX/view?usp=drive_link", customer_fname: "Azfar" });
+  const wp_message_body = getInstaTemplateMessageInput({ recipient, imageUrl: "https://i.postimg.cc/52DXCf1d/deal1.jpg", customer_fname: "Azfar" });
   
   const resp: any = await sendMessage(wp_message_body);
 
@@ -58,7 +58,7 @@ export default function Whatsapp_API() {
           Send Message
         </button>
       </Form>
-      
+
     </div>
   );
 }

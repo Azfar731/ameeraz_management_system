@@ -1,7 +1,7 @@
 
 
 Things to do:
-
+- mark incoming transactions as blue/green. Mark outgoing transactions as red. Use RowProps style element to achieve this.
 
 Done:
 - fixed issues in CLientTransaction caused due to change in Service Sale Record schema
@@ -57,3 +57,7 @@ Forms overlapping with navbar:
       return null;
     }
   };
+
+
+
+ 

@@ -38,6 +38,7 @@
     "@remix-run/serve": "^2.12.1",
     "@table-library/react-table-library": "^4.1.7",
     "argon2": "^0.41.1",
+    "axios": "^1.7.9",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

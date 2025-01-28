@@ -2,7 +2,6 @@
 import { Form } from "@remix-run/react";
 import {
   getInstaTemplateMessageInput,
-  getTextMessageInput,
   sendMessage,
 } from "~/utils/wp_api/functions.server";
 

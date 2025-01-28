@@ -1,8 +1,21 @@
 
 
 Things to do:
-- mark incoming transactions as blue/green. Mark outgoing transactions as red. Use RowProps style element to achieve this.
+backend
+- modify the API functions to send multiple messages at once(create a loop)
+- Keep track of rate limits using bottleneck for per second limit and redis upstash for 24 hour rolling window.
+ 
 
+frontend:
+- a page to send messages
+  - contains an option to select from multiple templates
+  - an option to add image link, if template needs it
+  - send button sends it to all the clients who have subscribed to the channel(require a subscribed attribute in the client info).
+- a page to display webhooks information
+  - webhooks will send information regarding message status.
+  - find a way to display failed message deliveries. 
+  
+   
 Done:
 - fixed issues in CLientTransaction caused due to change in Service Sale Record schema
 - add elements in navbar
@@ -22,6 +35,8 @@ Services:
 2. Disable buttons while form is submitting
 3. Figure out how to provide data to refine function messages in zod
 
+Webhooks:
+- find a way to provide real time updates for data coming from webhooks. Currently, I have only found one solution which uses sockets.io, but sockets.io requires the remix app to run on express, because it can't run on serverless environemnt(servers that sleep within requests).
 
 Update logic:
 - users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner
@@ -40,24 +55,5 @@ Forms overlapping with navbar:
 
 
 
- const fetchFormValues = (formData: FormData) => {
-    const start_date: string = (formData.get("start_date") as string) || "";
-    const end_date: string = (formData.get("end_date") as string) || "";
-    const mobile_num: string = (formData.get("mobile_num") as string) || "";
-    const payment_options = payment_option_ref.current?.map((opt) => opt.value);
 
-    if (start_date || end_date || mobile_num || payment_options.length > 0) {
-      return {
-        start_date,
-        end_date,
-        payment_options,
-        mobile_num,
-      };
-    } else {
-      return null;
-    }
-  };
-
-
-setup webhook using glitch. 
  

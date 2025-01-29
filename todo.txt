@@ -4,7 +4,7 @@ Things to do:
 backend
 - modify the API functions to send multiple messages at once(create a loop)
 - Keep track of rate limits using bottleneck for per second limit and redis upstash for 24 hour rolling window.
- 
+- make changes in prisma(add subscribed field to client, create templates model)
 
 frontend:
 - a page to send messages

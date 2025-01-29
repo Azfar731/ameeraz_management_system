@@ -1,9 +1,16 @@
 // import { ActionFunctionArgs } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import Select from "react-select";
 import {
   getInstaTemplateMessageInput,
   sendMessage,
 } from "~/utils/wp_api/functions.server";
+
+
+export async function loader(){
+  
+}
+
 
 export async function action() {
   // const formData =await request.formData()
@@ -31,33 +38,18 @@ export async function action() {
 }
 
 export default function Whatsapp_API() {
+
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <Form
-        method="post"
-        className="bg-white mt-14 p-6 rounded shadow-md w-80 "
-      >
-        <label
-          htmlFor="message"
-          className="block text-gray-700 text-sm font-bold mb-2"
-        >
-          Enter text to send
-        </label>
-
-        <input
-          type="text"
-          id="message"
-          name="message"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
+      <h1>Send Whatsapp Messages</h1>
+      <Form method="post">
+      <Select
+          name="template_name"
+          options={template_options}
+          className="basic-multi-select mb-4"
+          classNamePrefix="select"
         />
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Send Message
-        </button>
       </Form>
-
     </div>
   );
 }

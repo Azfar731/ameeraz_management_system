@@ -2,7 +2,7 @@ import { Header_type } from "@prisma/client";
 import { prisma_client } from "~/.server/db";
 
 const getAllTemplates = async () => {
-    return await prisma_client.template.findMany();
+    return await prisma_client.template.findMany({include: {variables: true}});
 };
 
 const getTemplatesByHeaderType = async ({

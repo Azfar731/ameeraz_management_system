@@ -227,11 +227,27 @@ model Template {
   name String
   header_type Header_type
   header_var_name String
-  body_var Json
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
+
+  variables Template_Variable[]
 }
 
+
+enum WP_Variable_Type {
+  text
+  currency
+  date_time
+}
+
+model Template_Variable {
+  id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  name String
+  type WP_Variable_Type
+  template_id String @db.Uuid
+  
+  template Template @relation(fields: [template_id], references: [id])
+}
 
 
 

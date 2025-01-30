@@ -8,9 +8,8 @@ import {
 
 
 export async function loader(){
-  
-}
 
+}
 
 export async function action() {
   // const formData =await request.formData()

@@ -32,6 +32,14 @@ enum Account_Status {
   inActive
 }
 
+
+enum Header_type {
+  none
+  image
+  text
+  video
+}
+
 model User {
   id       String    @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   userName String    @unique
@@ -51,6 +59,7 @@ model Client {
   client_lname String
   client_mobile_num String @unique
   client_area String
+  subscribed Boolean @default(false)
   points Int @default(0)
   services Service_Sale_Record[]   
   products Product_Sale_Record[]
@@ -212,10 +221,11 @@ model Operational_Expenses {
   modified_at DateTime @updatedAt
 }
 
+
 model Template {
   id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   name String
-  header_type String
+  header_type Header_type
   header_var_name String
   body_var Json
   created_at DateTime @default(now())

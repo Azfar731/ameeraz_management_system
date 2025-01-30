@@ -28,7 +28,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Create_Client() {
   const actionData = useActionData<ClientErrorData>();
-
+  
   return (
     <div className="flex justify-center items-center min-h-screen">
       <Client_Form errorMessage={actionData?.errors} />

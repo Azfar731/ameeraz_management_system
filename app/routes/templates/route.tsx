@@ -83,8 +83,6 @@ export default function Templates() {
             columns={COLUMNS}
             data={data}
             theme={theme}
-            // rowProps={ROW_PROPS}
-            // rowOptions={ROW_OPTIONS}
           />
         </div>
       </div>

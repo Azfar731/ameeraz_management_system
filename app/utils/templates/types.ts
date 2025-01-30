@@ -8,5 +8,13 @@ type TemplateWithRelations = Prisma.TemplateGetPayload<{
     }
 }>
 
+type TemplateErrorMessages = {
+    name: string[];
+    header_type: string[];
+    header_variable_name: string[];
+    header_var_name: string[];
+    variables: string[];
+}
 
-export type { TemplateWithRelations}
+
+export type { TemplateWithRelations, TemplateErrorMessages}

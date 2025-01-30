@@ -40,6 +40,15 @@ enum Header_type {
   video
 }
 
+enum WP_Variable_Type {
+  text
+  currency
+  date_time
+}
+
+
+
+
 model User {
   id       String    @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   userName String    @unique
@@ -224,7 +233,7 @@ model Operational_Expenses {
 
 model Template {
   id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
-  name String
+  name String @unique
   header_type Header_type
   header_var_name String
   created_at DateTime @default(now())
@@ -234,18 +243,12 @@ model Template {
 }
 
 
-enum WP_Variable_Type {
-  text
-  currency
-  date_time
-}
-
 model Template_Variable {
   id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   name String
   type WP_Variable_Type
   template_id String @db.Uuid
-  
+
   template Template @relation(fields: [template_id], references: [id])
 }
 

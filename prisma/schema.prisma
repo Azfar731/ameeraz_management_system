@@ -32,6 +32,10 @@ enum Account_Status {
   inActive
 }
 
+enum Boolean_Strings {
+  true
+  false
+}
 
 enum Header_type {
   none
@@ -248,7 +252,7 @@ model Template_Variable {
   name String
   type WP_Variable_Type
   template_id String @db.Uuid
-
+  input_required Boolean_Strings @default(false)
   template Template @relation(fields: [template_id], references: [id])
 }
 

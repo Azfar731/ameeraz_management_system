@@ -17,6 +17,11 @@ const variableTypeOptions = [
   { value: "date_time", label: "Date Time" },
 ];
 
+const variableInputRequiredOptions = [
+  { value: "true", label: "true" },
+  { value: "false", label: "false" },
+];
+
 export default function Template_Form({
   template,
   errorMessages,
@@ -29,7 +34,11 @@ export default function Template_Form({
   );
   const [variables, setVariables] = useState(
     template?.variables ||
-      Array.from({ length: numVariables }, () => ({ name: "", type: "" }))
+      Array.from({ length: numVariables }, () => ({
+        name: "",
+        type: "",
+        input_required: "",
+      }))
   );
 
   const submit = useSubmit();
@@ -47,7 +56,7 @@ export default function Template_Form({
 
   const handleVariableChange = (
     index: number,
-    field: "name" | "type",
+    field: "name" | "type" | "input_required",
     value: string
   ) => {
     setVariables((prev) =>
@@ -67,6 +76,7 @@ export default function Template_Form({
       variables: variables.map((variable) => ({
         name: variable.name,
         type: variable.type,
+        input_required: variable.input_required,
       })),
     };
     console.log("Data: ", data);
@@ -171,6 +181,7 @@ export default function Template_Form({
           <label className="block text-gray-700 text-sm font-bold">
             Variable {index + 1}
           </label>
+
           <input
             type="text"
             name={`variables[${index}][name]`}
@@ -192,6 +203,23 @@ export default function Template_Form({
             )}
             onChange={(selected) =>
               handleVariableChange(index, "type", selected?.value || "")
+            }
+            required
+          />
+          <Select
+            name={`variables[${index}][input_required]`}
+            options={variableInputRequiredOptions}
+            className="basic-single mt-2"
+            classNamePrefix="select"
+            value={variableInputRequiredOptions.find(
+              (opt) => opt.value === variable.input_required
+            )}
+            onChange={(selected) =>
+              handleVariableChange(
+                index,
+                "input_required",
+                selected?.value || ""
+              )
             }
             required
           />

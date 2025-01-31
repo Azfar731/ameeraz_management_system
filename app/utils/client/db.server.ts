@@ -89,10 +89,17 @@ const getClients = async (
     }
 };
 
+
+const getClientCount = async () => {
+    const count = await prisma_client.client.count();
+    return count;
+};
+
 export {
     createClient,
     findClientByMobile as getClientByMobile,
     getClientFromId,
     getClients,
     updateClient,
+    getClientCount
 };

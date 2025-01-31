@@ -15,6 +15,9 @@ const TemplateSchema = z.object({
             name: z.string().min(1, "Variable name cannot be empty"),
             type: z.enum(["text", "currency","date_time"], {
                 errorMap: () => ({ message: "Type must be either 'text' or 'currency'." })
+            }),
+            input_required: z.enum(["true", "false"], {
+                errorMap: () => ({ message: "Input Required must be either 'true' or 'false'." })
             })
         })
     ).optional() // Allows an empty array

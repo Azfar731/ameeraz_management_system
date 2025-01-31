@@ -2,10 +2,10 @@ import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
   url: "https://crucial-alpaca-59474.upstash.io", // Replace with your Upstash Redis URL
-  token: "********", // Replace with your Upstash Redis token
+  token: process.env.UPSTASH_WP_MESSAGE_LOG_DB_TOKEN, // Replace with your Upstash Redis token
 });
 
-const DAILY_LIMIT = 250; // Max messages allowed in 24 hours
+const DAILY_LIMIT = 230; // Max messages allowed in 24 hours
 const WINDOW_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const ZSET_KEY = "waba_message_tracking"; // Redis key for tracking messages
 
@@ -21,6 +21,19 @@ async function canSendMessages(count: number) {
   const currentCount = await redis.zcard(ZSET_KEY);
 
   return currentCount + count <= DAILY_LIMIT;
+}
+
+async function remainingDailyLimit(){
+  const now = Date.now();
+  const oldestAllowedTimestamp = now - WINDOW_DURATION;
+
+  // Remove timestamps older than 24 hours
+  await redis.zremrangebyscore(ZSET_KEY, 0, oldestAllowedTimestamp);
+
+  // Count messages within the last 24 hours
+  const currentCount = await redis.zcard(ZSET_KEY);
+
+  return DAILY_LIMIT - currentCount;
 }
 
 // Function to add new messages to the rolling window
@@ -86,3 +99,6 @@ export async function handler(event) {
     body: JSON.stringify({ message: "Messages sent successfully" }),
   };
 }
+
+
+export { remainingDailyLimit };

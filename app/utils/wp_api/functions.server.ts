@@ -1,5 +1,5 @@
 import { Client } from "@prisma/client";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Bottleneck from "bottleneck";
 
 const limiter = new Bottleneck({
@@ -22,46 +22,25 @@ async function sendMessage(data: string) {
         try {
             const resp = await axios(config);
             return resp;
-        } catch (err: any) {
-            if (err.response) {
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err) && err.response) {
                 console.log("API Error Response:");
                 console.log("Status:", err.response.status);
                 console.log("Data:", err.response.data);
-            } else if (err.request) {
-                console.log("No Response Received:", err.request);
             } else {
-                console.log("Error Message:", err.message);
+                console.log("Non-Axios Error:", err);
             }
-            // console.log("Request Config:", err.config);
             return null;
         }
     });
 }
 
-function getTextMessageInput(
-    { recipient }: { recipient: string },
-) {
-    return JSON.stringify({
-        "messaging_product": "whatsapp",
-        "to": recipient,
-        "type": "template",
-        "template": {
-            "name": "hello_world",
-            "language": {
-                "code": "en_US",
-            },
-        },
-    });
-}
-
 function getInstaTemplateMessageInput(
-    { recipient, variablesArray}: {
+    { recipient, variablesArray }: {
         recipient: string;
-        variablesArray: {key: string, value: string}[];
-
+        variablesArray: { key: string; value: string }[];
     },
 ) {
-   
     return JSON.stringify({
         "messaging_product": "whatsapp",
         "to": recipient,
@@ -98,61 +77,103 @@ function getInstaTemplateMessageInput(
     });
 }
 
+function getMessageInput(
+    { template_name, recipient }: { template_name: string; recipient: string },
+) {
+    return JSON.stringify({
+        "messaging_product": "whatsapp",
+        "to": recipient,
+        "type": "template",
+        "template": {
+            "name": template_name,
+            "language": {
+                "code": "en_GB",
+            },
+        },
+    });
+}
+
 function convertMobileNumber(mobileNumber: string): string {
     // Validate the input
     if (!/^0\d{10}$/.test(mobileNumber)) {
-        throw new Error("Invalid mobile number format. It must be 11 digits long and start with '0'.");
+        throw new Error(
+            "Invalid mobile number format. It must be 11 digits long and start with '0'.",
+        );
     }
-    
+
     // Replace the first "0" with "92"
     return mobileNumber.replace(/^0/, "92");
 }
 
-type TemplateFunction = (props: { recipient: string; variablesArray: {key: string,value:string}[]} ) => string;
+type TemplateFunctionWithVariables = (
+    props: {
+        recipient: string;
+        client: Client;
+        variablesArray: { key: string; value: string }[];
+    },
+) => string;
 
 // Define your dictionary with string keys and function values
-const templates: { [key: string]: TemplateFunction } = {
-    "deals_insta_link": getInstaTemplateMessageInput, // Make sure getInstaTemplateMessageInput matches the TemplateFunction type
-};
+const templatesWithVariables: { [key: string]: TemplateFunctionWithVariables } =
+    {
+        "deals_insta_link": getInstaTemplateMessageInput, // Make sure getInstaTemplateMessageInput matches the TemplateFunction type
+    };
 
 // sendMultipleMessages function
 async function sendMultipleMessages({
     template_name,
     clientsList,
-    imageUrl,
+    headerValue,
     variablesArray,
 }: {
     template_name: string;
     clientsList: Client[];
-    imageUrl?: string;
-    variablesArray: {key: string, value: string}[]; // Allows additional properties for each template
+    headerValue?: string;
+    variablesArray?: { key: string; value: string }[]; // Allows additional properties for each template
 }) {
     if (clientsList.length < 1) {
         console.log("Empty list sent to sendMultipleMessages");
         return null;
     }
-
     // Ensure the template_name exists in the dictionary
-    const templateFunction = templates[template_name];
-    if (!templateFunction) {
-        throw new Error(`Template function not found for template_name: ${template_name}`);
+    let messages: string[] = [];
+    if (variablesArray && variablesArray.length > 0) {
+        const templateFunction = templatesWithVariables[template_name];
+        if (!templateFunction) {
+            throw new Error(
+                `Template function not found for template_name: ${template_name}`,
+            );
+        }
+        messages = clientsList.map((client) =>
+            templateFunction({
+                recipient: convertMobileNumber(client.client_mobile_num),
+                client: client,
+                variablesArray: headerValue
+                    ? [
+                        { key: "imageUrl", value: headerValue },
+                        ...variablesArray,
+                    ]
+                    : variablesArray,
+            })
+        );
+    } else {
+        //send message without variables
+
+        messages = clientsList.map((client) =>
+            getMessageInput({
+                recipient: convertMobileNumber(client.client_mobile_num),
+                template_name,
+            })
+        );
     }
 
-    
-    // Generate messages using the template function
-    const messages = clientsList.map((client) =>
-        templateFunction({
-            recipient: convertMobileNumber(client.client_mobile_num),
-            variablesArray: imageUrl? [{key: "imageUrl", value: imageUrl}, ...variablesArray]: variablesArray,
-        })
+    const responses = await Promise.all(
+        messages.map((msg) => sendMessage(msg)),
     );
-
-    const responses = await Promise.all(messages.map((msg) => sendMessage(msg)));
 
     const nullCount = responses.filter((resp) => resp === null).length;
 
     return nullCount;
 }
 
-
-export { getInstaTemplateMessageInput, getTextMessageInput, sendMessage, sendMultipleMessages };
+export { sendMessage, sendMultipleMessages };

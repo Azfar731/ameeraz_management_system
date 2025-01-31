@@ -101,4 +101,4 @@ export async function handler(event) {
 }
 
 
-export { remainingDailyLimit };
+export { remainingDailyLimit, canSendMessages, recordMessage };

@@ -95,11 +95,22 @@ const getClientCount = async () => {
     return count;
 };
 
+
+const getRangeofClients = async({startIndex,total}:{startIndex: number;total: number})=> {
+    const clients = await prisma_client.client.findMany({
+        orderBy: { created_at: "asc" },  // Sort in ascending order
+        skip: startIndex,  // Skip the first 250 clients
+        take: total,   // Fetch the next 50 clients (from 251 to 300)
+      });
+    return clients
+}  
+
 export {
     createClient,
     findClientByMobile as getClientByMobile,
     getClientFromId,
     getClients,
     updateClient,
-    getClientCount
+    getClientCount,
+    getRangeofClients
 };

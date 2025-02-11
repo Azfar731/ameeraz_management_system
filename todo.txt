@@ -2,15 +2,11 @@
 
 Things to do:
 backend
-- modify the API functions to send multiple messages at once(create a loop)
-- Keep track of rate limits using bottleneck for per second limit and redis upstash for 24 hour rolling window.
-- make changes in prisma(add subscribed field to client, create templates model)
+- create a page to show failed messages.
+- create a generic function for templates.
+
 
 frontend:
-- a page to send messages
-  - contains an option to select from multiple templates
-  - an option to add image link, if template needs it
-  - send button sends it to all the clients who have subscribed to the channel(require a subscribed attribute in the client info).
 - a page to display webhooks information
   - webhooks will send information regarding message status.
   - find a way to display failed message deliveries. 

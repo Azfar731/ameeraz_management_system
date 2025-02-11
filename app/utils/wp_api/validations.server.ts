@@ -11,6 +11,7 @@ const WhatsappTemplateDataValidation = z.object({
         z.object({
             key: z.string().min(1, "Variable key(name) cannot be empty"),
             value: z.string().min(1, "Variable value cannot be empty"),
+            type: z.enum(["text","currency","date_time"])
         }),
     ).optional(), // Allows an empty array
     client_batch: z.string()

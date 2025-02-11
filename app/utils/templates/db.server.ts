@@ -1,4 +1,4 @@
-import { Boolean_Strings, Header_type, WP_Variable_Type } from "@prisma/client";
+import { Client_Property, Header_type, WP_Variable_Type } from "@prisma/client";
 import { prisma_client } from "~/.server/db";
 
 const getAllTemplates = async () => {
@@ -43,7 +43,7 @@ const createTemplate = async (
         name: string;
         header_type: Header_type;
         header_var_name: string;
-        variables?: { name: string; type: WP_Variable_Type; input_required: Boolean_Strings }[];
+        variables?: { name: string; type: WP_Variable_Type; client_property: Client_Property }[];
     },
 ) => {
     const template = await prisma_client.template.create({
@@ -66,7 +66,7 @@ const updateTemplate = async (
         name: string;
         header_type: Header_type;
         header_var_name: string;
-        variables?: { name: string; type: WP_Variable_Type; input_required: Boolean_Strings  }[];
+        variables?: { name: string; type: WP_Variable_Type; client_property: Client_Property  }[];
     },
 ) => {
     return await prisma_client.template.update({

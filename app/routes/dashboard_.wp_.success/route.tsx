@@ -2,25 +2,24 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const failed_messages = new URL(request.url).searchParams.get(
-    "failed_messages"
-  );
-  const daily_limit = process.env.WP_DAILY_LIMIT;
+  const searchParams = new URL(request.url).searchParams;
+  const failed_messages = searchParams.get("failed_messages");
+  const total_messages = searchParams.get("total_messages");
 
-  if (!(failed_messages && daily_limit)) {
+  if (!(failed_messages && total_messages)) {
     throw new Error("Failed Messages search Param not found");
   }
 
   return {
     failed_messages: parseInt(failed_messages),
-    daily_limit: parseInt(daily_limit),
+    total_messages: parseInt(total_messages),
   };
 }
 
 export default function Success_Message() {
-  const { failed_messages, daily_limit } = useLoaderData<{
+  const { failed_messages, total_messages } = useLoaderData<{
     failed_messages: number;
-    daily_limit: number;
+    total_messages: number;
   }>();
 
   return (
@@ -28,7 +27,9 @@ export default function Success_Message() {
       <div className="bg-white p-6 rounded shadow-md w-120">
         <div className="block text-gray-700 text-sm font-bold mb-2">
           Successfull Messages:{" "}
-          <span className="font-semibold">{daily_limit - failed_messages}</span>
+          <span className="font-semibold">
+            {total_messages - failed_messages}
+          </span>
         </div>
         <div className="block text-gray-700 text-sm font-bold mb-2">
           Failed Messages:{" "}

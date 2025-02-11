@@ -3,6 +3,7 @@ import { Template_Variable } from "@prisma/client";
 import { ActionFunctionArgs, SerializeFrom } from "@remix-run/node";
 import {
   Form,
+  redirect,
   useActionData,
   useLoaderData,
   useSubmit,
@@ -14,11 +15,13 @@ import { getAllTemplates } from "~/utils/templates/db.server";
 import { TemplateWithRelations } from "~/utils/templates/types";
 import {
   canSendMessages,
+  recordMessage,
   remainingDailyLimit,
 } from "~/utils/upstash_redis/functions.server";
 import { WhatsappTemplateDataValidation } from "~/utils/wp_api/validations.server";
 import { WP_ErrorMessages } from "~/utils/wp_api/types";
 import { sendMultipleMessages } from "~/utils/wp_api/functions.server";
+import { renderZodErrors } from "~/utils/render_functions";
 // import {
 //   getInstaTemplateMessageInput,
 //   sendMessage,
@@ -34,8 +37,10 @@ export async function loader() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const recvdData = await request.json();
+  recvdData.header_type = "image"
   const validationResult = WhatsappTemplateDataValidation.safeParse(recvdData);
   if (!validationResult.success) {
+    console.log("error occurred")
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
   const data = validationResult.data;
@@ -43,7 +48,7 @@ export async function action({ request }: ActionFunctionArgs) {
     process.env.WP_DAILY_LIMIT ? process.env.WP_DAILY_LIMIT : "230"
   );
   const clients = await getRangeofClients({
-    startIndex: data.client_batch * daily_limit,
+    startIndex: (data.client_batch-1) * daily_limit,
     total: daily_limit,
   });
   if (!canSendMessages(clients.length)) {
@@ -54,31 +59,11 @@ export async function action({ request }: ActionFunctionArgs) {
     clientsList: clients,
     headerValue: data.header_value,
     variablesArray: data.variables_array,
-
   });
+
   console.log("Failed Messages: ", failed_messages)
-  // const recipient = process.env.RECIPIENT_WAID;
-
-  // if (!recipient) {
-  //   throw new Error("Recipient env variable not found");
-  // }
-  // const wp_message_body = getInstaTemplateMessageInput({
-  //   recipient,
-  //   imageUrl: "https://i.postimg.cc/52DXCf1d/deal1.jpg",
-  //   customer_fname: "Azfar",
-  // });
-
-  // const resp: any = await sendMessage(wp_message_body);
-
-  // console.log("Cloud_API Response:");
-  // if (resp) {
-  //   console.log("Status:", resp.status); // HTTP Status Code
-  //   console.log("Response Data:", resp.data); // Full API response
-  //   // console.log("Rate Limit Remaining:", resp.headers["x-ratelimit-remaining"]); // Remaining API calls
-  //   console.log("Message ID:", resp.data.messages?.[0]?.id); // ID of the sent message
-  //   console.log("Recipient WA ID:", resp.data.contacts?.[0]?.wa_id);
-  // } // WhatsApp ID of the recipient
-  return null;
+  recordMessage(clients.length-failed_messages)
+ throw redirect(`/dashboard/wp/success?failed_messages=${failed_messages}&total_messages=${clients.length}`)
 }
 
 export default function Whatsapp_API() {
@@ -105,13 +90,13 @@ export default function Whatsapp_API() {
     const formObject = Object.fromEntries(formData.entries());
     const data = {
       ...formObject,
-      header_type: chosenTemplate?.header_type || "none",
       variables_array:
         chosenTemplate?.variables
           .filter((variables) => variables.input_required === "true")
           .map((variable) => ({
             key: variable.name,
             value: formObject[variable.name] as string,
+            type: variable.type
           })) || [],
     };
     console.log("Data: ", data);
@@ -223,7 +208,7 @@ export default function Whatsapp_API() {
             {actionData?.errorMessages.client_batch[0]}
           </h2>
         )}
-
+         {actionData && renderZodErrors(actionData.errorMessages)}
         <div className="w-full flex justify-center items-center">
           <button
             type="submit"

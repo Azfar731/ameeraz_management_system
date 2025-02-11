@@ -1,6 +1,15 @@
 import { Client } from "@prisma/client";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import Bottleneck from "bottleneck";
+import { getTemplateByName } from "../templates/db.server";
+import { TemplateWithRelations } from "../templates/types";
+
+// type TemplateFunctionWithVariables = (
+//     props: {
+//         client: Client;
+//         variablesArray: { key: string; value: string; type: string }[];
+//     },
+// ) => string;
 
 const limiter = new Bottleneck({
     minTime: 1000 / 80, // 80 requests per second
@@ -35,65 +44,245 @@ async function sendMessage(data: string) {
     });
 }
 
-function getInstaTemplateMessageInput(
-    { recipient, variablesArray }: {
-        recipient: string;
-        variablesArray: { key: string; value: string }[];
-    },
+// sendMultipleMessages function
+async function sendMultipleMessages({
+    template_name,
+    clientsList,
+    headerValue,
+    variablesArray,
+}: {
+    template_name: string;
+    clientsList: Client[];
+    headerValue?: string;
+    variablesArray: { key: string; value: string; type: string }[]; // Allows additional properties for each template
+}) {
+    if (clientsList.length < 1) {
+        throw new Error("Empty List sent to sendMultipleMessages funcion");
+    }
+    // Ensure the template_name exists in the dictionary
+    // let messages: string[] = [];
+    const template = await getTemplateByName(template_name);
+    if (!template) {
+        throw new Error(`NO template found with name ${template_name}`);
+    }
+
+    const messages = clientsList.map((client) => {
+        const completeVariablesArray = _generateVariablesArray({
+            client,
+            template,
+            variablesArray,
+            headerValue,
+        });
+        return _getDynamicTemplateBody({
+            recipient: _convertMobileNumber(client.client_mobile_num),
+            template,
+            variablesArray: completeVariablesArray,
+        });
+    });
+
+    const responses = messages.map(async (msg) => {
+        await _delay(1000);
+        return await sendMessage(msg);
+    });
+
+    // const responses = await Promise.all(
+    //     messages.map((msg) => sendMessage(msg)),
+    // );
+    const nullCount = responses.filter((resp) => resp === null).length;
+
+    return nullCount;
+}
+
+// function getInstaTemplateMessageInput(
+//     { client, variablesArray }: {
+//         client: Client;
+//         variablesArray: { key: string; value: string; type: string }[];
+//     },
+// ) {
+//     return JSON.stringify({
+//         "messaging_product": "whatsapp",
+//         "to": _convertMobileNumber(client.client_mobile_num),
+//         "type": "template",
+//         "template": {
+//             "name": "deals_insta_link",
+//             "language": {
+//                 "code": "en_GB",
+//             },
+//             "components": [
+//                 {
+//                     "type": "header",
+//                     "parameters": [
+//                         {
+//                             "type": "image",
+//                             "image": {
+//                                 "link": variablesArray[0].value,
+//                             },
+//                         },
+//                     ],
+//                 },
+//                 {
+//                     "type": "body",
+//                     "parameters": [
+//                         {
+//                             "type": "text",
+//                             "parameter_name": "customer_fname",
+//                             "text": client.client_fname,
+//                         },
+//                     ],
+//                 },
+//             ],
+//         },
+//     });
+// }
+
+// function getMessageInput(
+//     { template_name, recipient }: { template_name: string; recipient: string },
+// ) {
+//     return JSON.stringify({
+//         "messaging_product": "whatsapp",
+//         "to": recipient,
+//         "type": "template",
+//         "template": {
+//             "name": template_name,
+//             "language": {
+//                 "code": "en_GB",
+//             },
+//         },
+//     });
+// }
+
+// Define your dictionary with string keys and function values
+// const templatesWithVariables: { [key: string]: TemplateFunctionWithVariables } =
+//     {
+//         "deals_insta_link": getInstaTemplateMessageInput, // Make sure getInstaTemplateMessageInput matches the TemplateFunction type
+//     };
+
+// function for creating variables array
+function _generateVariablesArray({
+    client,
+    template,
+    variablesArray,
+    headerValue,
+}: {
+    client: Client;
+    template: TemplateWithRelations;
+    variablesArray: {
+        key: string;
+        value: string;
+        type: string;
+    }[];
+    headerValue?: string;
+}) {
+    const newVariables = template.variables.filter((variable) =>
+        variable.client_property !== "none"
+    );
+    const newVariablesArray = newVariables.map((variable) => ({
+        key: variable.name,
+        value: variable.client_property !== "none"
+            ? String(client[variable.client_property])
+            : "",
+        type: variable.type,
+    }));
+    const modifiedArray = [];
+
+    if (template.header_type !== "none" && headerValue) {
+        modifiedArray.push({
+            key: template.header_var_name,
+            value: headerValue,
+            type: template.header_type,
+        });
+    }
+
+    modifiedArray.push(...variablesArray, ...newVariablesArray);
+
+    return modifiedArray;
+}
+
+//function for generating message body for templates with variables:
+function _getDynamicTemplateHeader(
+    template: TemplateWithRelations,
+    variablesArray: { key: string; value: string; type: string }[],
 ) {
-    return JSON.stringify({
-        "messaging_product": "whatsapp",
-        "to": recipient,
-        "type": "template",
-        "template": {
-            "name": "deals_insta_link",
-            "language": {
-                "code": "en_GB",
-            },
-            "components": [
+    if (template.header_type === "none") {
+        return undefined;
+    }
+
+    return template.header_type === "text"
+        ? {
+            type: "header",
+            parameters: [
                 {
-                    "type": "header",
-                    "parameters": [
-                        {
-                            "type": "image",
-                            "image": {
-                                "link": variablesArray[0].value,
-                            },
-                        },
-                    ],
-                },
-                {
-                    "type": "body",
-                    "parameters": [
-                        {
-                            "type": "text",
-                            "parameter_name": variablesArray[1].key,
-                            "text": variablesArray[1].value,
-                        },
-                    ],
+                    type: "text",
+                    parameter_name: template.header_var_name,
+                    text: variablesArray[0].value,
                 },
             ],
-        },
-    });
+        }
+        : {
+            type: "header",
+            parameters: [
+                {
+                    type: template.header_type,
+                    [template.header_type]: {
+                        link: variablesArray[0].value,
+                    },
+                },
+            ],
+        };
 }
 
-function getMessageInput(
-    { template_name, recipient }: { template_name: string; recipient: string },
+function _getDynamicTemplateBodyContent(
+    template: TemplateWithRelations,
+    variablesArray: { key: string; value: string; type: string }[],
 ) {
+    if (template.variables.length === 0) {
+        return undefined;
+    }
+
+    const parameters = variablesArray.map((variable) => ({
+        type: "text",
+        parameter_name: variable.key,
+        text: variable.value,
+    }));
+
+    return {
+        type: "body",
+        parameters: parameters,
+    };
+}
+
+function _getDynamicTemplateBody({
+    template,
+    recipient,
+    variablesArray,
+}: {
+    template: TemplateWithRelations;
+    recipient: string;
+    variablesArray: { key: string; value: string; type: string }[];
+}) {
+    const header = _getDynamicTemplateHeader(template, variablesArray);
+    const body = _getDynamicTemplateBodyContent(template, variablesArray);
+
+    const components = [];
+    if (header) components.push(header);
+    if (body) components.push(body);
+
     return JSON.stringify({
-        "messaging_product": "whatsapp",
-        "to": recipient,
-        "type": "template",
-        "template": {
-            "name": template_name,
-            "language": {
-                "code": "en_GB",
+        messaging_product: "whatsapp",
+        to: recipient,
+        type: "template",
+        template: {
+            name: template.name,
+            language: {
+                code: "en_GB",
             },
+            components: components,
         },
     });
 }
 
-function convertMobileNumber(mobileNumber: string): string {
+//util functions
+function _convertMobileNumber(mobileNumber: string): string {
     // Validate the input
     if (!/^0\d{10}$/.test(mobileNumber)) {
         throw new Error(
@@ -105,75 +294,8 @@ function convertMobileNumber(mobileNumber: string): string {
     return mobileNumber.replace(/^0/, "92");
 }
 
-type TemplateFunctionWithVariables = (
-    props: {
-        recipient: string;
-        client: Client;
-        variablesArray: { key: string; value: string }[];
-    },
-) => string;
-
-// Define your dictionary with string keys and function values
-const templatesWithVariables: { [key: string]: TemplateFunctionWithVariables } =
-    {
-        "deals_insta_link": getInstaTemplateMessageInput, // Make sure getInstaTemplateMessageInput matches the TemplateFunction type
-    };
-
-// sendMultipleMessages function
-async function sendMultipleMessages({
-    template_name,
-    clientsList,
-    headerValue,
-    variablesArray,
-}: {
-    template_name: string;
-    clientsList: Client[];
-    headerValue?: string;
-    variablesArray?: { key: string; value: string }[]; // Allows additional properties for each template
-}) {
-    if (clientsList.length < 1) {
-        console.log("Empty list sent to sendMultipleMessages");
-        return null;
-    }
-    // Ensure the template_name exists in the dictionary
-    let messages: string[] = [];
-    if (variablesArray && variablesArray.length > 0) {
-        const templateFunction = templatesWithVariables[template_name];
-        if (!templateFunction) {
-            throw new Error(
-                `Template function not found for template_name: ${template_name}`,
-            );
-        }
-        messages = clientsList.map((client) =>
-            templateFunction({
-                recipient: convertMobileNumber(client.client_mobile_num),
-                client: client,
-                variablesArray: headerValue
-                    ? [
-                        { key: "imageUrl", value: headerValue },
-                        ...variablesArray,
-                    ]
-                    : variablesArray,
-            })
-        );
-    } else {
-        //send message without variables
-
-        messages = clientsList.map((client) =>
-            getMessageInput({
-                recipient: convertMobileNumber(client.client_mobile_num),
-                template_name,
-            })
-        );
-    }
-
-    const responses = await Promise.all(
-        messages.map((msg) => sendMessage(msg)),
-    );
-
-    const nullCount = responses.filter((resp) => resp === null).length;
-
-    return nullCount;
+function _delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export { sendMessage, sendMultipleMessages };

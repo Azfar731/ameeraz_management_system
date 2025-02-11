@@ -246,13 +246,21 @@ model Template {
   variables Template_Variable[]
 }
 
+enum Client_Property {
+  client_fname
+  client_lname
+  client_area
+  client_mobile_num
+  points
+  none
+}
 
 model Template_Variable {
   id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   name String
   type WP_Variable_Type
   template_id String @db.Uuid
-  input_required Boolean_Strings @default(false)
+  client_property Client_Property @default(none)
   template Template @relation(fields: [template_id], references: [id])
 }
 

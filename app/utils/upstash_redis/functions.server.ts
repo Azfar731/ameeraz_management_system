@@ -67,38 +67,6 @@ async function recordMessage(count: number) {
 //   });
 // }
 
-// Netlify handler function
-export async function handler(event) {
-  const { clients } = JSON.parse(event.body);
-
-  if (!clients || clients.length === 0) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "No clients provided" }),
-    };
-  }
-
-  // Check if messages can be sent within the rolling limit
-  const canSend = await canSendMessages(clients.length);
-  if (!canSend) {
-    return {
-      statusCode: 429,
-      body: JSON.stringify({ error: "Daily message limit reached" }),
-    };
-  }
-
-  // Send messages and record them in Redis
-  for (const client of clients) {
-    await sendMessage(client);
-  }
-
-  await recordMessage(clients.length);
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Messages sent successfully" }),
-  };
-}
 
 
 export { remainingDailyLimit, canSendMessages, recordMessage };

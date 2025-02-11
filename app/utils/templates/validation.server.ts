@@ -16,7 +16,7 @@ const TemplateSchema = z.object({
             type: z.enum(["text", "currency","date_time"], {
                 errorMap: () => ({ message: "Type must be either 'text' or 'currency'." })
             }),
-            client_property: z.enum(["client_fname", "client_lname", "client_mobile_num", "points", "none"], {
+            client_property: z.enum(["client_fname", "client_lname", "client_mobile_num", "client_area","points", "none"], {
                 errorMap: () => ({ message: "Client Property can only be one of client object properties" })
             })
         })

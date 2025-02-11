@@ -92,7 +92,7 @@ export default function Whatsapp_API() {
       ...formObject,
       variables_array:
         chosenTemplate?.variables
-          .filter((variables) => variables.input_required === "true")
+          .filter((variables) => variables.client_property === "none")
           .map((variable) => ({
             key: variable.name,
             value: formObject[variable.name] as string,
@@ -226,7 +226,7 @@ function Variable_fields({ variables }: { variables: Template_Variable[] }) {
   return (
     <div>
       {variables
-        .filter((variable) => variable.input_required === "true")
+        .filter((variable) => variable.client_property === "none")
         .map((variable) => (
           <div key={variable.name}>
             <label

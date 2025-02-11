@@ -13,7 +13,7 @@ const WhatsappTemplateDataValidation = z.object({
             value: z.string().min(1, "Variable value cannot be empty"),
             type: z.enum(["text","currency","date_time"])
         }),
-    ).optional(), // Allows an empty array
+    ).default([]), // Allows an empty array
     client_batch: z.string()
         .transform((str) => Number(str)) // Convert string to number
         .refine((num) => !isNaN(num) && num > 0, {

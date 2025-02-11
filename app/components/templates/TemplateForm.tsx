@@ -1,4 +1,3 @@
-import { Client_Property } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
 import { Form, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -18,13 +17,6 @@ const variableTypeOptions = [
   { value: "date_time", label: "Date Time" },
 ];
 
-const clientPropertyOptions = Object.values(Client_Property).map(
-  (property) => ({
-    value: property,
-    label: property,
-  })
-);
-
 export default function Template_Form({
   template,
   errorMessages,
@@ -32,6 +24,12 @@ export default function Template_Form({
   template?: SerializeFrom<TemplateWithRelations>;
   errorMessages?: TemplateErrorMessages;
 }) {
+  const clientPropertyOptions =["client_fname","client_lname","client_mobile_num","client_area","points","none"].map(
+    (property) => ({
+      value: property,
+      label: property,
+    })
+  );
   const [numVariables, setNumVariables] = useState(
     template?.variables.length || 0
   );

@@ -80,10 +80,16 @@ async function sendMultipleMessages({
         });
     });
 
-    const responses = messages.map(async (msg) => {
-        await _delay(1000);
-        return await sendMessage(msg);
-    });
+    const responses =  []
+    for (const msg of messages) {
+        // await _delay(100);
+        responses.push(await sendMessage(msg));
+    }
+    
+    // const responses = await Promise.all(messages.map(async (msg) => {
+    //     await _delay(1000);
+    //     return await sendMessage(msg);
+    // }));
 
     // const responses = await Promise.all(
     //     messages.map((msg) => sendMessage(msg)),
@@ -261,13 +267,16 @@ function _getDynamicTemplateBody({
     variablesArray: { key: string; value: string; type: string }[];
 }) {
     const header = _getDynamicTemplateHeader(template, variablesArray);
-    const body = _getDynamicTemplateBodyContent(template, variablesArray);
+    const body = _getDynamicTemplateBodyContent(
+        template,
+        variablesArray.slice(1),
+    );
 
     const components = [];
     if (header) components.push(header);
     if (body) components.push(body);
 
-    return JSON.stringify({
+    const msg = JSON.stringify({
         messaging_product: "whatsapp",
         to: recipient,
         type: "template",
@@ -279,6 +288,8 @@ function _getDynamicTemplateBody({
             components: components,
         },
     });
+    console.log("Message BODY:\n", msg);
+    return msg;
 }
 
 //util functions
@@ -294,8 +305,8 @@ function _convertMobileNumber(mobileNumber: string): string {
     return mobileNumber.replace(/^0/, "92");
 }
 
-function _delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
+// function _delay(ms: number) {
+//     return new Promise((resolve) => setTimeout(resolve, ms));
+// }
 
 export { sendMessage, sendMultipleMessages };

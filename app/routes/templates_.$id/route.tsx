@@ -24,10 +24,10 @@ export default function Template_Details() {
   if (template.variables?.length > 0) {
     template.variables.forEach((variable, index) => {
       renderered_variables.push(
-        <h4 key={`variable${index} name`}>{`${variable.name}(input required: ${variable.input_required})`}</h4>
+        <h4 key={`variable${index} name`}>{variable.name}</h4>
       );
       renderered_variables.push(
-        <h4 key={`variable${index} type`}>{variable.type}</h4>
+        <h4 key={`variable${index} type`}>{`${variable.type}(client property: ${variable.client_property})`}</h4>
       );
     });
   }

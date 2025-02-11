@@ -21,7 +21,7 @@ export async function action({request}: ActionFunctionArgs){
 
 export default function Create_Template(){
 
-    const actionData = useActionData<{errorMessages: TemplateErrorMessages}>();
+  const actionData = useActionData<{errorMessages: TemplateErrorMessages}>();
   
   return (
     <div className="flex justify-center items-center min-h-screen">

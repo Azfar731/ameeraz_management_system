@@ -345,7 +345,7 @@ export default function Index() {
 
       <div className="mt-20">
         <Link
-          to="create"
+          to="/salerecord/create"
           className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
           Create a new record <FaPlus />

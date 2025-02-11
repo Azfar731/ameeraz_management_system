@@ -56,9 +56,7 @@ export default function Template_Details() {
             <h3 className="text-gray-600">{template.header_var_name}</h3>
           </>
         )}
-        {/* <h3 className="font-medium text-gray-700">Variables</h3>
-        <h3 className="text-gray-600">{template.header_type}</h3>
-         */}
+        
         {template.variables?.length > 0 && generate_heading("Variables", "Name", "Type")}
         {renderered_variables}
 

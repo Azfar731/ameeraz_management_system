@@ -1,3 +1,4 @@
+import { Client_Property } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
 import { Form, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -17,10 +18,12 @@ const variableTypeOptions = [
   { value: "date_time", label: "Date Time" },
 ];
 
-const variableInputRequiredOptions = [
-  { value: "true", label: "true" },
-  { value: "false", label: "false" },
-];
+const clientPropertyOptions = Object.values(Client_Property).map(
+  (property) => ({
+    value: property,
+    label: property,
+  })
+);
 
 export default function Template_Form({
   template,
@@ -37,7 +40,7 @@ export default function Template_Form({
       Array.from({ length: numVariables }, () => ({
         name: "",
         type: "",
-        input_required: "",
+        client_property: "",
       }))
   );
 
@@ -49,14 +52,15 @@ export default function Template_Form({
       // Extend or shrink the array based on the new numVariables
       return Array.from(
         { length: numVariables },
-        (_, i) => prevVariables[i] || { name: "", type: "" }
+        (_, i) =>
+          prevVariables[i] || { name: "", type: "", client_property: "" }
       );
     });
   }, [numVariables]);
 
   const handleVariableChange = (
     index: number,
-    field: "name" | "type" | "input_required",
+    field: "name" | "type" | "client_property",
     value: string
   ) => {
     setVariables((prev) =>
@@ -76,7 +80,7 @@ export default function Template_Form({
       variables: variables.map((variable) => ({
         name: variable.name,
         type: variable.type,
-        input_required: variable.input_required,
+        client_property: variable.client_property,
       })),
     };
     console.log("Data: ", data);
@@ -207,17 +211,17 @@ export default function Template_Form({
             required
           />
           <Select
-            name={`variables[${index}][input_required]`}
-            options={variableInputRequiredOptions}
+            name={`variables[${index}][client_property]`}
+            options={clientPropertyOptions}
             className="basic-single mt-2"
             classNamePrefix="select"
-            value={variableInputRequiredOptions.find(
-              (opt) => opt.value === variable.input_required
+            value={clientPropertyOptions.find(
+              (opt) => opt.value === variable.client_property
             )}
             onChange={(selected) =>
               handleVariableChange(
                 index,
-                "input_required",
+                "client_property",
                 selected?.value || ""
               )
             }

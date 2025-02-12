@@ -44,6 +44,22 @@ async function sendMessage(data: string) {
     });
 }
 
+async function sendFreeFormMessage(
+    { recipient, msg }: { recipient: string; msg: string },
+) {
+    const data = JSON.stringify({
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: recipient,
+        type: "text",
+        text: {
+            preview_url: true,
+            body: msg,
+        },
+    });
+    return await sendMessage(data);
+}
+
 // sendMultipleMessages function
 async function sendMultipleMessages({
     template_name,
@@ -80,12 +96,12 @@ async function sendMultipleMessages({
         });
     });
 
-    const responses =  []
+    const responses = [];
     for (const msg of messages) {
         // await _delay(100);
         responses.push(await sendMessage(msg));
     }
-    
+
     // const responses = await Promise.all(messages.map(async (msg) => {
     //     await _delay(1000);
     //     return await sendMessage(msg);
@@ -305,8 +321,10 @@ function _convertMobileNumber(mobileNumber: string): string {
     return mobileNumber.replace(/^0/, "92");
 }
 
+
+
 // function _delay(ms: number) {
 //     return new Promise((resolve) => setTimeout(resolve, ms));
 // }
 
-export { sendMessage, sendMultipleMessages };
+export { sendFreeFormMessage, sendMultipleMessages };

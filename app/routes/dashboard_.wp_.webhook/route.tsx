@@ -1,4 +1,6 @@
 import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import { changeClientSubscribeStatus } from "~/utils/client/db.server";
+import { sendFreeFormMessage } from "~/utils/wp_api/functions.server";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const mode = url.searchParams.get("hub.mode");
@@ -17,7 +19,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 };
 
-
 export const action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
@@ -35,27 +36,44 @@ export const action = async ({ request }: ActionFunctionArgs) => {
             // Iterate through messages
             if (change.value.messages) {
               change.value.messages.forEach(async (message) => {
+                const phoneNumber = message.from; // Extract sender's phone number
                 if (message.type === "button" && message.button?.payload) {
-                  const phoneNumber = message.from; // Extract sender's phone number
                   const buttonPayload = message.button.payload;
 
                   console.log("Button Payload:", buttonPayload);
 
                   if (buttonPayload === "Stop promotions") {
                     // Update subscription status in database
-                    await prisma.client.update({
-                      where: { phone: phoneNumber },
-                      data: { subscribed: "FALSE" },
+                    await changeClientSubscribeStatus({
+                      status: false,
+                      mobile_num: phoneNumber,
                     });
 
-                    console.log(`Client with phone ${phoneNumber} unsubscribed from promotions`);
+                    console.log(
+                      `Client with phone ${phoneNumber} unsubscribed from promotions`
+                    );
 
                     // Send confirmation message to user
-                    await sendWhatsAppMessage(
-                      phoneNumber,
-                      "You have successfully unsubscribed from our promotions. Reply 'START' anytime to subscribe again."
-                    );
+                    await sendFreeFormMessage({
+                      recipient: phoneNumber,
+                      msg: `You have been successfully unsubscribed from our promotions. If you wish to start receiving updates again, simply type 'Sub' at any time.. `,
+                    });
                   }
+                } else if (message.type === "text" && message.text.body) {
+                  if (message.text.body.match(/^sub$/i)) {
+                    await changeClientSubscribeStatus({
+                      status: true,
+                      mobile_num: phoneNumber,
+                    });
+                  }
+                  console.log(
+                    `Client with phone ${phoneNumber} subscribed to promotions`
+                  );
+                  // Send confirmation message to user
+                  await sendFreeFormMessage({
+                    recipient: phoneNumber,
+                    msg: `You have been successfully subscribed to promotions`,
+                  });
                 }
               });
             }
@@ -64,7 +82,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       });
     }
 
-    return json({ message: "Webhook received successfully" }, { status: 200 });
+    return new Response("Webhook received successfully", { status: 200 });
   } catch (error) {
     console.error("Error processing webhook:", error);
     return new Response("Internal Server Error", { status: 500 });

@@ -1,9 +1,12 @@
 
+Done:
+- handle unsubscribe logic
+
 
 Things to do:
 backend
 - create a page to show failed messages.
-- create a generic function for templates.
+- modify client section to align with updated schema
 
 
 frontend:

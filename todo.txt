@@ -37,6 +37,11 @@ Services:
 Webhooks:
 - find a way to provide real time updates for data coming from webhooks. Currently, I have only found one solution which uses sockets.io, but sockets.io requires the remix app to run on express, because it can't run on serverless environemnt(servers that sleep within requests).
 
+Client:
+- Add logic that allows user to set subscribe field of client from update form.
+
+
+
 Update logic:
 - users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner
 - profile page => Can update password too.

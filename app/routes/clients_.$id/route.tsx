@@ -76,6 +76,9 @@ export default function View_Client() {
 
         <h3 className="font-medium text-gray-700">Total Amount Spent</h3>
         <h3 className="text-gray-600">{total_amount_spent}</h3>
+
+        <h3 className="font-medium text-gray-700">Subscribed to Promotions</h3>
+        <h3 className="text-gray-600">{client.subscribed === "true"? "Yes" : "No"}</h3>
         <Link
           to={`update`}
           className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"

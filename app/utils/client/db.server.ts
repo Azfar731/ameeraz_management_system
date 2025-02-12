@@ -44,6 +44,8 @@ const updateClient = async ({
     return { updatedClient };
 };
 
+
+
 const getClientFromId = async (
     { id, includeServices = false, includeProducts = false }: {
         id: string;
@@ -60,6 +62,25 @@ const getClientFromId = async (
     });
     return client;
 };
+
+const changeClientSubscribeStatus = async({status, mobile_num}:{status: boolean, mobile_num: string})=>{
+    return await prisma_client.client.update({
+        where: {
+            client_mobile_num: _removeInternationalCode(mobile_num),
+        },
+        data:{
+            subscribed: status? "true" : "false"
+        }
+    })
+
+}
+
+function _removeInternationalCode(mobile_num: string){
+    if (mobile_num.startsWith("92") && mobile_num.length === 12) {
+        return "0" + mobile_num.slice(2);
+    }
+    return mobile_num;
+}
 
 const getClients = async (
     mobile_num: string | undefined,
@@ -112,5 +133,6 @@ export {
     getClients,
     updateClient,
     getClientCount,
-    getRangeofClients
+    getRangeofClients,
+    changeClientSubscribeStatus
 };

@@ -17,6 +17,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
 };
 
+
 export const action = async ({ request }: ActionFunctionArgs) => {
   if (request.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
@@ -30,6 +31,34 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         entry.changes.forEach((change) => {
           if (change.field === "messages") {
             console.log("Received message status update:", change.value);
+
+            // Iterate through messages
+            if (change.value.messages) {
+              change.value.messages.forEach(async (message) => {
+                if (message.type === "button" && message.button?.payload) {
+                  const phoneNumber = message.from; // Extract sender's phone number
+                  const buttonPayload = message.button.payload;
+
+                  console.log("Button Payload:", buttonPayload);
+
+                  if (buttonPayload === "Stop promotions") {
+                    // Update subscription status in database
+                    await prisma.client.update({
+                      where: { phone: phoneNumber },
+                      data: { subscribed: "FALSE" },
+                    });
+
+                    console.log(`Client with phone ${phoneNumber} unsubscribed from promotions`);
+
+                    // Send confirmation message to user
+                    await sendWhatsAppMessage(
+                      phoneNumber,
+                      "You have successfully unsubscribed from our promotions. Reply 'START' anytime to subscribe again."
+                    );
+                  }
+                }
+              });
+            }
           }
         });
       });

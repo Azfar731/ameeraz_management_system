@@ -51,6 +51,14 @@ enum WP_Variable_Type {
 }
 
 
+enum Client_Property {
+  client_fname
+  client_lname
+  client_area
+  client_mobile_num
+  points
+  none
+}
 
 
 model User {
@@ -72,7 +80,7 @@ model Client {
   client_lname String
   client_mobile_num String @unique
   client_area String
-  subscribed Boolean @default(false)
+  subscribed Boolean_Strings @default(true)
   points Int @default(0)
   services Service_Sale_Record[]   
   products Product_Sale_Record[]
@@ -246,14 +254,6 @@ model Template {
   variables Template_Variable[]
 }
 
-enum Client_Property {
-  client_fname
-  client_lname
-  client_area
-  client_mobile_num
-  points
-  none
-}
 
 model Template_Variable {
   id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))

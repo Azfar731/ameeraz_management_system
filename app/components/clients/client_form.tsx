@@ -3,20 +3,14 @@ import Select from "react-select";
 import areasList from "./areas.json";
 
 import { Client } from "@prisma/client";
-
-type Errors = {
-  client_fname?: string[];
-  client_lname?: string[];
-  client_mobile_num?: string[];
-  client_area?: string[];
-};
+import { ClientErrorData } from "~/utils/client/types";
 
 export default function Client_Form({
   client,
   errorMessage,
 }: {
   client?: Client;
-  errorMessage?: Errors;
+  errorMessage?: ClientErrorData;
 }) {
   const area_options = areasList.areas.map((area) => ({
     value: area,
@@ -101,7 +95,7 @@ export default function Client_Form({
       <Select
         name="area"
         options={area_options}
-        className="basic-multi-select mt-2 z-10"
+        className="basic-multi-select mt-2 "
         classNamePrefix="select"
         defaultValue={
           client
@@ -118,6 +112,35 @@ export default function Client_Form({
           {errorMessage.client_area[0]}
         </h2>
       )}
+      {client && (
+        <>
+          <label
+            htmlFor="subscribed"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            Subscribed to messsages
+          </label>
+          <Select
+            name="subscribed"
+            options={[
+              { value: "true", label: "true" },
+              { value: "false", label: "false" },
+            ]}
+            className="basic-multi-select mt-2"
+            classNamePrefix="select"
+            defaultValue={{
+              value: client.subscribed,
+              label: client.subscribed,
+            }}
+            required
+          />
+          {errorMessage?.subscribed && (
+            <h2 className="text-red-500 font-semibold">
+              {errorMessage.subscribed[0]}
+            </h2>
+          )}
+        </>
+      )}
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
@@ -129,5 +152,3 @@ export default function Client_Form({
     </Form>
   );
 }
-
-

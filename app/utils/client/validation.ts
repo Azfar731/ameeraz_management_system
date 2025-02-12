@@ -21,6 +21,7 @@ const clientSchema = z.object({
       .regex(/^0\d{10}$/, "Mobile number must be 11 digits and start with 0."),
   
     client_area: z.string().min(1, "Area is required."),
+    subscribed: z.enum(["true","false"])
   });
   
 export {clientSchema}

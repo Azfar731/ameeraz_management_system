@@ -11,27 +11,21 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const validationResult = clientSchema.safeParse(clientData);
   if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors };
+    return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
-  const { client_fname, client_lname, client_mobile_num, client_area } =
-    validationResult.data;
+  
 
-  const client = await createClient({
-    client_fname,
-    client_lname,
-    client_mobile_num,
-    client_area,
-  });
+  const client = await createClient(validationResult.data);
 
   throw replace(`/clients/${client.client_id}`);
 }
 
 export default function Create_Client() {
-  const actionData = useActionData<ClientErrorData>();
+  const actionData = useActionData<{errorMessages: ClientErrorData}>();
   
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <Client_Form errorMessage={actionData?.errors} />
+      <Client_Form errorMessage={actionData?.errorMessages} />
     </div>
   );
 }

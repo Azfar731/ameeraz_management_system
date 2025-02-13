@@ -7,7 +7,8 @@ Things to do:
 backend
 - create a page to show failed messages.
 
-
+Things to fix:
+- clientTransaction routes and make changes according to  deals schema.
 
 frontend:
 - a page to display webhooks information

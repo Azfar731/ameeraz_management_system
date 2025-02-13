@@ -50,23 +50,6 @@ async function recordMessage(count: number) {
   await Promise.all(commands);
 }
 
-// Function to send a WhatsApp message
-// async function sendMessage(client) {
-//   return fetch("https://graph.facebook.com/v15.0/PHONE_NUMBER_ID/messages", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer YOUR_ACCESS_TOKEN`, // Replace with your API token
-//     },
-//     body: JSON.stringify({
-//       messaging_product: "whatsapp",
-//       to: client.phone,
-//       type: "text",
-//       text: { body: client.message },
-//     }),
-//   });
-// }
-
 
 
 export { remainingDailyLimit, canSendMessages, recordMessage };

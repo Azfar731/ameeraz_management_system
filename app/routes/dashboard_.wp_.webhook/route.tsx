@@ -1,5 +1,7 @@
-import { ActionFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { changeClientSubscribeStatus } from "~/utils/client/db.server";
+import { recordFailedMessage } from "~/utils/upstash_redis/failedMgsFunctions.server";
+import { WebhookObj } from "~/utils/webhooks/types.server";
 import { sendFreeFormMessage } from "~/utils/wp_api/functions.server";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -25,7 +27,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   try {
-    const payload = await request.json();
+    const payload: WebhookObj = await request.json();
 
     if (payload.entry) {
       payload.entry.forEach((entry) => {
@@ -76,6 +78,24 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                   });
                 }
               });
+            }
+            if(change.value.statuses){
+              change.value.statuses.forEach(statusObj =>{
+                if(statusObj.status === "failed"){
+                  recordFailedMessage({
+                    status: statusObj.status,
+                    mobile_num: statusObj.recipient_id,
+                    timestamp: statusObj.timestamp,
+                    errors: statusObj.errors?.map(err => {
+                      return {
+                        code: err.code,
+                        description: err.error_data.details
+                      }
+                    })
+                    
+                  })
+                }
+              })
             }
           }
         });

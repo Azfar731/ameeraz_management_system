@@ -96,20 +96,20 @@ async function sendMultipleMessages({
         });
     });
 
-    const responses = [];
-    for (const msg of messages) {
-        // await _delay(100);
-        responses.push(await sendMessage(msg));
-    }
+    // const responses = [];
+    // for (const msg of messages) {
+    //     // await _delay(100);
+    //     responses.push(await sendMessage(msg));
+    // }
 
     // const responses = await Promise.all(messages.map(async (msg) => {
     //     await _delay(1000);
     //     return await sendMessage(msg);
     // }));
 
-    // const responses = await Promise.all(
-    //     messages.map((msg) => sendMessage(msg)),
-    // );
+    const responses = await Promise.all(
+        messages.map((msg) => sendMessage(msg)),
+    );
     const nullCount = responses.filter((resp) => resp === null).length;
 
     return nullCount;

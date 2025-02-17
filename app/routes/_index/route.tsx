@@ -353,7 +353,6 @@ export default function Index() {
         <div className="mt-6">
           <SalesRecordTable
             serviceRecords={service_records}
-            employees={employees}
             onEdit={(id) => navigate(`/salerecord/${id}`)}
           />
         </div>

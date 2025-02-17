@@ -45,7 +45,7 @@ async function fetchServiceSaleRecords(
             client: true,
             transactions: true,
             deal_records: { include: { deal: true } },
-            employees: true,
+            employees: {include: {employee: true}},
         },
     });
 }

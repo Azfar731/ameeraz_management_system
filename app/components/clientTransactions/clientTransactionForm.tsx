@@ -8,15 +8,16 @@ import {
 } from "~/utils/functions";
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 import { Client_Transaction } from "@prisma/client";
+import { SerializeFrom } from "@remix-run/node";
 
 export default function ClientTransaction_Form({
   service_sale_record,
   transaction,
   errorMessages,
 }: {
-  service_sale_record: Omit<
+  service_sale_record: SerializeFrom<Omit<
     ServiceSaleRecordWithRelations,
-    "employees" | "deals"
+    "employees" | "deals">
   >;
   transaction?: Client_Transaction;
   errorMessages?: ClientTransactionErrors;

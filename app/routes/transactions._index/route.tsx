@@ -9,7 +9,7 @@ import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types"
 import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation.server";
 import {
   getAllPaymentMenuOptions,
-  setSearchParameters
+  setSearchParameters,
 } from "~/utils/functions";
 import ClientTransactionsTable from "./ClientTransactionsTable";
 
@@ -19,7 +19,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const validationResult = clientTransactionFetchSchema.safeParse(formValues);
   if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors, transactions: [] };
+    return {
+      errors: validationResult.error.flatten().fieldErrors,
+      transactions: [],
+    };
   }
   const transactions = await getClientTransactions(validationResult.data);
   return { transactions, errors: {} };
@@ -54,7 +57,6 @@ export default function Client_Transactions() {
   //other values
   const current_date = formatDateToISO(new Date());
   let error_message = "";
-
 
   const fetchFormValues = (formData: FormData) => {
     const start_date: string = (formData.get("start_date") as string) || "";
@@ -92,7 +94,7 @@ export default function Client_Transactions() {
   ) => {
     payment_option_ref.current = [...newValue];
   };
-  
+
   return (
     <div className="mt-8">
       <div className="w-full flex justify-center items-center ">
@@ -184,14 +186,14 @@ export default function Client_Transactions() {
         </button>
       </Form>
       <div className="mt-20">
-      <Link
-          to="create"
+        <Link
+          to="clientTransactions/create"
           className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
           Create Transaction <FaPlus />
         </Link>
         <div className="mt-6">
-          <ClientTransactionsTable transactions={transactions}/>
+          <ClientTransactionsTable transactions={transactions} />
         </div>
       </div>
     </div>

@@ -42,6 +42,8 @@ Client:
 
 - Add validation to clients route loader
 
+Client Transactions:
+- Replace table in Client Transaction create to use SalesRecordTableComponent
 
 Update logic:
 - users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner

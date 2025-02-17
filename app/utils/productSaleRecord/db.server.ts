@@ -10,7 +10,6 @@ const getProductSaleRecords = async ({
   start_date,
   end_date,
   products,
-
   payment_cleared,
 }: {
   client_mobile_num?: string;
@@ -27,19 +26,12 @@ const getProductSaleRecords = async ({
         ? { in: transaction_types }
         : undefined,
       created_at: {
-        gte: start_date || undefined,
-        lte: end_date || undefined,
+        gte: start_date,
+        lte: end_date,
       },
-      client: client_mobile_num
-        ? {
-          client_mobile_num: client_mobile_num,
-        }
-        : undefined,
-      vendor: vendor_mobile_num
-        ? {
-          vendor_mobile_num: vendor_mobile_num,
-        }
-        : undefined,
+      client: { client_mobile_num },
+
+      vendor: { vendor_mobile_num },
       products: products
         ? {
           some: {
@@ -150,11 +142,10 @@ const createProductSaleRecord = async ({
         prisma.product.update({
           where: { prod_id: product.product_id },
           data: {
-            quantity:
-              transaction_type === "sold" ||
+            quantity: transaction_type === "sold" ||
                 (transaction_type === "returned" && !isClient)
-                ? { decrement: product.quantity }
-                : { increment: product.quantity },
+              ? { decrement: product.quantity }
+              : { increment: product.quantity },
           },
         })
       ),
@@ -195,12 +186,11 @@ const updateProductSaleRecord = async ({
         prisma.product.update({
           where: { prod_id: product_record.prod_id },
           data: {
-            quantity:
-              oldProductSaleRecord.transaction_type === "sold" ||
+            quantity: oldProductSaleRecord.transaction_type === "sold" ||
                 (oldProductSaleRecord.transaction_type === "returned" &&
                   !isClient)
-                ? { increment: product_record.quantity }
-                : { decrement: product_record.quantity },
+              ? { increment: product_record.quantity }
+              : { decrement: product_record.quantity },
           },
         })
       ),
@@ -240,11 +230,10 @@ const updateProductSaleRecord = async ({
               quantity: product.quantity,
               product: {
                 update: {
-                  quantity:
-                    transaction_type === "sold" ||
+                  quantity: transaction_type === "sold" ||
                       (transaction_type === "returned" && !isClient)
-                      ? { decrement: product.quantity }
-                      : { increment: product.quantity },
+                    ? { decrement: product.quantity }
+                    : { increment: product.quantity },
                 },
               },
             },

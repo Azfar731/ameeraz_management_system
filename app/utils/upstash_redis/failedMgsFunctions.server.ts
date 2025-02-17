@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { failed_message } from "./types";
 
 const redis = new Redis({
   url: "https://crucial-alpaca-59474.upstash.io", // Replace with your Upstash Redis URL
@@ -6,14 +7,15 @@ const redis = new Redis({
 });
 
 const FAILED_ZSET_KEY = "failed_messages"; // Redis key for tracking failed messages
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+// const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 /**
  * Cleans up failed messages older than 7 days.
  */
-async function cleanupFailedMessages() {
+async function cleanupFailedMessages(days: number) {
   const now = Date.now();
-  const oldestAllowedTimestamp = now - SEVEN_DAYS_MS;
+  const days_in_ms = days * 24 * 60 * 60 * 1000;
+  const oldestAllowedTimestamp = now - days_in_ms;
 
   // Remove messages older than 7 days
   await redis.zremrangebyscore(FAILED_ZSET_KEY, 0, oldestAllowedTimestamp);
@@ -23,13 +25,7 @@ async function cleanupFailedMessages() {
  * Inserts a failed message into the Redis sorted set.
  * @param message - The failed message object containing details.
  */
-async function recordFailedMessage(message: {
-  mobile_num: string;
-  status: string;
-  timestamp: string
-  errors?: {description: string; code: string;}[]
-  
-}) {
+async function recordFailedMessage(message: failed_message) {
   const now = Date.now();
   const messageData = JSON.stringify(message);
 
@@ -38,14 +34,17 @@ async function recordFailedMessage(message: {
 }
 
 async function getFailedMessages() {
-    // First, clean up expired messages
-    await cleanupFailedMessages();
-  
-    // Retrieve all remaining failed messages
-    const failedMessages: string[] = await redis.zrange(FAILED_ZSET_KEY, 0, -1);
-  
-    // Parse JSON strings into objects
-    return failedMessages.map((msg) => JSON.parse(msg));
-  }
+  // First, clean up expired messages
+  await cleanupFailedMessages(7);
 
-export { cleanupFailedMessages, recordFailedMessage, getFailedMessages };
+  // Retrieve all remaining failed messages
+  const failedMessages: string[] = await redis.zrange(FAILED_ZSET_KEY, 0, -1);
+  console.log("failed messsages json: ", failedMessages)
+  // Parse JSON strings into objects
+  // const failedMessagesArray =  failedMessages.map((msg) => JSON.parse(msg));
+  // console.log("Failed messages: ", failedMessagesArray)
+
+  return failedMessages
+}
+
+export { cleanupFailedMessages, getFailedMessages, recordFailedMessage };

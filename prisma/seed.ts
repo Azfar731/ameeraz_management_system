@@ -1,4 +1,5 @@
 import { PrismaClient, Role, Service } from "@prisma/client";
+import { subscribe } from "diagnostics_channel";
 import { createCategory } from "~/utils/category/db.server";
 import { createClient } from "~/utils/client/db.server";
 import { createEmployee } from "~/utils/employee/db.server";
@@ -14,6 +15,7 @@ async function create_clients() {
             client_lname: "Razzaq",
             client_area: "Lahore",
             client_mobile_num: "03134549126",
+            
         },
         {
             client_fname: "Lailma",

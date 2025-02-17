@@ -11,8 +11,8 @@ const createClient = async ({
     client_lname,
     client_mobile_num,
     client_area,
-    subscribed,
-}: Omit<Client, "client_id" | "created_at" | "points">) => {
+    subscribed = "true",
+}: Omit<Client, "client_id" | "created_at" | "points" | "subscribed"> & { subscribed?: Boolean_Strings }) => {
     const client = await prisma_client.client.create({
         data: {
             client_fname: (client_fname.toLowerCase()),

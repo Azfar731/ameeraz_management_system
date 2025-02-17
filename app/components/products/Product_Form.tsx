@@ -1,11 +1,12 @@
 import { ProductErrors } from "~/utils/products/types";
 import { Form } from "@remix-run/react";
 import { Product } from "@prisma/client";
+import { SerializeFrom } from "@remix-run/node";
 export default function Product_Form({
   product,
   errorMessages,
 }: {
-  product?: Product;
+  product?: SerializeFrom<Product>;
   errorMessages?: ProductErrors;
 }) {
   return (

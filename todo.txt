@@ -59,6 +59,8 @@ Forms overlapping with navbar:
 - update employee
 
 
-
-
- 
+Sections that need fixing:
+client transactions: update, create, id
+remove route client._id.transactions
+deals section
+ product: update

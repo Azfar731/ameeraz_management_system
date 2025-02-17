@@ -57,29 +57,29 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 
 export default function Update_Service() {
-  const loaderData = useLoaderData<{
+  const {service,categories} = useLoaderData<{
     service: ServiceWithRelations;
     categories: Category[];
   }>();
   const actionData = useActionData<{ errors: ServiceErrors }>();
 
-  const categories = loaderData.categories;
+  // const categories = loaderData.categories;
 
   //convert deals date fields to date type
-  const updated_deals = loaderData.service.deals.map((deal) => {
-    return {
-      ...deal,
-      created_at: new Date(deal.created_at),
-      modified_at: new Date(deal.modified_at),
-      activate_from: new Date(deal.activate_from),
-      activate_till: deal.activate_till ? new Date(deal.activate_till) : null,
-    };
-  });
+  // const updated_deals = loaderData.service.deals.map((deal) => {
+  //   return {
+  //     ...deal,
+  //     created_at: new Date(deal.created_at),
+  //     modified_at: new Date(deal.modified_at),
+  //     activate_from: new Date(deal.activate_from),
+  //     activate_till: deal.activate_till ? new Date(deal.activate_till) : null,
+  //   };
+  // });
 
-  const service = {
-    ...loaderData.service,
-    deals: updated_deals,
-  };
+  // const service = {
+  //   ...loaderData.service,
+  //   deals: updated_deals,
+  // };
 
   return (
     <div className="flex justify-center">

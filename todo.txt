@@ -66,3 +66,9 @@ client transactions: update, create, id
 remove route client._id.transactions
 deals section
  product: update
+
+
+
+Delete Files:
+app/server/utilityFunctions
+components/Entity.tsx

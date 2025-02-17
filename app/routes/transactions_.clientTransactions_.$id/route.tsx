@@ -25,7 +25,7 @@ export default function View_Client_Transaction() {
     transaction: ClientTransactionWithRelations;
   }>();
   const client = transaction.record.client;
-  const deals = transaction.record.deals;
+  const deal_records = transaction.record.deal_records;
 
   const render_transactions = () => {
     const rendered_transactions: JSX.Element[] = [];
@@ -86,7 +86,9 @@ export default function View_Client_Transaction() {
 
         <h3 className="font-medium text-gray-700">Deals/services</h3>
         <h3 className="text-gray-600">
-          {deals.map((deal) => deal.deal_name).join(",")}
+          {deal_records
+            .map((deal_record) => deal_record.deal.deal_name)
+            .join(",")}
         </h3>
         {transaction.record.transactions.length > 1 && (
           <>

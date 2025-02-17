@@ -19,7 +19,7 @@ export default function ClientTransaction_Form({
     ServiceSaleRecordWithRelations,
     "employees" | "deals">
   >;
-  transaction?: Client_Transaction;
+  transaction?: SerializeFrom<Client_Transaction>;
   errorMessages?: ClientTransactionErrors;
 }) {
   const remaining_amount =

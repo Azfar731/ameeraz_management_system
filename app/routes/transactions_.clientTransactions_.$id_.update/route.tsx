@@ -11,7 +11,6 @@ import {
   ClientTransactionWithRelations,
 } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
-import { updateServiceSaleRecordDateTypes } from "~/utils/serviceSaleRecord/functions";
 import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
@@ -70,27 +69,29 @@ export async function action({ params, request }: ActionFunctionArgs) {
 }
 
 export default function ClientTransaction_Update() {
-  const loaderData = useLoaderData<{
+  const {transaction} = useLoaderData<{
     transaction: ClientTransactionWithRelations;
   }>();
 
-  const service_sale_record = updateServiceSaleRecordDateTypes(
-    loaderData.transaction.record
-  );
+  // const service_sale_record = updateServiceSaleRecordDateTypes(
+  //   loaderData.transaction.record
+  // );
 
-  const transaction = {
-    ...loaderData.transaction,
-    created_at: new Date(loaderData.transaction.created_at),
-    modified_at: new Date(loaderData.transaction.modified_at),
-    record: undefined,
-  };
+  
+
+  // const transaction = {
+  //   ...loaderData.transaction,
+  //   created_at: new Date(loaderData.transaction.created_at),
+  //   modified_at: new Date(loaderData.transaction.modified_at),
+  //   record: undefined,
+  // };
 
   const actionData = useActionData<{ errors: ClientTransactionErrors }>();
 
   return (
     <div className="flex justify-center items-center min-h-screen">
       <ClientTransaction_Form
-        service_sale_record={service_sale_record}
+        service_sale_record={transaction.record}
         transaction={transaction}
         errorMessages={actionData?.errors}
       />

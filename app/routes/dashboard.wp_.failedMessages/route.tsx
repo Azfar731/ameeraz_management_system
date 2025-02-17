@@ -9,7 +9,7 @@ import { getTheme } from "@table-library/react-table-library/baseline";
 
 export async function loader() {
   const failed_messages = await getFailedMessages();
-  console.log("Failed messages: ", failed_messages)
+  
   return { failed_messages };
 }
 
@@ -17,7 +17,6 @@ export default function Failed_Messages() {
   const { failed_messages } = useLoaderData<{
     failed_messages: failed_message[];
   }>();
-  console.log("in component: ", failed_messages)
   //table values
   const [ids, setIds] = useState<string[]>([]);
   const nodes = [...failed_messages];

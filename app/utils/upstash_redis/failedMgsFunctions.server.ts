@@ -39,10 +39,6 @@ async function getFailedMessages() {
 
   // Retrieve all remaining failed messages
   const failedMessages: string[] = await redis.zrange(FAILED_ZSET_KEY, 0, -1);
-  console.log("failed messsages json: ", failedMessages)
-  // Parse JSON strings into objects
-  // const failedMessagesArray =  failedMessages.map((msg) => JSON.parse(msg));
-  // console.log("Failed messages: ", failedMessagesArray)
 
   return failedMessages
 }

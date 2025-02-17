@@ -1,12 +1,13 @@
 import { Form } from "@remix-run/react";
 import { Vendor } from "@prisma/client";
 import { VendorErrors } from "~/utils/vendors/types";
+import { SerializeFrom } from "@remix-run/node";
 
 export default function Vendor_Form({
   vendor,
   errorMessages,
 }: {
-  vendor?: Vendor;
+  vendor?: SerializeFrom<Vendor>;
   errorMessages?: VendorErrors;
 }) {
   return (

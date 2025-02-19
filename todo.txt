@@ -1,19 +1,14 @@
 
 Done:
-- handle unsubscribe logic
+
+
 
 
 Things to do:
-backend
-- create a page to show failed messages.
-
-Things to fix:
-- clientTransaction routes and make changes according to  deals schema.
+Figure how to upload media to fb pages.
+Setup whatsapp number
 
 frontend:
-- a page to display webhooks information
-  - webhooks will send information regarding message status.
-  - find a way to display failed message deliveries. 
   
    
 Done:
@@ -62,10 +57,8 @@ Forms overlapping with navbar:
 
 
 Sections that need fixing:
-client transactions: update, create, id
+
 remove route client._id.transactions
-deals section
- product: update
 
 
 

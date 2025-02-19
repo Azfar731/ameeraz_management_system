@@ -1,4 +1,4 @@
-import { Form, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { cleanupFailedMessages, getFailedMessages } from "~/utils/upstash_redis/failedMgsFunctions.server";
 import { failed_message } from "~/utils/upstash_redis/types";
@@ -30,8 +30,7 @@ export default function Failed_Messages() {
     failed_messages: failed_message[];
   }>();
   const actionData = useActionData<{deletedCount: number}>()
-  // const submit = useSubmit();
-  //table values
+ 
   const [ids, setIds] = useState<string[]>([]);
   const nodes = [...failed_messages];
   const data = { nodes };

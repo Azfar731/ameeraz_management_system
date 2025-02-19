@@ -4,12 +4,6 @@ import Bottleneck from "bottleneck";
 import { getTemplateByName } from "../templates/db.server";
 import { TemplateWithRelations } from "../templates/types";
 
-// type TemplateFunctionWithVariables = (
-//     props: {
-//         client: Client;
-//         variablesArray: { key: string; value: string; type: string }[];
-//     },
-// ) => string;
 
 const limiter = new Bottleneck({
     minTime: 1000 / 80, // 80 requests per second
@@ -323,8 +317,5 @@ function _convertMobileNumber(mobileNumber: string): string {
 
 
 
-// function _delay(ms: number) {
-//     return new Promise((resolve) => setTimeout(resolve, ms));
-// }
 
 export { sendFreeFormMessage, sendMultipleMessages };

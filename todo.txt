@@ -5,7 +5,11 @@ Done:
 
 
 Things to do:
-Figure how to upload media to fb pages.
+Check file types before processing the file. add safety checks
+Disable button while image is uploading
+Add a menu in dashboard/wp, to choose media
+change wp functions to use id instead of link. 
+
 Setup whatsapp number
 
 frontend:
@@ -39,6 +43,7 @@ Client:
 
 Client Transactions:
 - Replace table in Client Transaction create to use SalesRecordTableComponent
+
 
 Update logic:
 - users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner

@@ -5,14 +5,17 @@ import {
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
-import { Form, redirect } from "@remix-run/react";
+import { Form, redirect, useActionData } from "@remix-run/react";
 import Select from "react-select";
+import { createMedia } from "~/utils/media/db.server";
+import { MediaValidation } from "~/utils/media/validation";
 import { upload_media } from "~/utils/wp_api/mediaFunctions.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const uploadHandler = unstable_composeUploadHandlers(
     unstable_createFileUploadHandler({
       directory: "/tmp",
+      file: ({ filename }) => filename,
       maxPartSize: 5_000_000, // 5MB limit
     }),
     unstable_createMemoryUploadHandler()
@@ -23,20 +26,42 @@ export async function action({ request }: ActionFunctionArgs) {
     uploadHandler
   );
   const file = formData.get("file");
-
-  if (!(file instanceof File)) {
-    return { errors: { file: ["File upload error. Uplaod a Valid file"] } };
+  if(!file){
+    return { errors: { file: ["File couldn't be parsed"] } };
+    
   }
 
+  // Convert formData to an object but manually add the file
+  const formObject = Object.fromEntries(formData.entries());
+ 
+ 
+  const validationResult = await MediaValidation.safeParseAsync({...formObject, fileType: file.type});
+  if (!validationResult.success) {
+    return { errors: validationResult.error.flatten().fieldErrors };
+  }
+
+  const { fileType, name, type } = validationResult.data;
   try {
-    const mediaId = await upload_media(file);
-    throw redirect(`/dashboard/wp`);
+    const mediaId = await upload_media({filePath: file.filepath, type: fileType});
+    console.log("ID RETURNED:  ", mediaId);
+    await createMedia({ id: mediaId, name, type });
+
+    return redirect("/dashboard/wp");
   } catch (error) {
+    console.log("Error: ", error)
     return { errors: { file: ["Failed to upload file to Meta Servers"] } };
   }
 }
 
+type mediaErrors = {
+  name: string[];
+  file: string[];
+  type: string[];
+};
+
 export default function Upload_Media() {
+  const actionData = useActionData<{ errors: mediaErrors }>();
+
   return (
     <div className="flex justify-center  ">
       <Form
@@ -50,26 +75,31 @@ export default function Upload_Media() {
           </h1>
         </div>
         <label
-          htmlFor="file_name"
+          htmlFor="name"
           className="block text-gray-700 text-sm font-bold mb-2"
         >
           File Name
         </label>
         <input
           type="text"
-          name="file_name"
-          id="file_name"
+          name="name"
+          id="name"
           className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
           required
         />
+        {actionData?.errors.name && (
+          <h2 className="text-red-500 font-semibold">
+            {actionData?.errors.name[0]}
+          </h2>
+        )}
         <label
-          htmlFor="media_type"
+          htmlFor="type"
           className="block text-gray-700 text-sm font-bold mb-2"
         >
           Media Type
         </label>
         <Select
-          name="media_type"
+          name="type"
           options={[
             { value: "img", label: "Image" },
             { value: "vid", label: "Video" },
@@ -78,8 +108,13 @@ export default function Upload_Media() {
           classNamePrefix="select"
           required
         />
+        {actionData?.errors.type && (
+          <h2 className="text-red-500 font-semibold">
+            {actionData?.errors.type[0]}
+          </h2>
+        )}
         <label
-          htmlFor="file_name"
+          htmlFor="file"
           className="block text-gray-700 text-sm font-bold mb-2"
         >
           Upload File
@@ -91,6 +126,11 @@ export default function Upload_Media() {
           className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
           required
         />
+        {actionData?.errors.file && (
+          <h2 className="text-red-500 font-semibold">
+            {actionData?.errors.file[0]}
+          </h2>
+        )}
         <div className="w-full flex justify-center items-center">
           <button
             type="submit"

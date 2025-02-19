@@ -18,7 +18,8 @@ async function cleanupFailedMessages(days: number) {
   const oldestAllowedTimestamp = now - days_in_ms;
 
   // Remove messages older than 7 days
-  await redis.zremrangebyscore(FAILED_ZSET_KEY, 0, oldestAllowedTimestamp);
+  const deletedCount = await redis.zremrangebyscore(FAILED_ZSET_KEY, 0, oldestAllowedTimestamp);
+  return deletedCount
 }
 
 /**

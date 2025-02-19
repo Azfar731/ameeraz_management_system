@@ -1,22 +1,36 @@
-import { useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useSubmit } from "@remix-run/react";
 import { useState } from "react";
-import { getFailedMessages } from "~/utils/upstash_redis/failedMgsFunctions.server";
+import { cleanupFailedMessages, getFailedMessages } from "~/utils/upstash_redis/failedMgsFunctions.server";
 import { failed_message } from "~/utils/upstash_redis/types";
 
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
+import { ActionFunctionArgs } from "@remix-run/node";
 
 export async function loader() {
   const failed_messages = await getFailedMessages();
-  
+
   return { failed_messages };
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  
+  console.log("formData MEthod: ", request.method)
+  if (request.method === "DELETE") {
+    console.log("Delete request received");
+    const deletedCount = await cleanupFailedMessages(0)
+    return {deletedCount}
+  }
+  return null
 }
 
 export default function Failed_Messages() {
   const { failed_messages } = useLoaderData<{
     failed_messages: failed_message[];
   }>();
+  const actionData = useActionData<{deletedCount: number}>()
+  // const submit = useSubmit();
   //table values
   const [ids, setIds] = useState<string[]>([]);
   const nodes = [...failed_messages];
@@ -37,7 +51,8 @@ export default function Failed_Messages() {
     },
     {
       label: "Descriptiion",
-      renderCell: (item: failed_message) => item.errors && item.errors[0].description,
+      renderCell: (item: failed_message) =>
+        item.errors && item.errors[0].description,
     },
   ];
 
@@ -99,17 +114,21 @@ export default function Failed_Messages() {
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
-        <h1 className=" font-semibold text-6xl text-gray-700">Failed Messages</h1>
+        <h1 className=" font-semibold text-6xl text-gray-700">
+          Failed Messages
+        </h1>
       </div>
       <div className="mt-20">
-        <div className="w-full flex justify-between items-center">
-          {/* <button
-            onClick={deleteMessages}
-            className="w-60 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-          >
-            Clear Messages
-          </button> */}
+        <div className="w-full flex justify-between items-right">
+          <Form method="delete">
+            <button
+              className="w-60 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+            >
+              Clear Messages
+            </button>
+          </Form>
         </div>
+        {actionData &&  <p className="text-red-500 font-semibold">{actionData.deletedCount > 0 ? `Deleted ${actionData.deletedCount} Messages` : "No Messages to Delete"}</p>}
         <div className="mt-6">
           <CompactTable
             columns={COLUMNS}

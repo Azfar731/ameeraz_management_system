@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Form, Link, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
@@ -39,7 +39,7 @@ export default function Clients() {
     areas: sp_areas,
   } = getSearchParams(searchParams);
   const { clients } = useLoaderData<{ clients: Client[] }>();
-  console.log("Clients Fetched: ", clients);
+  const navigation = useNavigation();
   //other values
   const area_options = areasList.areas.map((area) => ({
     value: area,
@@ -263,7 +263,8 @@ export default function Clients() {
         )}
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled= {navigation.state === "loading" || navigation.state === "submitting"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed "
         >
           Fetch
         </button>

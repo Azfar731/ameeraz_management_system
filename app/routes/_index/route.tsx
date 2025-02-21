@@ -6,6 +6,7 @@ import {
   Link,
   useLoaderData,
   useNavigate,
+  useNavigation,
   useSearchParams,
 } from "@remix-run/react";
 import { useState } from "react";
@@ -112,6 +113,7 @@ export default function Index() {
   });
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const navigation = useNavigation();
 
   //loader Data
   const { service_records, deals, employees, categories, errorMessages } =
@@ -337,7 +339,8 @@ export default function Index() {
         />
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={navigation.state === "submitting" || navigation.state === "loading"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           Fetch
         </button>
@@ -346,7 +349,7 @@ export default function Index() {
       <div className="mt-20">
         <Link
           to="/salerecord/create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded "
         >
           Create a new record <FaPlus />
         </Link>

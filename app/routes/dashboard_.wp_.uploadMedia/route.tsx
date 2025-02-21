@@ -5,7 +5,7 @@ import {
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
-import { Form, redirect, useActionData } from "@remix-run/react";
+import { Form, redirect, useActionData, useNavigation } from "@remix-run/react";
 import Select from "react-select";
 import { createMedia } from "~/utils/media/db.server";
 import { MediaValidation } from "~/utils/media/validation";
@@ -61,6 +61,9 @@ type mediaErrors = {
 
 export default function Upload_Media() {
   const actionData = useActionData<{ errors: mediaErrors }>();
+
+  const navigation = useNavigation();
+
 
   return (
     <div className="flex justify-center  ">
@@ -134,7 +137,8 @@ export default function Upload_Media() {
         <div className="w-full flex justify-center items-center">
           <button
             type="submit"
-            className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            disabled={navigation.state === "submitting" || navigation.state === "loading"} 
+            className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Upload
           </button>

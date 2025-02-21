@@ -1,4 +1,4 @@
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Form, Link, useLoaderData, useSearchParams, useNavigation } from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
@@ -40,6 +40,7 @@ export default function Vendors() {
     vendors: Vendor[];
     errorMessages: VendorErrors;
   }>();
+  const navigation = useNavigation();
   console.log("Vendors Fetched: ", vendors);
 
   const nodes = [...vendors];
@@ -159,7 +160,8 @@ export default function Vendors() {
         )}
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={navigation.state === "loading" || navigation.state === "submitting"}
         >
           Fetch
         </button>

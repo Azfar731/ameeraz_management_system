@@ -5,12 +5,12 @@ Done:
 
 
 Things to do:
-
+Implement a global error catch and store errors. 
 Check file types before processing the file. add safety checks
 Setup whatsapp number
 see how I can implement logging
 See how I can implement authentication based on environemnt(production, development)
-
+Explore telemetry/better stack
 
 
 frontend:

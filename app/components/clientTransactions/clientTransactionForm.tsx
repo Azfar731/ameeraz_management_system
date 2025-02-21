@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import Select from "react-select";
 import {
@@ -22,6 +22,7 @@ export default function ClientTransaction_Form({
   transaction?: SerializeFrom<Client_Transaction>;
   errorMessages?: ClientTransactionErrors;
 }) {
+  const navigation = useNavigation();
   const remaining_amount =
     service_sale_record.total_amount -
     service_sale_record.transactions.reduce((sum, trans) => {
@@ -86,7 +87,8 @@ export default function ClientTransaction_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {transaction ? "Update" : "Create"}
         </button>

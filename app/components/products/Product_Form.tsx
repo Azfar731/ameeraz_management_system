@@ -1,5 +1,5 @@
 import { ProductErrors } from "~/utils/products/types";
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import { Product } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
 export default function Product_Form({
@@ -9,6 +9,7 @@ export default function Product_Form({
   product?: SerializeFrom<Product>;
   errorMessages?: ProductErrors;
 }) {
+  const navigation = useNavigation();
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
       <div className="w-full flex justify-center items-center">
@@ -81,7 +82,8 @@ export default function Product_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {product ? "Update" : "Create"}
         </button>

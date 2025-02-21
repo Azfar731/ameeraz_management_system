@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Product_Transaction } from "@prisma/client";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import { ProductTransactionErrorData } from "~/utils/productTransaction/types";
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import Select from "react-select";
 import { getAllPaymentMenuOptions, getSinglePaymentMenuOption } from "~/utils/functions";
 import { SerializeFrom } from "@remix-run/node";
-export default function ProductTransactionForm({
+export default function ProductTransaction_Form({
   product_sale_record,
   transaction,
   errorMessages,
@@ -15,6 +15,7 @@ export default function ProductTransactionForm({
   transaction?: SerializeFrom<Product_Transaction>;
   errorMessages?: ProductTransactionErrorData;
 }) {
+  const navigation = useNavigation();
   const remaining_amount =
     product_sale_record.total_amount -
     product_sale_record.transactions.reduce((sum, trans) => {
@@ -86,7 +87,8 @@ export default function ProductTransactionForm({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {transaction ? "Update" : "Create"}
         </button>

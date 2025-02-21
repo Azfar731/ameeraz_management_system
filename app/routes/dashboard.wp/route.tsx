@@ -1,5 +1,5 @@
 // import { ActionFunctionArgs } from "@remix-run/node";
-import { Template_Variable } from "@prisma/client";
+import { Media, Template_Variable } from "@prisma/client";
 import { ActionFunctionArgs, SerializeFrom } from "@remix-run/node";
 import {
   Form,
@@ -22,6 +22,7 @@ import { WhatsappTemplateDataValidation } from "~/utils/wp_api/validations.serve
 import { WP_ErrorMessages } from "~/utils/wp_api/types";
 import { sendMultipleMessages } from "~/utils/wp_api/functions.server";
 import { renderZodErrors } from "~/utils/render_functions";
+import { getAllMedia } from "~/utils/media/db.server";
 // import {
 //   getInstaTemplateMessageInput,
 //   sendMessage,
@@ -31,16 +32,16 @@ export async function loader() {
   const templates = await getAllTemplates();
   const remainingLimit = await remainingDailyLimit();
   const clientCount = await getClientCount();
+  const media = await getAllMedia();
   const numOfClientBatches = Math.ceil(clientCount / 230);
-  return { templates, remainingLimit, numOfClientBatches };
+  return { templates, remainingLimit, numOfClientBatches, media };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const recvdData = await request.json();
-  recvdData.header_type = "image"
+  // recvdData.header_type = "image";
   const validationResult = WhatsappTemplateDataValidation.safeParse(recvdData);
   if (!validationResult.success) {
-    console.log("error occurred")
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
   const data = validationResult.data;
@@ -48,7 +49,7 @@ export async function action({ request }: ActionFunctionArgs) {
     process.env.WP_DAILY_LIMIT ? process.env.WP_DAILY_LIMIT : "230"
   );
   const clients = await getRangeofClients({
-    startIndex: (data.client_batch-1) * daily_limit,
+    startIndex: (data.client_batch - 1) * daily_limit,
     total: daily_limit,
   });
   if (!canSendMessages(clients.length)) {
@@ -61,17 +62,21 @@ export async function action({ request }: ActionFunctionArgs) {
     variablesArray: data.variables_array,
   });
 
-  console.log("Failed Messages: ", failed_messages)
-  recordMessage(clients.length-failed_messages)
- throw redirect(`/dashboard/wp/success?failed_messages=${failed_messages}&total_messages=${clients.length}`)
+  console.log("Failed Messages: ", failed_messages);
+  recordMessage(clients.length - failed_messages);
+  throw redirect(
+    `/dashboard/wp/success?failed_messages=${failed_messages}&total_messages=${clients.length}`
+  );
 }
 
 export default function Whatsapp_API() {
-  const { templates, remainingLimit, numOfClientBatches } = useLoaderData<{
-    templates: TemplateWithRelations[];
-    remainingLimit: number;
-    numOfClientBatches: number;
-  }>();
+  const { templates, remainingLimit, numOfClientBatches, media } =
+    useLoaderData<{
+      templates: TemplateWithRelations[];
+      remainingLimit: number;
+      numOfClientBatches: number;
+      media: Media[];
+    }>();
   const [chosenTemplate, setChosenTemplate] = useState<
     SerializeFrom<TemplateWithRelations> | undefined
   >(undefined);
@@ -88,16 +93,20 @@ export default function Whatsapp_API() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData.entries());
+    if(!chosenTemplate){
+      return;
+    }
     const data = {
       ...formObject,
       variables_array:
-        chosenTemplate?.variables
+        chosenTemplate.variables
           .filter((variables) => variables.client_property === "none")
           .map((variable) => ({
             key: variable.name,
             value: formObject[variable.name] as string,
-            type: variable.type
+            type: variable.type,
           })) || [],
+      header_type: chosenTemplate.header_type,
     };
     console.log("Data: ", data);
     submit(data, { method: "post", encType: "application/json" });
@@ -157,15 +166,28 @@ export default function Whatsapp_API() {
             >
               {chosenTemplate.header_type === "text"
                 ? chosenTemplate.header_var_name
-                : `${chosenTemplate.header_type} URL`}
+                : `${chosenTemplate.header_type} ID`}
             </label>
-            <input
-              type="text"
-              name="header_value"
-              id="header_value"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
-              required
-            />
+            {chosenTemplate.header_type === "text" ? (
+              <input
+                type="text"
+                name="header_value"
+                id="header_value"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
+                required
+              />
+            ) : (
+              <Select
+                id="header_value"
+                name="header_value"
+                options={media.map((media) => ({
+                  value: media.id,
+                  label: media.name,
+                }))}
+                className="basic-multi-select mb-4"
+                classNamePrefix="select"
+              />
+            )}
             {actionData?.errorMessages?.header_value && (
               <h2 className="text-red-500 font-semibold">
                 {actionData?.errorMessages.header_value[0]}
@@ -208,7 +230,7 @@ export default function Whatsapp_API() {
             {actionData?.errorMessages.client_batch[0]}
           </h2>
         )}
-         {actionData && renderZodErrors(actionData.errorMessages)}
+        {actionData && renderZodErrors(actionData.errorMessages)}
         <div className="w-full flex justify-center items-center">
           <button
             type="submit"

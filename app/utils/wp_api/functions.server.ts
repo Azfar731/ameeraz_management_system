@@ -240,7 +240,7 @@ function _getDynamicTemplateHeader(
                 {
                     type: template.header_type,
                     [template.header_type]: {
-                        link: variablesArray[0].value,
+                        id: variablesArray[0].value,
                     },
                 },
             ],

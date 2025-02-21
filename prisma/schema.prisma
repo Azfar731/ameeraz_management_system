@@ -274,6 +274,7 @@ model Media{
   id String @id
   name String @unique
   type Media_Type 
+  created_at DateTime @default(now())
 }
 
 

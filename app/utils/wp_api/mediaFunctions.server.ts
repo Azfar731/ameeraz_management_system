@@ -1,8 +1,9 @@
-
 import FormData from "form-data";
 import fs from "fs";
 import axios from "axios";
-async function upload_media({filePath, type}:{filePath: string, type: string}) {
+async function upload_media(
+    { filePath, type }: { filePath: string; type: string },
+) {
     // const tmpPath = path.join("/tmp", filePath.name);
     // const buffer = await filePath.arrayBuffer();
     // await fs.promises.writeFile(tmpPath, Buffer.from(buffer));
@@ -42,4 +43,32 @@ async function upload_media({filePath, type}:{filePath: string, type: string}) {
     }
 }
 
-export { upload_media };
+async function send_delete_request(id: string) {
+    const config = {
+        method: "delete",
+        url: `https://graph.facebook.com/${process.env.VERSION}/${id}`,
+        headers: {
+            Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+        },
+    };
+    try {
+        const response = await axios(config);
+
+        console.log("response of delete request", response.data);
+        if (response.data.success) {
+            return true; // Returns the media_id}
+        }
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.error(
+                "Meta API Error:",
+                error.response.data,
+            );
+        } else {
+            console.error("Delete Error:", error);
+        }
+        return false;
+    }
+}
+
+export { send_delete_request , upload_media };

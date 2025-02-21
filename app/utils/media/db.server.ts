@@ -19,4 +19,8 @@ const createMedia = async (data: {
     });
 };
 
-export { createMedia, getAllMedia , getMediaFromName};
+const deleteMedia = async(id: string) => {
+    return await prisma_client.media.delete({where: {id}});
+}
+
+export { createMedia, getAllMedia , getMediaFromName, deleteMedia};

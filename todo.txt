@@ -5,12 +5,13 @@ Done:
 
 
 Things to do:
+setup Media page. add delete logic. Also delete from META storage.
 Check file types before processing the file. add safety checks
-Disable button while image is uploading
-Add a menu in dashboard/wp, to choose media
-change wp functions to use id instead of link. 
-
 Setup whatsapp number
+see how I can implement loggingn
+See how I can implement authentication based on environemnt(production, development)
+
+
 
 frontend:
   

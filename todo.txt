@@ -5,10 +5,10 @@ Done:
 
 
 Things to do:
-setup Media page. add delete logic. Also delete from META storage.
+
 Check file types before processing the file. add safety checks
 Setup whatsapp number
-see how I can implement loggingn
+see how I can implement logging
 See how I can implement authentication based on environemnt(production, development)
 
 

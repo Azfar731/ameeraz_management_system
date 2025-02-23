@@ -7,7 +7,7 @@ export default function Transactions() {
       </div>
       <div className="flex justify-center items-center bg-gray-100 p-4 mt-6 shadow-md w-fit mx-auto rounded-full">
         <NavLink
-          to="clientTransactions"
+          to="/transactions"
           className={({ isActive }) =>
             `text-lg px-4 py-2 rounded-full transition-colors ${
               isActive
@@ -15,6 +15,7 @@ export default function Transactions() {
                 : "text-gray-600 hover:bg-blue-100 hover:text-blue-600"
             }`
           }
+          end
         >
           Client Transactions
         </NavLink>
@@ -43,7 +44,7 @@ export default function Transactions() {
           Operational Expenses
         </NavLink>
         <NavLink
-          to="all"
+          to="all-transactions"
           className={({ isActive }) =>
             `text-lg px-4 py-2 rounded-full transition-colors ${
               isActive

@@ -7,20 +7,20 @@ const clientTransactionFetchSchema = z.object({
     start_date: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
-        .transform((str) =>  {
-           const date =  new Date(str);
-           date.setHours(0,0,0,0)
-           return date
+        .transform((str) => {
+            const date = new Date(str);
+            date.setHours(0, 0, 0, 0);
+            return date;
         })
         .optional(),
 
     end_date: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
-        .transform((str) =>  {
-           const date =  new Date(str);
-           date.setHours(0,0,0,0)
-           return date
+        .transform((str) => {
+            const date = new Date(str);
+            date.setHours(23, 59, 59, 999);
+            return date;
         })
         .optional(),
 
@@ -60,8 +60,12 @@ const clientTransactionFetchSchema = z.object({
         path: ["end_date"],
     },
 ).superRefine((data) => {
-    if (!(data.start_date || data.end_date ||  data.mobile_num || data.payment_options)) {
+    if (
+        !(data.start_date || data.end_date || data.mobile_num ||
+            data.payment_options)
+    ) {
         data.start_date = new Date();
+        data.start_date.setHours(0, 0, 0, 0);
     }
 });
 
@@ -74,7 +78,8 @@ const clientTransactionSchema = (maxAmount: number) =>
                 message: "Amount paid must be greater than 0",
             })
             .refine((amount) => amount <= maxAmount, {
-                message: `Amount paid can not be greater than Pending Amount. Pending amount is ${maxAmount}`,
+                message:
+                    `Amount paid can not be greater than Pending Amount. Pending amount is ${maxAmount}`,
             }),
         mode_of_payment: z
             .string()

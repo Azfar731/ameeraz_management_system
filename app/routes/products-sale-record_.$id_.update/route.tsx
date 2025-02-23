@@ -81,7 +81,7 @@ export default function Update_Product_Sale_Record() {
   const actionData = useActionData<{ errors: ProductSaleRecordUpdateErrors }>();
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Product_Sale_Record_Form
         products={products}
         record={productSaleRecord}

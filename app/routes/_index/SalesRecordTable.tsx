@@ -4,18 +4,16 @@ import { getTheme } from "@table-library/react-table-library/baseline";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { formatDate } from "shared/utilityFunctions";
 import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
-import { Employee } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 interface SalesRecordTableProps {
   serviceRecords: SerializeFrom<ServiceSaleRecordWithRelations[]>;
-  employees: SerializeFrom<Employee[]>;
   onEdit: (id: string) => void;
 }
 
 export default function SalesRecordTable({
   serviceRecords,
-  employees,
   onEdit,
 }: SalesRecordTableProps) {
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
@@ -30,17 +28,30 @@ export default function SalesRecordTable({
     }
   };
 
-  const getEmployeeNames = (
-    record: ServiceSaleRecordWithRelations,
-    fullName = false
-  ) => {
-    const empIds = record.employees.map((emp) => emp.emp_id);
-    const empEntities = employees.filter((emp) => empIds.includes(emp.emp_id));
-    return fullName
-      ? empEntities.map((emp) => `${emp.emp_fname} ${emp.emp_lname}`).join(", ")
-      : empEntities.map((emp) => emp.emp_fname).join(", ");
-  };
+  // const getEmployeeNames = (
+  //   record: ServiceSaleRecordWithRelations,
+  //   fullName = false
+  // ) => {
+  //   const empIds = record.employees.map((emp) => emp.emp_id);
+  //   const empEntities = employees.filter((emp) => empIds.includes(emp.emp_id));
+  //   return fullName
+  //     ? empEntities.map((emp) => `${emp.emp_fname} ${emp.emp_lname}`).join(", ")
+  //     : empEntities.map((emp) => emp.emp_fname).join(", ");
+  // };
 
+  const getEmployeeNames = (
+    item: ServiceSaleRecordWithRelations,
+    getFullName = false
+  ) => {
+    return item.employees
+      .map(
+        (record) =>
+          `${record.employee.emp_fname} ${
+            getFullName && record.employee.emp_lname
+          }`
+      )
+      .join(",");
+  };
   const data = { nodes: serviceRecords };
 
   const ROW_PROPS = {
@@ -63,7 +74,9 @@ export default function SalesRecordTable({
                 <li>
                   <strong>Deals/Services:</strong>{" "}
                   {record.deal_records
-                    .map((record) => `${record.deal.deal_name}(${record.quantity})`)
+                    .map(
+                      (record) => `${record.deal.deal_name}(${record.quantity})`
+                    )
                     .join(", ")}
                 </li>
                 <li>
@@ -111,9 +124,11 @@ export default function SalesRecordTable({
       renderCell: getEmployeeNames,
     },
     {
-      label: "Edit",
+      label: "View",
       renderCell: (record: ServiceSaleRecordWithRelations) => (
-        <button onClick={() => onEdit(record.service_record_id)}>Edit</button>
+        <button onClick={() => onEdit(record.service_record_id)}>
+          <FaExternalLinkAlt />
+        </button>
       ),
     },
   ];

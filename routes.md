@@ -84,3 +84,19 @@
 - /transactions/product-transactions/create/product-sale-record-id => transaction.productTransactions_.create_.$product-sale-record-id
 - /transactions/product-transactions/id/update => transactions.productTransactions_.$id_.update
 
+
+
+## User routes
+
+/users => view all users
+/users/:id => view a single user
+/users/:id/update => update the info about a user
+/users/create => create a new user
+
+
+Checks:
+/users => Can only be accessed by owner or admin. Only sends users, lower than the current user level.
+/users/:id => The user must be admin or higher level than the user they are viewing. If the user is viewing their own id, than they will be allowed to see it.
+/users/:id/update => can update their own info or for the users below them. 
+/users/create => owner is allowed to create accounts for manager or worker.
+

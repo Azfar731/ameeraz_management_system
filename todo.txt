@@ -1,17 +1,33 @@
 
-
-Next:
-
-
-
-Fixes:
-Check product, include price while creating
-Services being shown as Inactive when created through seed file, but not when created manually
+Done:
 
 
 
 
+Things to do:
+Implement a global error catch and store errors. 
+Check file types before processing the file. add safety checks
+Setup whatsapp number
+see how I can implement logging
+See how I can implement authentication based on environemnt(production, development)
+Explore telemetry/better stack
 
+
+frontend:
+  
+   
+Done:
+- fixed issues in CLientTransaction caused due to change in Service Sale Record schema
+- add elements in navbar
+- make clientTransactions the default in transactions
+- added icons to sale record page.
+- fix params issue in sales record page
+- add payment cleared parameter to sale record page
+- added show all employees functionality in employees page
+- fix form overlapping navbar by changing h-screen to min-h-screen so that if the forms or anything else exceeds the screen height, it doesn't overlap with navbar
+- seperated Client Transactions and Operational Expenses route form and table logic into seperate components
+- create an All transaction page
+- added pending value param to product sale record fetch form
 
 Improvements:
 Services:
@@ -19,7 +35,39 @@ Services:
 2. Disable buttons while form is submitting
 3. Figure out how to provide data to refine function messages in zod
 
+Webhooks:
+- find a way to provide real time updates for data coming from webhooks. Currently, I have only found one solution which uses sockets.io, but sockets.io requires the remix app to run on express, because it can't run on serverless environemnt(servers that sleep within requests).
 
-Authentication:
-- use form-strategy for authentication
-- use cookieSessionStorage to mange sessions
+Client:
+
+- Add validation to clients route loader
+
+Client Transactions:
+- Replace table in Client Transaction create to use SalesRecordTableComponent
+
+
+Update logic:
+- users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner
+- profile page => Can update password too.
+Owner can update manager and worker information and also disbale their accounts.
+Admin can update every role information or disbale account.
+
+
+Create a seperate route for updating password. 
+    - ask for old password
+    - ask for new password
+
+
+Forms overlapping with navbar:
+- update employee
+
+
+Sections that need fixing:
+
+remove route client._id.transactions
+
+
+
+Delete Files:
+app/server/utilityFunctions
+components/Entity.tsx

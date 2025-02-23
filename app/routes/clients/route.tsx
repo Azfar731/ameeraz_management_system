@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Form, Link, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
@@ -7,7 +7,7 @@ import Select, { OnChangeValue } from "react-select";
 
 import areasList from "../../components/clients/areas.json";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Client } from "@prisma/client";
+import { Boolean_Strings, Client } from "@prisma/client";
 import { formatDate } from "shared/utilityFunctions";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 
@@ -15,9 +15,16 @@ import { getSearchParams } from "~/utils/client/functions";
 import { getClients } from "~/utils/client/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
-  const { mobile_num, fname, lname, areas } = getSearchParams(searchParams);
-  if (mobile_num || fname || lname || areas) {
-    const clients = await getClients(mobile_num, fname, lname, areas);
+  const { mobile_num, fname, lname, areas, subscribe } =
+    getSearchParams(searchParams);
+  if (mobile_num || fname || lname || areas || subscribe) {
+    const clients = await getClients({
+      mobile_num,
+      fname,
+      lname,
+      areas,
+      subscribe: subscribe as Boolean_Strings,
+    });
     return { clients };
   }
   return { clients: [] };
@@ -32,7 +39,7 @@ export default function Clients() {
     areas: sp_areas,
   } = getSearchParams(searchParams);
   const { clients } = useLoaderData<{ clients: Client[] }>();
-  console.log("Clients Fetched: ", clients);
+  const navigation = useNavigation();
   //other values
   const area_options = areasList.areas.map((area) => ({
     value: area,
@@ -62,6 +69,10 @@ export default function Clients() {
     {
       label: "Area",
       renderCell: (item: Client) => `${item.client_area}`,
+    },
+    {
+      label: "Subscribed",
+      renderCell: (item: Client) => `${item.subscribed}`,
     },
     {
       label: "Registrated On",
@@ -103,9 +114,16 @@ export default function Clients() {
     const mobile_num = (formData.get("mobile_num") as string) || "";
     const fname = (formData.get("fname") as string) || "";
     const lname = (formData.get("lname") as string) || "";
-    const areas = areasRef.current?.map((area) => area.value);
-    if (mobile_num || fname || lname || areas) {
-      return { mobile_num, fname, lname, areas };
+    const subscribe = (formData.get("subscribe") as string) || "";
+    // const areas = areasRef.current?.map((area) => area.value);
+
+    const areas = formData
+      .getAll("area")
+      .map((value) => String(value))
+      .filter((val) => val.trim() !== "");
+
+    if (mobile_num || fname || lname || areas || subscribe) {
+      return { mobile_num, fname, lname, areas, subscribe };
     }
     return null;
   };
@@ -115,6 +133,7 @@ export default function Clients() {
     fname: string;
     lname: string;
     areas: string[];
+    subscribe: string;
   }) => {
     const params = new URLSearchParams();
 
@@ -220,7 +239,23 @@ export default function Clients() {
           onChange={onAreaChange}
           options={area_options}
           defaultValue={sp_areas?.map((area) => ({ value: area, label: area }))}
-          className="basic-multi-select mt-2 z-10"
+          className="basic-multi-select mt-2 "
+          classNamePrefix="select"
+        />
+        <label
+          htmlFor="subscribe"
+          className="block text-gray-700 text-sm font-bold mt-4"
+        >
+          Client Subscription
+        </label>
+        <Select
+          name="subscribe"
+          options={[
+            { value: "true", label: "true" },
+            { value: "false", label: "false" },
+          ]}
+          isClearable 
+          className="basic-multi-select mt-2 "
           classNamePrefix="select"
         />
         {errorMessage && (
@@ -228,7 +263,8 @@ export default function Clients() {
         )}
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled= {navigation.state === "loading" || navigation.state === "submitting"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed "
         >
           Fetch
         </button>

@@ -1,7 +1,6 @@
 import { prisma_client } from "~/.server/db";
 import argon2 from "argon2";
-import { Role } from "@prisma/client";
-
+import { Account_Status, Role } from "@prisma/client";
 
 const createUser = async (
     {
@@ -41,6 +40,7 @@ const updateUser = async (
             password?: string;
             fname?: string;
             lname?: string;
+            account_status?: Account_Status;
         };
     },
 ) => {
@@ -59,11 +59,34 @@ const updateUser = async (
 };
 
 const getAllUsers = async () => {
-    return prisma_client.user.findMany();
+    return prisma_client.user.findMany({
+        select: {
+            id: true,
+            userName: true,
+            fname: true,
+            lname: true,
+            role: true,
+            account_status: true,
+            created_at: true,
+            modified_at: true,
+        },
+    });
 };
 
 const getUserFromId = async (id: string) => {
-    return prisma_client.user.findFirst({ where: { id } });
+    return prisma_client.user.findFirst({
+        where: { id },
+        select: {
+            id: true,
+            userName: true,
+            fname: true,
+            lname: true,
+            role: true,
+            account_status: true,
+            created_at: true,
+            modified_at: true,
+        },
+    });
 };
 
 const getUserFromUserName = async (userName: string) => {

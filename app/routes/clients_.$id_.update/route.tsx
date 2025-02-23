@@ -32,34 +32,29 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const clientData = getClientFormData(formData);
   const validationResult = clientSchema.safeParse(clientData);
   if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors };
+    return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
 
-  const { client_fname, client_lname, client_mobile_num, client_area } =
-    validationResult.data;
-
+  
   const { updatedClient } = await updateClient({
-    client_fname,
-    client_lname,
-    client_mobile_num,
-    client_area,
     client_id: id,
+    ...validationResult.data,
   });
-  console.log("Updated CLIent", updatedClient);
+  console.log("Updated Client", updatedClient);
   throw redirect(`/clients/${updatedClient.client_id}`);
 }
 
 export default function Update_Client() {
   const loaderData = useLoaderData<{ client: Client }>();
-  const actionData = useActionData<ClientErrorData>();
+  const actionData = useActionData<{errorMessages: ClientErrorData}>();
 
   const client = {
     ...loaderData.client,
     created_at: new Date(loaderData.client.created_at), // Convert the created_at string back to a Date object
   };
   return (
-    <div className="flex justify-center items-center h-screen">
-      <Client_Form client={client} errorMessage={actionData?.errors} />
+    <div className="flex justify-center items-center min-h-screen">
+      <Client_Form client={client} errorMessage={actionData?.errorMessages} />
     </div>
   );
 }

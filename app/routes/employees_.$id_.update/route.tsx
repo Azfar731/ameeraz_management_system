@@ -65,7 +65,7 @@ export default function Update_Employee() {
   const { employee } = useLoaderData<{ employee: Employee }>();
   console.log(employee);
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center ">
       <Employee_Form employee={employee} errorMessage={actionData?.errors} />
     </div>
   );

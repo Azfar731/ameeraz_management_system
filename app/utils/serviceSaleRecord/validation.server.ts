@@ -30,6 +30,10 @@ const ServiceSaleRecordFetchSchema = z.object({
     })
     .optional(),
 
+  payment_cleared: z.enum(["paid", "pending"]).transform((str) =>
+    str === "paid" ? true : false
+  ).optional(),
+
   client_mobile_num: z
     .string()
     .regex(
@@ -75,7 +79,7 @@ const ServiceSaleRecordFetchSchema = z.object({
 }).superRefine((data) => {
   if (
     !(data.start_date || data.end_date || data.client_mobile_num ||
-      data.category_ids || data.employee_ids || data.deal_ids)
+      data.category_ids || data.employee_ids || data.deal_ids || (data.payment_cleared !== undefined))
   ) {
     data.start_date = new Date();
     data.start_date.setHours(0, 0, 0, 0);
@@ -161,8 +165,6 @@ const ServiceSaleRecordSchema = BaseServiceSaleRecordSchema.refine(
     },
   );
 
-
-  
 const serviceSaleRecordUpdateSchema = BaseServiceSaleRecordSchema.omit({
   mode_of_payment: true,
 }).refine(async (data) => {

@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+//this schema is also used by all-transactions route loader
 const expensesFetchSchema = z.object({
     start_date: z
         .string()
@@ -28,6 +29,7 @@ const expensesFetchSchema = z.object({
 ).superRefine((data) => {
     if (!(data.start_date || data.end_date)) {
         data.start_date = new Date();
+        data.start_date.setHours(0,0,0,0)
     }
 
     if (data.end_date) {

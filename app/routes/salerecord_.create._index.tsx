@@ -4,22 +4,20 @@ import {
   useOutletContext,
   useSubmit,
 } from "@remix-run/react";
-import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  replace,
+} from "@remix-run/node";
 
 import { FormType } from "~/utils/types";
 import { getClientByMobile } from "~/utils/client/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 
-
-
-
-export async function loader({request}: LoaderFunctionArgs){
-  await authenticate({request, requiredClearanceLevel: 1})
-  return null
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
+  return null;
 }
-
-
-
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -59,7 +57,7 @@ export default function Part1() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Form
         method="post"
         onSubmit={handleSubmit}

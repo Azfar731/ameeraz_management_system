@@ -44,13 +44,17 @@ export default function View_Deal() {
 
         <h3 className="font-medium text-gray-700">Active From</h3>
         <h3 className="text-gray-600">{formatDate(deal.activate_from)}</h3>
-        
+
         <h3 className="font-medium text-gray-700">Active till</h3>
-        <h3 className="text-gray-600">{ deal.activate_till? formatDate(deal.activate_till): "NA"}</h3>
+        <h3 className="text-gray-600">
+          {deal.activate_till ? formatDate(deal.activate_till) : "NA"}
+        </h3>
 
         <h3 className="font-medium text-gray-700">Services</h3>
-        <h3 className="text-gray-600">{deal.services.map(serv => serv.serv_name).join(", ")}</h3>
-        
+        <h3 className="text-gray-600">
+          {deal.services.map((serv) => serv.serv_name).join(", ")}
+        </h3>
+
         <Link
           to={`update`}
           className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"

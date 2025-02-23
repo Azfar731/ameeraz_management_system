@@ -2,21 +2,21 @@ import { TransactionType } from "@prisma/client";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { Form, useOutletContext, useSubmit } from "@remix-run/react";
 import Select from "react-select";
-import { getAllTransactionMenuOptions, getSingleTransactionMenuOption } from "~/utils/functions";
+import {
+  getAllTransactionMenuOptions,
+  getSingleTransactionMenuOption,
+} from "~/utils/functions";
 import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
-
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const transaction_type = formData.get("transaction_type")?.toString() || "";
-  if(transaction_type === ""){
+  if (transaction_type === "") {
     throw new Error("Transaction type is required");
   }
-  
-    throw replace("part2");
+
+  throw replace("part2");
 }
-
-
 
 export default function Product_Sale_Record_Create_Part1() {
   //hooks
@@ -39,7 +39,7 @@ export default function Product_Sale_Record_Create_Part1() {
     submit(form);
   };
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Form
         method="post"
         onSubmit={handleSubmit}
@@ -55,12 +55,14 @@ export default function Product_Sale_Record_Create_Part1() {
           options={getAllTransactionMenuOptions()}
           name="transaction_type"
           id="transaction_type"
-          defaultValue={getSingleTransactionMenuOption(formData.transaction_type)}
+          defaultValue={getSingleTransactionMenuOption(
+            formData.transaction_type
+          )}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
           required
         />
-       
+
         <button
           type="submit"
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

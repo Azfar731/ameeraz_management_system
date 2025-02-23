@@ -14,6 +14,11 @@ enum Payment {
 }
 
 
+enum Media_Type {
+  img
+  vid
+}
+
 enum Role {
   admin
   owner
@@ -27,6 +32,40 @@ enum TransactionType {
   returned
 }
 
+enum Account_Status {
+  active
+  inActive
+}
+
+enum Boolean_Strings {
+  true
+  false
+}
+
+enum Header_type {
+  none
+  image
+  text
+  video
+}
+
+enum WP_Variable_Type {
+  text
+  currency
+  date_time
+}
+
+
+enum Client_Property {
+  client_fname
+  client_lname
+  client_area
+  client_mobile_num
+  points
+  none
+}
+
+
 model User {
   id       String    @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   userName String    @unique
@@ -34,6 +73,7 @@ model User {
   fname String
   lname String
   role     Role
+  account_status  Account_Status @default(active)
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
 }
@@ -45,6 +85,7 @@ model Client {
   client_lname String
   client_mobile_num String @unique
   client_area String
+  subscribed Boolean_Strings @default(true)
   points Int @default(0)
   services Service_Sale_Record[]   
   products Product_Sale_Record[]
@@ -207,8 +248,34 @@ model Operational_Expenses {
 }
 
 
+model Template {
+  id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  name String @unique
+  header_type Header_type
+  header_var_name String
+  created_at DateTime @default(now())
+  modified_at DateTime @updatedAt
+
+  variables Template_Variable[]
+}
 
 
+model Template_Variable {
+  id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  name String
+  type WP_Variable_Type
+  template_id String @db.Uuid
+  client_property Client_Property @default(none)
+  template Template @relation(fields: [template_id], references: [id])
+}
+
+
+model Media{
+  id String @id
+  name String @unique
+  type Media_Type 
+  created_at DateTime @default(now())
+}
 
 
 

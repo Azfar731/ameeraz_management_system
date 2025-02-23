@@ -4,13 +4,14 @@ import { Form, useSubmit } from "@remix-run/react";
 import { formatDateToISO } from "shared/utilityFunctions";
 import Select, { OnChangeValue } from "react-select";
 import { useRef } from "react";
+import { SerializeFrom } from "@remix-run/node";
 export default function Deal_Form({
   services,
   deal,
   errorMessage,
 }: {
-  services: Service[];
-  deal?: DealWithServices;
+  services: SerializeFrom<Service>[];
+  deal?: SerializeFrom<DealWithServices>;
   errorMessage?: DealErrors;
 }) {
   //references

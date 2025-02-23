@@ -1,7 +1,9 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { formatDate } from "shared/utilityFunctions";
-import { getProductSaleRecordById, getProductSaleRecordByIdWithRelations } from "~/utils/productSaleRecord/db.server";
+import {
+  getProductSaleRecordByIdWithRelations
+} from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import { generate_heading } from "~/utils/render_functions";
 import { FaLongArrowAltLeft, FaEdit } from "react-icons/fa";
@@ -12,7 +14,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
   }
   const productSaleRecord = await getProductSaleRecordByIdWithRelations({
     id,
-    
   });
   if (!productSaleRecord) {
     throw new Error("Product sale record not found");
@@ -32,7 +33,7 @@ export default function View_Product_Sale_Record() {
       <h4 key={`product${index} name`}>{product.product.prod_name}</h4>
     );
     renderered_products.push(
-      <h4 key={`product${index} price`}>{product.product.prod_price}</h4>
+      <h4 key={`product${index} quantity`}>{product.quantity}</h4>
     );
   });
 
@@ -102,7 +103,7 @@ export default function View_Product_Sale_Record() {
               0
             )}
         </h3>
-        {generate_heading("Products", "Name", "Price")}
+        {generate_heading("Products", "Name", "Quantity")}
         {renderered_products}
         {generate_heading("Transactions", "Date", "Amount Paid")}
         {render_transactions()}

@@ -1,14 +1,16 @@
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import { Employee } from "@prisma/client";
 import { EmployeeErrors } from "~/utils/employee/types";
 import Select from "react-select";
+import { SerializeFrom } from "@remix-run/node";
 export default function Employee_Form({
   employee,
   errorMessage,
 }: {
-  employee?: Employee;
+  employee?:  SerializeFrom<Employee>;
   errorMessage?: EmployeeErrors;
 }) {
+  const navigation = useNavigation();
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
       <div className="w-full flex justify-center items-center">
@@ -146,7 +148,8 @@ export default function Employee_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {employee ? "Update" : "Register"}
         </button>

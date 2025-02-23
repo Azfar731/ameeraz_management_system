@@ -1,4 +1,5 @@
 import { PrismaClient, Role, Service } from "@prisma/client";
+import { subscribe } from "diagnostics_channel";
 import { createCategory } from "~/utils/category/db.server";
 import { createClient } from "~/utils/client/db.server";
 import { createEmployee } from "~/utils/employee/db.server";
@@ -14,6 +15,7 @@ async function create_clients() {
             client_lname: "Razzaq",
             client_area: "Lahore",
             client_mobile_num: "03134549126",
+            
         },
         {
             client_fname: "Lailma",
@@ -221,15 +223,16 @@ async function create_users(){
 }
 
 async function main() {
-    const clients = await create_clients();
-    const employees = await create_employees();
-    const categories = await create_categories();
-    const services = await create_services();
-    const deals = await create_deals();
-    const vendors = await create_vendors();
-    const products = await create_products();
-    const users = await create_users();
-    console.log(clients, employees, categories, services, deals, vendors, products, users);
+    // const clients = await create_clients();
+    // const employees = await create_employees();
+    // const categories = await create_categories();
+    // const services = await create_services();
+    // const deals = await create_deals();
+    // const vendors = await create_vendors();
+    // const products = await create_products();
+    await create_users();
+    // console.log(clients, employees, categories, services, deals, vendors, products, users);
+    
     prisma_client.$disconnect();
 }
 

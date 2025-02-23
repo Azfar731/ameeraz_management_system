@@ -24,6 +24,15 @@ const Nav: React.FC<NavProps> = ({ closeNav }: { closeNav: () => void }) => {
             Sale Records
           </NavLink>
           <NavLink
+            to="/products-sale-record"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Product Sale Records
+          </NavLink>
+          <NavLink
             to="/clients"
             className={({ isActive }) =>
               isActive ? "underline font-bold text-pink-500" : "hover:underline"
@@ -67,6 +76,42 @@ const Nav: React.FC<NavProps> = ({ closeNav }: { closeNav: () => void }) => {
             onClick={closeNav}
           >
             Employees
+          </NavLink>
+          <NavLink
+            to="/transactions"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Transactions
+          </NavLink>
+          <NavLink
+            to="/products"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Products
+          </NavLink>
+          <NavLink
+            to="/vendors"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Vendors
+          </NavLink>
+          <NavLink
+            to="/users"
+            className={({ isActive }) =>
+              isActive ? "underline font-bold text-pink-500" : "hover:underline"
+            }
+            onClick={closeNav}
+          >
+            Users
           </NavLink>
         </nav>
       </div>

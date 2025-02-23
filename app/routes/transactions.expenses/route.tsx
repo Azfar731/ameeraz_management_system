@@ -1,15 +1,14 @@
+// Expenses.tsx
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData, useSearchParams, Link } from "@remix-run/react";
-import { getTheme } from "@table-library/react-table-library/baseline";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { formatDate, formatDateToISO } from "shared/utilityFunctions";
+import { formatDateToISO } from "shared/utilityFunctions";
 import { getOperationalExpenses } from "~/utils/expenses/db.server";
 import { Operational_Expenses } from "@prisma/client";
 import { expensesFetchSchema } from "~/utils/expenses/validation.server";
 import { setSearchParameters } from "~/utils/functions";
-import { FaExternalLinkAlt, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { ExpenseDateErrors } from "~/utils/expenses/types";
+import CompactTableComponent from "./ExpensesTable";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -39,53 +38,9 @@ export default function Expenses() {
     expenses: Operational_Expenses[];
     errorMessages: ExpenseDateErrors;
   }>();
-  console.log("Expenses: ", expenses);
   const current_date = formatDateToISO(new Date());
 
-  const nodes = [...expenses];
-  const data = { nodes };
-
-  const COLUMNS = [
-    {
-      label: "Date",
-      renderCell: (item: Operational_Expenses) => formatDate(item.created_at),
-    },
-    {
-      label: "Amount Paid",
-      renderCell: (item: Operational_Expenses) => item.amount_paid,
-    },
-    {
-      label: "Description",
-      renderCell: (item: Operational_Expenses) => item.description,
-    },
-    {
-      label: "View",
-      renderCell: (item: Operational_Expenses) => (
-        <Link to={`${item.expense_id}`}>
-          {" "}
-          <FaExternalLinkAlt />{" "}
-        </Link>
-      ),
-    },
-  ];
-
-  const theme = useTheme([
-    getTheme(),
-    {
-      HeaderRow: `
-        background-color: #eaf5fd;
-      `,
-      Row: `
-        &:nth-of-type(odd) {
-          background-color: #d2e9fb;
-        }
-
-        &:nth-of-type(even) {
-          background-color: #eaf5fd;
-        }
-      `,
-    },
-  ]);
+  
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -162,10 +117,10 @@ export default function Expenses() {
           to="create"
           className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
-          Create Transaction <FaPlus />
+          Create  Expense <FaPlus />
         </Link>
         <div className="mt-6">
-          <CompactTable columns={COLUMNS} data={data} theme={theme} />
+          <CompactTableComponent expenses={expenses} />
         </div>
       </div>
     </div>

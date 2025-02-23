@@ -9,6 +9,7 @@ async function fetchServiceSaleRecords(
         deal_ids,
         category_ids,
         employee_ids,
+        payment_cleared,
     }: {
         start_date?: Date | undefined;
         end_date?: Date | undefined;
@@ -16,12 +17,14 @@ async function fetchServiceSaleRecords(
         deal_ids?: string[] | undefined;
         category_ids?: string[] | undefined;
         employee_ids?: string[] | undefined;
+        payment_cleared?: boolean | undefined;
     },
 ) {
     return prisma_client.service_Sale_Record.findMany({
         where: {
             created_at: { gte: start_date, lte: end_date },
             client: { client_mobile_num },
+            payment_cleared,
             deal_records: {
                 some: {
                     deal: {
@@ -42,7 +45,7 @@ async function fetchServiceSaleRecords(
             client: true,
             transactions: true,
             deal_records: { include: { deal: true } },
-            employees: true,
+            employees: {include: {employee: true}},
         },
     });
 }

@@ -2,6 +2,7 @@ import { ServiceErrors, ServiceWithRelations } from "~/utils/service/types";
 import { Form } from "@remix-run/react";
 import Select from "react-select";
 import { Category } from "@prisma/client";
+import { SerializeFrom } from "@remix-run/node";
 
 export default function Service_Form({
   categories,
@@ -9,7 +10,7 @@ export default function Service_Form({
   errorMessage,
 }: {
   categories: Category[];
-  service?: ServiceWithRelations;
+  service?: SerializeFrom<ServiceWithRelations>;
   errorMessage?: ServiceErrors;
 }) {
   const category_options = categories.map((category) => ({

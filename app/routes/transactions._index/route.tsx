@@ -1,20 +1,23 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
-import { getTheme } from "@table-library/react-table-library/baseline";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { useRef, useState } from "react";
-import { FaExternalLinkAlt, FaPlus } from "react-icons/fa";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useSearchParams,
+  useNavigation,
+} from "@remix-run/react";
+import { useRef } from "react";
+import { FaPlus } from "react-icons/fa";
 import Select, { OnChangeValue } from "react-select";
-import { formatDate, formatDateToISO } from "shared/utilityFunctions";
+import { formatDateToISO } from "shared/utilityFunctions";
 import { getClientTransactions } from "~/utils/clientTransaction/db.server";
 import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
 import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation.server";
 import {
-  capitalizeFirstLetter,
   getAllPaymentMenuOptions,
   setSearchParameters,
 } from "~/utils/functions";
+import ClientTransactionsTable from "./ClientTransactionsTable";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -22,9 +25,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const validationResult = clientTransactionFetchSchema.safeParse(formValues);
   if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors, transactions: [] };
+    return {
+      errors: validationResult.error.flatten().fieldErrors,
+      transactions: [],
+    };
   }
-  console.log("Validation Result: ", validationResult.data);
   const transactions = await getClientTransactions(validationResult.data);
   return { transactions, errors: {} };
 }
@@ -48,6 +53,7 @@ export default function Client_Transactions() {
   const { transactions } = useLoaderData<{
     transactions: ClientTransactionWithRelations[];
   }>();
+  const navigation = useNavigation();
 
   //references
   const payment_option_ref = useRef<{ value: string; label: string }[]>([]);
@@ -58,129 +64,6 @@ export default function Client_Transactions() {
   //other values
   const current_date = formatDateToISO(new Date());
   let error_message = "";
-
-  //table values
-  const nodes = [...transactions];
-  const data = { nodes };
-  const [ids, setIds] = useState<string[]>([]);
-
-  const handleExpand = (item: ClientTransactionWithRelations) => {
-    if (ids.includes(item.client_transaction_id)) {
-      setIds(ids.filter((id) => id !== item.client_transaction_id));
-    } else {
-      setIds(ids.concat(item.client_transaction_id));
-    }
-  };
-
-  const ROW_PROPS = {
-    onClick: handleExpand,
-  };
-
-  const ROW_OPTIONS = {
-    renderAfterRow: (item: ClientTransactionWithRelations) => (
-      <>
-        {ids.includes(item.client_transaction_id) && (
-          <tr style={{ display: "flex", gridColumn: "1 / -1" }}>
-            <td style={{ flex: "1" }}>
-              <ul
-                style={{
-                  margin: "0",
-                  padding: "0",
-                  backgroundColor: "#e0e0e0",
-                }}
-              >
-                <li>
-                  <Link
-                    to={`/salerecord/${item.record.service_record_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:font-semibold"
-                  >
-                    Sale Record Link
-                  </Link>
-                </li>
-                <li>
-                  <strong>Total Amount: </strong>
-                  {item.record.total_amount}
-                </li>
-                <li>
-                  <strong>Client Mobile Number: </strong>
-                  {item.record.client.client_mobile_num}
-                </li>
-                <li>
-                  <strong>Deals/Services: </strong>
-                  {item.record.deals.map((deal) => deal.deal_name).join(", ")}
-                </li>
-              </ul>
-            </td>
-          </tr>
-        )}
-      </>
-    ),
-  };
-
-  const COLUMNS = [
-    {
-      label: "Date",
-      renderCell: (item: ClientTransactionWithRelations) =>
-        formatDate(item.created_at),
-    },
-    {
-      label: "Client Name",
-      renderCell: (item: ClientTransactionWithRelations) =>
-        `${item.record.client.client_fname} ${item.record.client.client_lname}`,
-    },
-    {
-      label: "Paid Amount",
-      renderCell: (item: ClientTransactionWithRelations) => item.amount_paid,
-    },
-    {
-      label: "Payment Cleared",
-      renderCell: (item: ClientTransactionWithRelations) =>
-        item.record.payment_cleared ? "Yes" : "No",
-    },
-    {
-      label: "Mode of Payment",
-      renderCell: (item: ClientTransactionWithRelations) =>
-        capitalizeFirstLetter(item.mode_of_payment),
-    },
-    {
-      label: "Deals/Services",
-      renderCell: (item: ClientTransactionWithRelations) =>
-        item.record.deals.map((deal) => deal.deal_name).join(", "),
-    },
-
-    {
-      label: "View",
-      renderCell: (item: ClientTransactionWithRelations) => {
-        return (
-          <Link
-            to={`/transactions/clientTransactions/${item.client_transaction_id}`}
-          >
-            <FaExternalLinkAlt />
-          </Link>
-        );
-      },
-    },
-  ];
-
-  const theme = useTheme([
-    getTheme(),
-    {
-      HeaderRow: `
-        background-color: #eaf5fd;
-      `,
-      Row: `
-        &:nth-of-type(odd) {
-          background-color: #d2e9fb;
-        }
-
-        &:nth-of-type(even) {
-          background-color: #eaf5fd;
-        }
-      `,
-    },
-  ]);
 
   const fetchFormValues = (formData: FormData) => {
     const start_date: string = (formData.get("start_date") as string) || "";
@@ -218,6 +101,7 @@ export default function Client_Transactions() {
   ) => {
     payment_option_ref.current = [...newValue];
   };
+
   return (
     <div className="mt-8">
       <div className="w-full flex justify-center items-center ">
@@ -303,26 +187,23 @@ export default function Client_Transactions() {
         )}
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
         >
           Fetch
         </button>
       </Form>
       <div className="mt-20">
-      <Link
-          to="create"
+        <Link
+          to="clientTransactions/create"
           className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
           Create Transaction <FaPlus />
         </Link>
         <div className="mt-6">
-          <CompactTable
-            columns={COLUMNS}
-            data={data}
-            theme={theme}
-            rowProps={ROW_PROPS}
-            rowOptions={ROW_OPTIONS}
-          />
+          <ClientTransactionsTable transactions={transactions} />
         </div>
       </div>
     </div>

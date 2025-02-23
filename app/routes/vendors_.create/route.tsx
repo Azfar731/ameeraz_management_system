@@ -23,7 +23,7 @@ export default function Create_Vendor() {
   const actionData = useActionData<{ errors: VendorErrors }>();
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Vendor_Form errorMessages={actionData?.errors} />
     </div>
   );

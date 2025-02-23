@@ -4,7 +4,7 @@ import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types"
 import ProductSaleRecordTable from "../products-sale-record/ProductSaleRecordTable";
 export async function loader() {
   const pending_records = await getProductSaleRecords({
-    payment_status: "pending",
+    payment_cleared: false,
   });
   return { pending_records };
 }

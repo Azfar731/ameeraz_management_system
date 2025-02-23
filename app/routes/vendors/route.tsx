@@ -1,8 +1,13 @@
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useSearchParams,
+  useNavigation,
+} from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
-
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { fetchVendors } from "~/utils/vendors/db.server";
 import { Vendor } from "@prisma/client";
@@ -35,16 +40,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return { vendors: [], errorMessages: {} };
 }
 
-
-
-
-
 export default function Vendors() {
-    const [, setSearchParams] = useSearchParams();
-  const { vendors, errorMessages } = useLoaderData<{ vendors: Vendor[], errorMessages:VendorErrors  }>();
+  const [, setSearchParams] = useSearchParams();
+  const { vendors, errorMessages } = useLoaderData<{
+    vendors: Vendor[];
+    errorMessages: VendorErrors;
+  }>();
+  const navigation = useNavigation();
   console.log("Vendors Fetched: ", vendors);
 
-  
   const nodes = [...vendors];
   const data = { nodes };
 
@@ -64,9 +68,7 @@ export default function Vendors() {
     {
       label: "View",
       renderCell: (item: Vendor) => (
-        <Link
-          to={`${item.vendor_id}`}
-        >
+        <Link to={`${item.vendor_id}`}>
           <FaExternalLinkAlt />
         </Link>
       ),
@@ -80,13 +82,11 @@ export default function Vendors() {
     const mobile_num = (formData.get("mobile_num") as string) || "";
     const fname = (formData.get("fname") as string) || "";
     const lname = (formData.get("lname") as string) || "";
-    if (mobile_num || fname || lname ) {
-      return { mobile_num, fname, lname};
+    if (mobile_num || fname || lname) {
+      return { mobile_num, fname, lname };
     }
     return null;
   };
-
-  
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -97,7 +97,6 @@ export default function Vendors() {
     }
     setSearchParameters(formValues, setSearchParams);
   };
-  
 
   return (
     <div className="m-8">
@@ -121,10 +120,11 @@ export default function Vendors() {
           id="mobile_num"
           className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
           placeholder="03334290689"
-          
         />
         {errorMessages?.vendor_mobile_num && (
-          <h2 className="text-red-500 font-semibold">{errorMessages?.vendor_mobile_num[0]}</h2>
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages?.vendor_mobile_num[0]}
+          </h2>
         )}
         <label
           htmlFor="fname"
@@ -141,7 +141,9 @@ export default function Vendors() {
           placeholder="Ali"
         />
         {errorMessages?.vendor_fname && (
-          <h2 className="text-red-500 font-semibold">{errorMessages?.vendor_fname[0]}</h2>
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages?.vendor_fname[0]}
+          </h2>
         )}
         <label
           htmlFor="lname"
@@ -158,11 +160,16 @@ export default function Vendors() {
           placeholder="Khan"
         />
         {errorMessages?.vendor_lname && (
-          <h2 className="text-red-500 font-semibold">{errorMessages?.vendor_lname[0]}</h2>
+          <h2 className="text-red-500 font-semibold">
+            {errorMessages?.vendor_lname[0]}
+          </h2>
         )}
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
         >
           Fetch
         </button>

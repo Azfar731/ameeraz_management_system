@@ -343,7 +343,7 @@ export default function Part2() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <Form
         method="post"
         onSubmit={handleSubmit}

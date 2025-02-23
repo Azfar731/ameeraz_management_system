@@ -5,7 +5,6 @@ import { createClientTransaction } from "~/utils/clientTransaction/db.server";
 import { getClientTransactionFormData } from "~/utils/clientTransaction/functions";
 import { ClientTransactionErrors } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
-import { updateServiceSaleRecordDateTypes } from "~/utils/serviceSaleRecord/functions";
 import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { getServiceSaleRecordFromId } from "~/utils/serviceSaleRecord/db.server";
 import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
@@ -53,7 +52,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 }
 
 export default function Client_Transaction_Create_Part2() {
-  const loaderData = useLoaderData<{
+  const {service_sale_record} = useLoaderData<{
     service_sale_record: Omit<
       ServiceSaleRecordWithRelations,
       "employees" | "deals"
@@ -63,11 +62,11 @@ export default function Client_Transaction_Create_Part2() {
   const actionData = useActionData<{ errors: ClientTransactionErrors }>();
 
   //converting the type of Date objects
-  const service_sale_record = updateServiceSaleRecordDateTypes(
-    loaderData.service_sale_record
-  );
+  // const service_sale_record = updateServiceSaleRecordDateTypes(
+  //   loaderData.service_sale_record
+  // );
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center min-h-screen">
       <ClientTransaction_Form
         service_sale_record={service_sale_record}
         errorMessages={actionData?.errors}

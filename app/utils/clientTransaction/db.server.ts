@@ -27,7 +27,7 @@ const getClientTransactions = async ({
         },
         include: {
             record: {
-                include: { deals: true, client: true },
+                include: { deal_records: { include: { deal: true} }, client: true },
             },
         },
     });
@@ -41,7 +41,11 @@ const getClientTransactionFromID = async (
         include: {
             record: includeRecord
                 ? {
-                    include: { deals: true, client: true, transactions: true },
+                    include: {
+                        deal_records: { include: { deal: true} },
+                        client: true,
+                        transactions: true,
+                    },
                 }
                 : false,
         },
@@ -108,6 +112,8 @@ const updateClientTransaction = async (
 
     return updated_transaction;
 };
+
+
 
 export {
     createClientTransaction,

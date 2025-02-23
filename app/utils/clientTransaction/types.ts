@@ -4,7 +4,7 @@ type ClientTransactionWithRelations = Prisma.Client_TransactionGetPayload<{
     include: {
         record: {
             include: {
-                deals: true;
+                deal_records: {include: { deal: true}};
                 client: true;
                 transactions: true;
             };

@@ -6,6 +6,7 @@ import {
   Link,
   useLoaderData,
   useNavigate,
+  useNavigation,
   useSearchParams,
 } from "@remix-run/react";
 import { useState } from "react";
@@ -29,6 +30,8 @@ import { getAllEmployees } from "~/utils/employee/db.server";
 import { getAllDeals } from "~/utils/deal/db.server";
 import { getAllCategories } from "~/utils/category/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
+import { FaPlus } from "react-icons/fa";
+
 export const meta: MetaFunction = () => {
   return [
     { title: "Ameeraz Management" },
@@ -38,9 +41,8 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   //authenticate user
-  await authenticate({request,requiredClearanceLevel: 1})
-  
-  
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const searchParams = new URL(request.url).searchParams;
 
   // Extract filters
@@ -78,12 +80,8 @@ function extractFilters(searchParams: URLSearchParams) {
 
   const start_date = searchParams.get("start_date") || undefined;
   const end_date = searchParams.get("end_date") || undefined;
-
-  // const deal_ids = searchParams.get("all_deals")?.split("|");
-  // const employee_ids = searchParams.get("employees")?.split("|");
-  // const category_ids = searchParams.get("categories")?.split("|");
   const client_mobile_num = searchParams.get("mobile_num") || undefined;
-
+  const payment_cleared = searchParams.get("payment_cleared") || undefined;
   const deals = searchParams.getAll("deals").filter((val) => val !== "");
   const services = searchParams.getAll("services").filter((val) => val !== "");
   const employee_ids = searchParams
@@ -103,6 +101,7 @@ function extractFilters(searchParams: URLSearchParams) {
     client_mobile_num,
     start_date,
     end_date,
+    payment_cleared
   };
 }
 
@@ -114,6 +113,7 @@ export default function Index() {
   });
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const navigation = useNavigation();
 
   //loader Data
   const { service_records, deals, employees, categories, errorMessages } =
@@ -128,15 +128,27 @@ export default function Index() {
   //search Parameter values
   const start_date = searchParams.get("startDate");
   const end_date = searchParams.get("endDate");
-  const all_deals = searchParams.get("deals")?.split("|") || [];
+  const all_deals =
+    searchParams
+      .get("deals")
+      ?.split("|")
+      .filter((val) => val !== "") || [];
   const sel_deals = all_deals.filter(
     (id) => !deals.find((deal) => deal.deal_id === id)?.auto_generated
   );
   const sel_services = all_deals.filter(
     (id) => deals.find((deal) => deal.deal_id === id)?.auto_generated
   );
-  const sel_emp = searchParams.get("employees")?.split("|") || [];
-  const sel_categories = searchParams.get("categories")?.split("|") || [];
+  const sel_emp =
+    searchParams
+      .get("employees")
+      ?.split("|")
+      .filter((val) => val !== "") || [];
+  const sel_categories =
+    searchParams
+      .get("categories")
+      ?.split("|")
+      .filter((val) => val !== "") || [];
 
   //default form Options
   const def_deals = sel_deals.map((id) => ({
@@ -308,9 +320,27 @@ export default function Index() {
             {errorMessages.category_ids[0]}
           </h2>
         )}
+        <label
+          htmlFor="payment_cleared"
+          className="block text-gray-700 text-sm font-bold mt-4"
+        >
+          Payment Status
+        </label>
+        <Select
+          id="payment_cleared"
+          name="payment_cleared"
+          options={[
+            { value: "paid", label: "Paid" },
+            { value: "pending", label: "Pending" },
+            {value: undefined, label: "Any"}
+          ]}
+          className="basic-multi-select mt-2"
+          classNamePrefix="select"
+        />
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={navigation.state === "submitting" || navigation.state === "loading"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           Fetch
         </button>
@@ -319,14 +349,13 @@ export default function Index() {
       <div className="mt-20">
         <Link
           to="/salerecord/create"
-          className=" bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded "
         >
-          Create a new record
+          Create a new record <FaPlus />
         </Link>
         <div className="mt-6">
           <SalesRecordTable
             serviceRecords={service_records}
-            employees={employees}
             onEdit={(id) => navigate(`/salerecord/${id}`)}
           />
         </div>

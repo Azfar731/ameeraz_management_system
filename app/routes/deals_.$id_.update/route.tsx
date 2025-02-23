@@ -3,9 +3,7 @@ import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
 import Deal_Form from "~/components/deals/deal_form";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import {
-  getDealFormData
-} from "~/utils/deal/functions.server";
+import { getDealFormData } from "~/utils/deal/functions.server";
 import { dealSchema } from "~/utils/deal/validation";
 import { getActiveServices } from "~/utils/service/db.server";
 import { getDealFromId, updateDeal } from "~/utils/deal/db.server";
@@ -44,23 +42,22 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function Update_Deal() {
-  const loaderData = useLoaderData<{
+  const { deal, services } = useLoaderData<{
     deal: DealWithServices;
     services: Service[];
   }>();
   const actionData = useActionData<{ errors: DealErrors }>();
-  const services = loaderData.services;
 
   //convert date strings back to dates
-  const deal = {
-    ...loaderData.deal,
-    created_at: new Date(loaderData.deal.created_at),
-    modified_at: new Date(loaderData.deal.modified_at),
-    activate_from: new Date(loaderData.deal.activate_from),
-    activate_till: loaderData.deal.activate_till
-      ? new Date(loaderData.deal.activate_till)
-      : null,
-  };
+  // const deal = {
+  //   ...loaderData.deal,
+  //   created_at: new Date(loaderData.deal.created_at),
+  //   modified_at: new Date(loaderData.deal.modified_at),
+  //   activate_from: new Date(loaderData.deal.activate_from),
+  //   activate_till: loaderData.deal.activate_till
+  //     ? new Date(loaderData.deal.activate_till)
+  //     : null,
+  // };
 
   return (
     <div className="flex justify-center">

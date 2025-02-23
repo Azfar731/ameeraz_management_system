@@ -1,6 +1,11 @@
 import { TransactionType } from "@prisma/client";
 import { ActionFunctionArgs, replace } from "@remix-run/node";
-import { Form, useOutletContext, useSubmit } from "@remix-run/react";
+import {
+  Form,
+  useOutletContext,
+  useSubmit,
+  useNavigation,
+} from "@remix-run/react";
 import Select from "react-select";
 import {
   getAllTransactionMenuOptions,
@@ -19,6 +24,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Product_Sale_Record_Create_Part1() {
+  const navigation = useNavigation();
   //hooks
   const submit = useSubmit();
   const { formData, setFormData } = useOutletContext<{
@@ -65,7 +71,10 @@ export default function Product_Sale_Record_Create_Part1() {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
         >
           Next
         </button>

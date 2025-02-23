@@ -1,6 +1,12 @@
 // Expenses.tsx
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useSearchParams, Link } from "@remix-run/react";
+import {
+  Form,
+  useLoaderData,
+  useSearchParams,
+  Link,
+  useNavigation,
+} from "@remix-run/react";
 import { formatDateToISO } from "shared/utilityFunctions";
 import { getOperationalExpenses } from "~/utils/expenses/db.server";
 import { Operational_Expenses } from "@prisma/client";
@@ -33,14 +39,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Expenses() {
+  const navigation = useNavigation();
   const [, setSearchParams] = useSearchParams();
   const { expenses, errorMessages } = useLoaderData<{
     expenses: Operational_Expenses[];
     errorMessages: ExpenseDateErrors;
   }>();
   const current_date = formatDateToISO(new Date());
-
-  
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -107,7 +112,10 @@ export default function Expenses() {
         )}
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
         >
           Fetch
         </button>
@@ -117,7 +125,7 @@ export default function Expenses() {
           to="create"
           className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
         >
-          Create  Expense <FaPlus />
+          Create Expense <FaPlus />
         </Link>
         <div className="mt-6">
           <CompactTableComponent expenses={expenses} />

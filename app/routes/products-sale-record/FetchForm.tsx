@@ -1,6 +1,6 @@
 import { Product, TransactionType } from "@prisma/client";
 import Select from "react-select";
-import { Form, useSearchParams } from "@remix-run/react";
+import { Form, useSearchParams, useNavigation } from "@remix-run/react";
 import { formatDateToISO } from "shared/utilityFunctions";
 import { getProductOptions } from "~/utils/selectMenuOptionFunctions";
 import {
@@ -18,6 +18,7 @@ export default function FetchForm({
   products: SerializeFrom<Product>[];
   errorMessages: ProductSaleRecordFetchErrors;
 }) {
+  const navigation = useNavigation();
   //searchParam values
   const [searchParams, setSearchParams] = useSearchParams();
   const start_date = searchParams.get("start_date");
@@ -59,7 +60,7 @@ export default function FetchForm({
       transaction_types,
       client_mobile_num,
       vendor_mobile_num,
-      payment_cleared
+      payment_cleared,
     };
   };
 
@@ -219,7 +220,7 @@ export default function FetchForm({
         options={[
           { value: "paid", label: "Paid" },
           { value: "pending", label: "Pending" },
-          { value: undefined, label: "Any"}
+          { value: undefined, label: "Any" },
         ]}
         className="basic-multi-select mt-2"
         classNamePrefix="select"
@@ -231,7 +232,10 @@ export default function FetchForm({
       )}
       <button
         type="submit"
-        className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+        disabled={
+          navigation.state === "loading" || navigation.state === "submitting"
+        }
       >
         Fetch
       </button>

@@ -1,6 +1,6 @@
 import { Payment, Product, TransactionType } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
-import { Form, useSearchParams } from "@remix-run/react";
+import { Form, useSearchParams, useNavigation } from "@remix-run/react";
 import Select from "react-select";
 import { formatDateToISO } from "shared/utilityFunctions";
 import {
@@ -19,6 +19,7 @@ export default function Product_Transaction_FetchForm({
 }) {
   const [searchParams] = useSearchParams();
   const newSearchParams = new URLSearchParams(searchParams);
+  const navigation = useNavigation();
 
   // Remove keys with empty values
   for (const [key, value] of newSearchParams.entries()) {
@@ -93,7 +94,7 @@ export default function Product_Transaction_FetchForm({
         options={[
           { value: "client", label: "Client" },
           { value: "vendor", label: "Vendor" },
-          {value: "", label: "None"},
+          { value: "", label: "None" },
         ]}
         defaultValue={
           newSearchParams.get("userType")
@@ -165,7 +166,8 @@ export default function Product_Transaction_FetchForm({
         options={getAllPaymentMenuOptions()}
         defaultValue={
           newSearchParams
-            .getAll("payment_options").filter(val => val !== "")
+            .getAll("payment_options")
+            .filter((val) => val !== "")
             ?.map((mode) => getSinglePaymentMenuOption(mode as Payment)) ||
           undefined
         }
@@ -190,7 +192,8 @@ export default function Product_Transaction_FetchForm({
         defaultValue={
           newSearchParams
             .getAll("transaction_types")
-            ?.filter(val => val !== "").map((mode) =>
+            ?.filter((val) => val !== "")
+            .map((mode) =>
               getSingleTransactionMenuOption(mode as TransactionType)
             ) || undefined
         }
@@ -216,11 +219,14 @@ export default function Product_Transaction_FetchForm({
           label: product.prod_name,
         }))}
         defaultValue={
-          newSearchParams.getAll("products")?.filter(val => val !== "").map((prod_id) => ({
-            value: prod_id,
-            label: products.find((product) => product.prod_id === prod_id)
-              ?.prod_name,
-          })) || undefined
+          newSearchParams
+            .getAll("products")
+            ?.filter((val) => val !== "")
+            .map((prod_id) => ({
+              value: prod_id,
+              label: products.find((product) => product.prod_id === prod_id)
+                ?.prod_name,
+            })) || undefined
         }
         className="basic-multi-select mb-4"
         classNamePrefix="select"
@@ -232,7 +238,10 @@ export default function Product_Transaction_FetchForm({
       )}
       <button
         type="submit"
-        className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+        disabled={
+          navigation.state === "loading" || navigation.state === "submitting"
+        }
       >
         Fetch
       </button>

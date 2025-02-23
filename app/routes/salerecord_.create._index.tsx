@@ -3,6 +3,7 @@ import {
   useActionData,
   useOutletContext,
   useSubmit,
+  useNavigation,
 } from "@remix-run/react";
 import {
   ActionFunctionArgs,
@@ -45,7 +46,7 @@ export default function Part1() {
     formData: FormType;
     setFormData: React.Dispatch<React.SetStateAction<FormType>>;
   }>();
-
+  const navigation = useNavigation();
   const submit = useSubmit();
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     const form = event.currentTarget;
@@ -84,7 +85,8 @@ export default function Part1() {
         ) : undefined}
         <button
           type="submit"
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={navigation.state === "loading" || navigation.state === "submitting"}
         >
           Next
         </button>

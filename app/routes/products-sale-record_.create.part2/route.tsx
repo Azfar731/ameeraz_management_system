@@ -7,6 +7,7 @@ import {
   useNavigate,
   useOutletContext,
   useSubmit,
+  useNavigation,
 } from "@remix-run/react";
 import { getClientByMobile } from "~/utils/client/db.server";
 import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
@@ -55,6 +56,7 @@ export default function Product_Sale_Record_Create_Part2() {
   const actionData = useActionData<{ error: string }>();
   const { transaction_type } = formData;
   const formRef = useRef<HTMLFormElement>(null);
+  const navigation = useNavigation();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     const form = event.currentTarget;
@@ -153,7 +155,8 @@ export default function Product_Sale_Record_Create_Part2() {
           </button>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={navigation.state === "loading" || navigation.state === "submitting"}
           >
             Next
           </button>

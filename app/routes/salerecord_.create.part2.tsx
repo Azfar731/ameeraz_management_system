@@ -11,6 +11,7 @@ import {
   useOutletContext,
   useSubmit,
   useNavigate,
+  useNavigation,
 } from "@remix-run/react";
 import { prisma_client } from "~/.server/db";
 import { Client, Deal } from "@prisma/client";
@@ -68,6 +69,7 @@ function validatePayment(amount_paid: number, amount_charged: number) {
 }
 
 export default function Part2() {
+  const navigation = useNavigation();
   //context
   const { formData, setFormData } = useOutletContext<{
     formData: FormType;
@@ -474,7 +476,8 @@ export default function Part2() {
           </button>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={navigation.state === "loading" || navigation.state === "submitting"}
           >
             Next
           </button>

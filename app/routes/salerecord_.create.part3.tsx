@@ -7,6 +7,7 @@ import {
   useSubmit,
   useNavigate,
   useActionData,
+  useNavigation,
 } from "@remix-run/react";
 import { useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
@@ -50,6 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function Part3() {
+  const navigation = useNavigation();
   //action data
   const actionData = useActionData<{
     errorMessages: ServiceSaleRecordCreateErrors;
@@ -226,7 +228,8 @@ export default function Part3() {
           </button>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={navigation.state === "loading" || navigation.state === "submitting"}
           >
             Next
           </button>

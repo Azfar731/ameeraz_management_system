@@ -16,13 +16,19 @@ import Product_Sale_Record_Form from "./product_Sale_Record_Form";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Product sale record ID is required");
+    throw new Response("ID not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const productSaleRecord = await getProductSaleRecordByIdWithRelations({
     id,
   });
   if (!productSaleRecord) {
-    throw new Error("Product sale record not found");
+    throw new Response("Product sale record not found", {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   const products = await getAllProducts();
   return { productSaleRecord, products };
@@ -42,13 +48,19 @@ type ActionDataObject = {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Product sale record ID is required");
+    throw new Response("ID not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const oldProductSaleRecord = await getProductSaleRecordByIdWithRelations({
     id,
   });
   if (!oldProductSaleRecord) {
-    throw new Error("Product sale record not found");
+    throw new Response("Product sale record not found", {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   const data = (await request.json()) as ActionDataObject;
   console.log("Data", data);

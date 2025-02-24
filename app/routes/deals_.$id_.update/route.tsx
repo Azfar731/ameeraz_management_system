@@ -11,11 +11,17 @@ import { getDealFromId, updateDeal } from "~/utils/deal/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id parameter not found in URL");
+    throw new Response("Id parameter not found in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const deal = await getDealFromId({ id, includeServices: true });
   if (!deal) {
-    throw new Error(`No deal found with id: ${id}`);
+    throw new Response(`No deal found with id: ${id}`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   const services = await getActiveServices();
   return { deal, services };
@@ -24,7 +30,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No id provided in the URL");
+    throw new Response("No id provided in the URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const formData = await request.formData();
   const dealFormData = getDealFormData(formData);

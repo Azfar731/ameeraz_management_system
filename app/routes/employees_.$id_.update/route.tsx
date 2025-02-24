@@ -14,11 +14,17 @@ import { getEmployeeFromId, updateEmployee } from "~/utils/employee/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Employee id not provided for Employee Update Page");
+    throw new Response("Id not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const employee = await getEmployeeFromId(id);
   if (!employee) {
-    throw new Error(`Employee with id ${id} not found`);
+    throw new Response(`Employee with id ${id} not found`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { employee };
 }
@@ -26,7 +32,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not found in URL");
+    throw new Response("Id not found in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
 
   const formData = await request.formData();
@@ -57,7 +66,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   throw replace(`/employees/${updated_employee.emp_id}`);
 }
-
 
 export default function Update_Employee() {
   const actionData = useActionData<{ errors: EmployeeErrors }>();

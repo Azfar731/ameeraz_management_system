@@ -7,11 +7,17 @@ import { getEmployeeFromId } from "~/utils/employee/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in URL");
+    throw new Response("Id not provided in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const employee = await getEmployeeFromId(id);
   if (!employee) {
-    throw new Error(`Client with id:${id} not found`);
+    throw new Response(`Employee with id:${id} not found`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { employee };
 }

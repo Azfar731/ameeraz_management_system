@@ -1,22 +1,26 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { formatDate } from "shared/utilityFunctions";
-import {
-  getProductSaleRecordByIdWithRelations
-} from "~/utils/productSaleRecord/db.server";
+import { getProductSaleRecordByIdWithRelations } from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import { generate_heading } from "~/utils/render_functions";
 import { FaLongArrowAltLeft, FaEdit } from "react-icons/fa";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Product sale record ID is required");
+    throw new Response("ID not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const productSaleRecord = await getProductSaleRecordByIdWithRelations({
     id,
   });
   if (!productSaleRecord) {
-    throw new Error("Product sale record not found");
+    throw new Response("Product sale record not found", {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { productSaleRecord };
 }

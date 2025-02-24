@@ -9,10 +9,18 @@ import { generate_heading } from "~/utils/render_functions";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No ID provided in the URL");
+    throw new Response("No ID provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const transaction = await getProductTransactionWithRelationsFromId(id);
-  if (!transaction) throw new Error(`No transaction with id: ${id} exists`);
+  if (!transaction) {
+    throw new Response(`No transaction with id: ${id} exists`, {
+      status: 404,
+      statusText: "Not Found"
+    });
+  }
 
   return { transaction };
 }

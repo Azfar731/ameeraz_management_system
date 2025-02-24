@@ -15,10 +15,18 @@ import { productTransactionSchema } from "~/utils/productTransaction/validation.
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No ID provided in the URL");
+    throw new Response("No ID provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const transaction = await getProductTransactionWithRelationsFromId(id);
-  if (!transaction) throw new Error(`No transaction with id: ${id} exists`);
+  if (!transaction) {
+    throw new Response(`No transaction with id: ${id} exists`, {
+      status: 404,
+      statusText: "Not Found"
+    });
+  }
 
   return { transaction };
 }
@@ -26,10 +34,18 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No ID provided in the URL");
+    throw new Response("No ID provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const transaction = await getProductTransactionFromId(id);
-  if (!transaction) throw new Error(`No transaction with id: ${id} exists`);
+  if (!transaction) {
+    throw new Response(`No transaction with id: ${id} exists`, {
+      status: 404,
+      statusText: "Not Found"
+    });
+  }
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
   const new_remaining_amount =

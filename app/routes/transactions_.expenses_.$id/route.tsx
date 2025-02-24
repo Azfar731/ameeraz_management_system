@@ -8,11 +8,17 @@ import { formatDate } from "shared/utilityFunctions";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in URL");
+    throw new Response("Id not provided in URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const expense = await getOperationalExpenseById(id);
   if (!expense) {
-    throw new Error(`Expense with id:${id} not found`);
+    throw new Response(`Expense with id:${id} not found`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   return { expense };
 }

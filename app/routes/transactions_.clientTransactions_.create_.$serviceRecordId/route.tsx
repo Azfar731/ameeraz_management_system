@@ -12,7 +12,10 @@ import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { serviceRecordId } = params;
   if (!serviceRecordId) {
-    throw new Error("No Service Record Id provided");
+    throw new Response("No Id provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const service_sale_record = await getServiceSaleRecordFromId({
     id: serviceRecordId,
@@ -20,7 +23,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
     includeClient: true,
   });
   if (!service_sale_record) {
-    throw new Error(`No Sale record with id: ${serviceRecordId} exists`);
+    throw new Response(`No Sale record with id: ${serviceRecordId} exists`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   return { service_sale_record };
 }
@@ -28,7 +34,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ params, request }: ActionFunctionArgs) {
   const { serviceRecordId } = params;
   if (!serviceRecordId) {
-    throw new Error("No Service Record Id provided");
+    throw new Response("No Id provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
 
   const formData = await request.formData();

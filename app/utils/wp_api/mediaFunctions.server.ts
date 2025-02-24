@@ -4,9 +4,7 @@ import axios from "axios";
 async function upload_media(
     { filePath, type }: { filePath: string; type: string },
 ) {
-    // const tmpPath = path.join("/tmp", filePath.name);
-    // const buffer = await filePath.arrayBuffer();
-    // await fs.promises.writeFile(tmpPath, Buffer.from(buffer));
+    
 
     const formData = new FormData();
     formData.append("messaging_product", "whatsapp");

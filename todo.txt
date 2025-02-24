@@ -3,7 +3,7 @@ Today:
 Implement a global error catch and store errors.
 see how I can implement logging
 Explore telemetry/better stack
-
+Save errors occuring in SendMessage function
 
 Things to do:
 

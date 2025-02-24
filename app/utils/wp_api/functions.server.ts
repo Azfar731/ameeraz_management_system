@@ -3,7 +3,7 @@ import axios from "axios";
 import Bottleneck from "bottleneck";
 import { getTemplateByName } from "../templates/db.server";
 import { TemplateWithRelations } from "../templates/types";
-
+import { WP_ServiceError } from "../errorClasses";
 
 const limiter = new Bottleneck({
     minTime: 1000 / 80, // 80 requests per second
@@ -38,6 +38,9 @@ async function sendMessage(data: string) {
     });
 }
 
+
+
+
 async function sendFreeFormMessage(
     { recipient, msg }: { recipient: string; msg: string },
 ) {
@@ -67,13 +70,11 @@ async function sendMultipleMessages({
     variablesArray: { key: string; value: string; type: string }[]; // Allows additional properties for each template
 }) {
     if (clientsList.length < 1) {
-        throw new Error("Empty List sent to sendMultipleMessages funcion");
+        throw new WP_ServiceError("Empty Recipient list provided to Whatsapp API");
     }
-    // Ensure the template_name exists in the dictionary
-    // let messages: string[] = [];
     const template = await getTemplateByName(template_name);
     if (!template) {
-        throw new Error(`NO template found with name ${template_name}`);
+        throw new WP_ServiceError(`No template found with name ${template_name}`);
     }
 
     const messages = clientsList.map((client) => {
@@ -90,20 +91,10 @@ async function sendMultipleMessages({
         });
     });
 
-    // const responses = [];
-    // for (const msg of messages) {
-    //     // await _delay(100);
-    //     responses.push(await sendMessage(msg));
-    // }
-
-    // const responses = await Promise.all(messages.map(async (msg) => {
-    //     await _delay(1000);
-    //     return await sendMessage(msg);
-    // }));
-
     const responses = await Promise.all(
         messages.map((msg) => sendMessage(msg)),
     );
+    //each null entry represents a failed message
     const nullCount = responses.filter((resp) => resp === null).length;
 
     return nullCount;
@@ -306,8 +297,8 @@ function _getDynamicTemplateBody({
 function _convertMobileNumber(mobileNumber: string): string {
     // Validate the input
     if (!/^0\d{10}$/.test(mobileNumber)) {
-        throw new Error(
-            "Invalid mobile number format. It must be 11 digits long and start with '0'.",
+        throw new WP_ServiceError(
+            "Invalid mobile number format in client list. It must be 11 digits long and start with '0'.",
         );
     }
 

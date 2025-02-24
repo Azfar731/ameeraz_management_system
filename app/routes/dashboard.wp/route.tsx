@@ -53,7 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
     total: daily_limit,
   });
   if (!canSendMessages(clients.length)) {
-    throw new Error("Daily Limit Exceeded");
+    return {errorMessages: {client_batch: ["Daily Limit Exceeded"]}}
   }
   const failed_messages = await sendMultipleMessages({
     template_name: data.template_name,
@@ -62,7 +62,6 @@ export async function action({ request }: ActionFunctionArgs) {
     variablesArray: data.variables_array,
   });
 
-  console.log("Failed Messages: ", failed_messages);
   recordMessage(clients.length - failed_messages);
   throw redirect(
     `/dashboard/wp/success?failed_messages=${failed_messages}&total_messages=${clients.length}`

@@ -6,11 +6,17 @@ import { getServiceFromId } from "~/utils/service/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in the URL");
+    throw new Response("Id not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const service = await getServiceFromId({ id, includeCategory: true });
   if (!service) {
-    throw new Error(`No service found with id: ${id}`);
+    throw new Response(`No service found with id: ${id}`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   return { service };
 }

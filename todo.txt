@@ -71,3 +71,16 @@ remove route client._id.transactions
 Delete Files:
 app/server/utilityFunctions
 components/Entity.tsx
+
+
+Prompt for replacing error instances with Response:
+
+In the files selected in the working set, search loader and action functions for thrown error instances: "throw new Error("<Error Message>") and replace them with the following:
+  throw new Response("<Error Message>", {
+    status: errorStatus,
+    statusText: "<statusText>"
+   });
+Replace:
+Error Message: with the message in error instance
+status: with an appropriate status for example 400 for bad user input, 404 for data not found etc.
+statusText: with an appropriate Text for status

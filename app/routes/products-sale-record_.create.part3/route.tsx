@@ -30,7 +30,12 @@ import { findVendorByMobileNumber } from "~/utils/vendors/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
   const mobile_num = searchParams.get("mobile_num");
-  if (!mobile_num) throw new Error(`Mobile number not provided in URL`);
+  if (!mobile_num) {
+    throw new Response("Mobile number not provided in URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
+  }
 
   const isClient = searchParams.get("isClient") === "true";
   let client;
@@ -38,12 +43,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (isClient) {
     client = await getClientByMobile(mobile_num);
     if (!client) {
-      throw new Error(`Client with mobile number ${mobile_num} not found`);
+      throw new Response(`Client with mobile number ${mobile_num} not found`, {
+        status: 404,
+        statusText: "Not Found"
+      });
     }
   } else {
     vendor = await findVendorByMobileNumber(mobile_num);
     if (!vendor) {
-      throw new Error(`Vendor with mobile number ${mobile_num} not found`);
+      throw new Response(`Vendor with mobile number ${mobile_num} not found`, {
+        status: 404,
+        statusText: "Not Found"
+      });
     }
   }
   const products = await getAllProducts();

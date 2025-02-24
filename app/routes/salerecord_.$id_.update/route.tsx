@@ -17,7 +17,10 @@ import { serviceSaleRecordUpdateSchema } from "~/utils/serviceSaleRecord/validat
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No id Provided in the URL");
+    throw new Response("No id Provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const record = await getServiceSaleRecordFromId({
     id,
@@ -27,7 +30,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
     includeDeals: true,
   });
   if (!record) {
-    throw new Error("Record with the specified Id doesn't exist");
+    throw new Response("Record with the specified Id doesn't exist", {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   const deals = await getAllDeals();
   const employees = await getAllEmployees();
@@ -37,14 +43,20 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No id Provided in the URL");
+    throw new Response("No id Provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const record = await getServiceSaleRecordFromId({
     id,
     includeTransactions: true,
   });
   if (!record) {
-    throw new Error("Record with the specified Id doesn't exist");
+    throw new Response("Record with the specified Id doesn't exist", {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   const amount_paid = record.transactions.reduce(
     (acc, curr) => acc + curr.amount_paid,

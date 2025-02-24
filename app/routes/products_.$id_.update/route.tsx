@@ -10,12 +10,18 @@ import { ProductSchema } from "~/utils/products/validation.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error(`No Id provided in the URL`);
+    throw new Response("No Id provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
 
   const product = await getProductFromId({ id });
   if (!product) {
-    throw new Error(`No Product exists with id: ${id}`);
+    throw new Response(`No Product exists with id: ${id}`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   return { product };
 }
@@ -23,7 +29,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error(`No Id provided in the URL`);
+    throw new Response("No Id provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
 
   const formData = await request.formData();

@@ -10,14 +10,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("Id not provided in URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const expense = await getOperationalExpenseById(id);
   if (!expense) {
     throw new Response(`Expense with id:${id} not found`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   return { expense };

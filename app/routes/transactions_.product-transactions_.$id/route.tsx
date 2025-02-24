@@ -11,14 +11,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("No ID provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const transaction = await getProductTransactionWithRelationsFromId(id);
   if (!transaction) {
     throw new Response(`No transaction with id: ${id} exists`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
 

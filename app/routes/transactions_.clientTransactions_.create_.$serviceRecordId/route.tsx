@@ -14,7 +14,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!serviceRecordId) {
     throw new Response("No Id provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const service_sale_record = await getServiceSaleRecordFromId({
@@ -25,7 +25,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!service_sale_record) {
     throw new Response(`No Sale record with id: ${serviceRecordId} exists`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   return { service_sale_record };
@@ -36,7 +36,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   if (!serviceRecordId) {
     throw new Response("No Id provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
 
@@ -61,7 +61,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 }
 
 export default function Client_Transaction_Create_Part2() {
-  const {service_sale_record} = useLoaderData<{
+  const { service_sale_record } = useLoaderData<{
     service_sale_record: Omit<
       ServiceSaleRecordWithRelations,
       "employees" | "deals"

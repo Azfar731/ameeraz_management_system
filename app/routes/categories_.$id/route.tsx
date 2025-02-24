@@ -6,11 +6,17 @@ import { getCategoryFromId } from "~/utils/category/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in the url");
+    throw new Response("Id not provided in the url", {
+      status: 400,
+      statusText: "Bad Request: Missing ID parameter",
+    });
   }
   const category = await getCategoryFromId({ id, include_services: true });
   if (!category) {
-    throw new Error(`No category found with id: ${id}`);
+    throw new Response(`No category found with id: ${id}`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { category };
 }

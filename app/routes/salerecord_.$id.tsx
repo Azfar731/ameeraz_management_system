@@ -12,7 +12,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
   const { id } = params;
   if (!id) {
-    throw new Error("No id Provided in the URL");
+    throw new Response("No id Provided in the URL", {
+      status: 400,
+      statusText: "Bad Request: Missing ID parameter",
+    });
   }
   const record = await getServiceSaleRecordFromId({
     id,
@@ -24,7 +27,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   if (record) {
     return { record };
   } else {
-    throw new Error("Record with the specified Id doesn't exist");
+    throw new Response("Record with the specified Id doesn't exist", {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
 }
 

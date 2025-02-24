@@ -30,9 +30,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const client_mobile_num = new URL(request.url).searchParams.get("mobile_num");
   if (!client_mobile_num)
-    throw new Error(
-      `Client with mobile number: ${client_mobile_num} does not exist`
-    );
+    throw new Response(`Client Mobile number not provided in Search Param`, {
+      status: 400,
+      statusText: "Bad Request: Missing client mobile number",
+    });
 
   const client = await getClientByMobile(client_mobile_num);
   const deals = await prisma_client.deal.findMany();
@@ -477,7 +478,10 @@ export default function Part2() {
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
-            disabled={navigation.state === "loading" || navigation.state === "submitting"}
+            disabled={
+              navigation.state === "loading" ||
+              navigation.state === "submitting"
+            }
           >
             Next
           </button>

@@ -15,9 +15,8 @@ export default function ClientTransaction_Form({
   transaction,
   errorMessages,
 }: {
-  service_sale_record: SerializeFrom<Omit<
-    ServiceSaleRecordWithRelations,
-    "employees" | "deals">
+  service_sale_record: SerializeFrom<
+    Omit<ServiceSaleRecordWithRelations, "employees" | "deals">
   >;
   transaction?: SerializeFrom<Client_Transaction>;
   errorMessages?: ClientTransactionErrors;
@@ -87,7 +86,9 @@ export default function ClientTransaction_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {transaction ? "Update" : "Create"}

@@ -1,5 +1,11 @@
 import { useRef } from "react";
-import { Form, Link, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useNavigation,
+  useSearchParams,
+} from "@remix-run/react";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
@@ -14,6 +20,10 @@ import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 import { getSearchParams } from "~/utils/client/functions";
 import { getClients } from "~/utils/client/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
+  // throw new Response("Testing Response Error Boundary", {
+  //   status: 500,
+  //   statusText: "Internal Server Error"
+  // });
   const searchParams = new URL(request.url).searchParams;
   const { mobile_num, fname, lname, areas, subscribe } =
     getSearchParams(searchParams);
@@ -254,7 +264,7 @@ export default function Clients() {
             { value: "true", label: "true" },
             { value: "false", label: "false" },
           ]}
-          isClearable 
+          isClearable
           className="basic-multi-select mt-2 "
           classNamePrefix="select"
         />
@@ -263,7 +273,9 @@ export default function Clients() {
         )}
         <button
           type="submit"
-          disabled= {navigation.state === "loading" || navigation.state === "submitting"}
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed "
         >
           Fetch

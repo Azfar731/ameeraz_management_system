@@ -13,12 +13,18 @@ import { getCategoryFromId, updateCategory } from "~/utils/category/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error(`No id provided in the URL`);
+    throw new Response("No id provided in the URL", {
+      status: 400,
+      statusText: "Bad Request: Missing ID parameter",
+    });
   }
 
   const category = await getCategoryFromId({ id, include_services: false });
   if (!category) {
-    throw new Error(`No category found with id: ${id}`);
+    throw new Response(`No category found with id: ${id}`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { category };
 }
@@ -26,7 +32,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in the URL");
+    throw new Response("Id not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request: Missing ID parameter",
+    });
   }
   const formData = await request.formData();
   const name = formData.get("name");
@@ -38,7 +47,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { cat_name } = validationResult.data;
 
-  const updated_cateogry = await updateCategory({ cat_name, cat_id:id });
+  const updated_cateogry = await updateCategory({ cat_name, cat_id: id });
   throw replace(`/categories/${updated_cateogry.cat_id}`);
 }
 

@@ -8,11 +8,17 @@ import { getDealFromId } from "~/utils/deal/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in the URL");
+    throw new Response("Id not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request: Missing ID parameter",
+    });
   }
   const deal = await getDealFromId({ id, includeServices: true });
   if (!deal) {
-    throw new Error(`No deal with id: ${id} found`);
+    throw new Response(`No deal with id: ${id} found`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { deal };
 }

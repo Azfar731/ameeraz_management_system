@@ -13,20 +13,28 @@ import { getClientFromId, updateClient } from "~/utils/client/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Client id not provided for Client Update Page");
+    throw new Response("Client id not provided for Client Update Page", {
+      status: 400,
+      statusText: "Bad Request: Missing ID parameter",
+    });
   }
   const client = await getClientFromId({ id });
   if (!client) {
-    throw new Error(`No client with id:${id} found`);
+    throw new Response(`No client with id:${id} found`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { client };
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  console.log("In action function");
   const { id } = params;
   if (!id) {
-    throw new Error("Id not found in URL");
+    throw new Response("Id not found in URL", {
+      status: 400,
+      statusText: "Bad Request: Missing ID parameter",
+    });
   }
   const formData = await request.formData();
   const clientData = getClientFormData(formData);
@@ -35,7 +43,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
 
-  
   const { updatedClient } = await updateClient({
     client_id: id,
     ...validationResult.data,
@@ -46,7 +53,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 export default function Update_Client() {
   const loaderData = useLoaderData<{ client: Client }>();
-  const actionData = useActionData<{errorMessages: ClientErrorData}>();
+  const actionData = useActionData<{ errorMessages: ClientErrorData }>();
 
   const client = {
     ...loaderData.client,

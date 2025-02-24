@@ -18,7 +18,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("Id parameter not provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
 
@@ -29,7 +29,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!transaction) {
     throw new Response(`No transaction with id: ${id} exists`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   console.log("Transaction: ", transaction);
@@ -41,7 +41,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   if (!id) {
     throw new Response("NO ID in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
 
@@ -52,7 +52,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   if (!transaction) {
     throw new Response(`No transaction with id: ${id} exists`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
 
@@ -81,15 +81,13 @@ export async function action({ params, request }: ActionFunctionArgs) {
 }
 
 export default function ClientTransaction_Update() {
-  const {transaction} = useLoaderData<{
+  const { transaction } = useLoaderData<{
     transaction: ClientTransactionWithRelations;
   }>();
 
   // const service_sale_record = updateServiceSaleRecordDateTypes(
   //   loaderData.transaction.record
   // );
-
-  
 
   // const transaction = {
   //   ...loaderData.transaction,

@@ -10,14 +10,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("No Id provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const template = await getTemplateById(id);
   if (!template) {
     throw new Response(`No Template exists with id: ${id}`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   return { template };
@@ -33,7 +33,9 @@ export default function Template_Details() {
         <h4 key={`variable${index} name`}>{variable.name}</h4>
       );
       renderered_variables.push(
-        <h4 key={`variable${index} type`}>{`${variable.type}(client property: ${variable.client_property})`}</h4>
+        <h4
+          key={`variable${index} type`}
+        >{`${variable.type}(client property: ${variable.client_property})`}</h4>
       );
     });
   }
@@ -62,8 +64,9 @@ export default function Template_Details() {
             <h3 className="text-gray-600">{template.header_var_name}</h3>
           </>
         )}
-        
-        {template.variables?.length > 0 && generate_heading("Variables", "Name", "Type")}
+
+        {template.variables?.length > 0 &&
+          generate_heading("Variables", "Name", "Type")}
         {renderered_variables}
 
         <Link

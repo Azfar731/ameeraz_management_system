@@ -19,7 +19,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("No ID provided in the parameter", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
 
@@ -27,7 +27,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!service) {
     throw new Response(`No Service found with id:${id}`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   const categories = await prisma_client.category.findMany();
@@ -40,7 +40,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!id) {
     throw new Response("No id provided in URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const formData = await request.formData();
@@ -63,9 +63,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   throw replace(`/services/${updated_service.serv_id}`);
 }
 
-
 export default function Update_Service() {
-  const {service,categories} = useLoaderData<{
+  const { service, categories } = useLoaderData<{
     service: ServiceWithRelations;
     categories: Category[];
   }>();

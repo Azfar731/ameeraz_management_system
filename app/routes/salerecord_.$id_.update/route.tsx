@@ -19,7 +19,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("No id Provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const record = await getServiceSaleRecordFromId({
@@ -32,7 +32,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!record) {
     throw new Response("Record with the specified Id doesn't exist", {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   const deals = await getAllDeals();
@@ -45,7 +45,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!id) {
     throw new Response("No id Provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const record = await getServiceSaleRecordFromId({
@@ -55,7 +55,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!record) {
     throw new Response("Record with the specified Id doesn't exist", {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   const amount_paid = record.transactions.reduce(
@@ -64,7 +64,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
   );
   const data = await request.json();
   data.amount_paid = amount_paid;
-  const validationResult = await serviceSaleRecordUpdateSchema.safeParseAsync(data);
+  const validationResult = await serviceSaleRecordUpdateSchema.safeParseAsync(
+    data
+  );
   if (!validationResult.success) {
     return {
       errorMessages: validationResult.error.flatten().fieldErrors,

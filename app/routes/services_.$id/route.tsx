@@ -8,14 +8,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("Id not provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
   const service = await getServiceFromId({ id, includeCategory: true });
   if (!service) {
     throw new Response(`No service found with id: ${id}`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   return { service };

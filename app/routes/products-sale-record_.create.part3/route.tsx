@@ -33,7 +33,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (!mobile_num) {
     throw new Response("Mobile number not provided in URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
 
@@ -45,7 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (!client) {
       throw new Response(`Client with mobile number ${mobile_num} not found`, {
         status: 404,
-        statusText: "Not Found"
+        statusText: "Not Found",
       });
     }
   } else {
@@ -53,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (!vendor) {
       throw new Response(`Vendor with mobile number ${mobile_num} not found`, {
         status: 404,
-        statusText: "Not Found"
+        statusText: "Not Found",
       });
     }
   }

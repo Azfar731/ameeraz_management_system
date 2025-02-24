@@ -12,7 +12,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!id) {
     throw new Response("No Id provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
 
@@ -20,7 +20,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   if (!product) {
     throw new Response(`No Product exists with id: ${id}`, {
       status: 404,
-      statusText: "Not Found"
+      statusText: "Not Found",
     });
   }
   return { product };
@@ -31,7 +31,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!id) {
     throw new Response("No Id provided in the URL", {
       status: 400,
-      statusText: "Bad Request"
+      statusText: "Bad Request",
     });
   }
 

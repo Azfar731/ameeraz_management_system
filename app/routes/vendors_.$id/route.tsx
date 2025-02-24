@@ -7,11 +7,17 @@ import { getVendorFromId } from "~/utils/vendors/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in URL");
+    throw new Response("Id not provided in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const vendor = await getVendorFromId({ id });
   if (!vendor) {
-    throw new Error(`Vendor with id:${id} not found`);
+    throw new Response(`Vendor with id:${id} not found`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { vendor };
 }

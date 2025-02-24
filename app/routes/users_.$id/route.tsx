@@ -8,11 +8,17 @@ import { getUserFromId } from "~/utils/user/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No Id found in URL");
+    throw new Response("No Id found in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const user = await getUserFromId(id);
   if (!user) {
-    `No user found with id ${id}`;
+    throw new Response(`No user found with id ${id}`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { user };
 }

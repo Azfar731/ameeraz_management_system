@@ -7,25 +7,37 @@ import { createProductTransaction } from "~/utils/productTransaction/db.server";
 import { getProductSaleRecordPendingAmount } from "~/utils/productTransaction/functions.server";
 import { ProductTransactionErrorData } from "~/utils/productTransaction/types";
 import { productTransactionSchema } from "~/utils/productTransaction/validation.server";
+
 export async function loader({ params }: LoaderFunctionArgs) {
   const { productSaleRecordId } = params;
   if (!productSaleRecordId) {
-    throw new Error("NO ID providedin the URL");
+    throw new Response("NO ID provided in the URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const product_sale_record = await getProductSaleRecordByIdWithRelations({
     id: productSaleRecordId,
   });
-  if (!product_sale_record)
-    throw new Error(
-      `No product sale record with id: ${productSaleRecordId} exists`
+  if (!product_sale_record) {
+    throw new Response(
+      `No product sale record with id: ${productSaleRecordId} exists`,
+      {
+        status: 404,
+        statusText: "Not Found",
+      }
     );
+  }
   return { product_sale_record };
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { productSaleRecordId } = params;
   if (!productSaleRecordId) {
-    throw new Error("NO ID providedin the URL");
+    throw new Response("NO ID provided in the URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());

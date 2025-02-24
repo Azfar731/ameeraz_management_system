@@ -9,11 +9,17 @@ import { UpdateUserValidation } from "~/utils/user/validation.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No Id found in URL");
+    throw new Response("No Id found in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const user = await getUserFromId(id);
   if (!user) {
-    `No user found with id ${id}`;
+    throw new Response(`No user found with id ${id}`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
 
   return { user };
@@ -22,11 +28,17 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ params, request }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No Id found in URL");
+    throw new Response("No Id found in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const user = await getUserFromId(id);
   if (!user) {
-    throw new Error(`No user found with id ${id}`);
+    throw new Response(`No user found with id ${id}`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   const formData = await request.formData();
   const dataObject = Object.fromEntries(formData.entries());

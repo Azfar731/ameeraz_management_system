@@ -10,11 +10,17 @@ import { vendorSchema } from "~/utils/vendors/validations.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in URL");
+    throw new Response("Id not provided in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const vendor = await getVendorFromId({ id });
   if (!vendor) {
-    throw new Error(`Vendor with id:${id} not found`);
+    throw new Response(`Vendor with id:${id} not found`, {
+      status: 404,
+      statusText: "Not Found",
+    });
   }
   return { vendor };
 }
@@ -22,7 +28,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ request, params }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not provided in URL");
+    throw new Response("Id not provided in URL", {
+      status: 400,
+      statusText: "Bad Request",
+    });
   }
   const formData = await request.formData();
   const vendorData = getVendorFormData(formData);

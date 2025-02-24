@@ -17,12 +17,18 @@ import { getServiceFromId, updateService } from "~/utils/service/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No ID provided in the parameter");
+    throw new Response("No ID provided in the parameter", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
 
   const service = await getServiceFromId({ id, includeCategory: true });
   if (!service) {
-    throw new Error(`No Service found with id:${id}`);
+    throw new Response(`No Service found with id:${id}`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   const categories = await prisma_client.category.findMany();
 
@@ -30,10 +36,12 @@ export async function loader({ params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  console.log("In update action function");
   const { id } = params;
   if (!id) {
-    throw new Error("No id provided in URL");
+    throw new Response("No id provided in URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const formData = await request.formData();
   const serviceFormData = getServiceFormData(formData);
@@ -62,24 +70,6 @@ export default function Update_Service() {
     categories: Category[];
   }>();
   const actionData = useActionData<{ errors: ServiceErrors }>();
-
-  // const categories = loaderData.categories;
-
-  //convert deals date fields to date type
-  // const updated_deals = loaderData.service.deals.map((deal) => {
-  //   return {
-  //     ...deal,
-  //     created_at: new Date(deal.created_at),
-  //     modified_at: new Date(deal.modified_at),
-  //     activate_from: new Date(deal.activate_from),
-  //     activate_till: deal.activate_till ? new Date(deal.activate_till) : null,
-  //   };
-  // });
-
-  // const service = {
-  //   ...loaderData.service,
-  //   deals: updated_deals,
-  // };
 
   return (
     <div className="flex justify-center">

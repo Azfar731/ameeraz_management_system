@@ -8,11 +8,17 @@ import { TemplateSchema } from "~/utils/templates/validation.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("Id not given in URL");
+    throw new Response("Id not given in URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const template = await getTemplateById(id);
   if(!template){
-    throw new Error(`No template exists with id ${id}`)
+    throw new Response(`No template exists with id ${id}`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   return {template}
 }
@@ -20,7 +26,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({request,params}: ActionFunctionArgs){
     const {id} = params;
     if(!id){
-        throw new Error("No id provided in URL")
+        throw new Response("No id provided in URL", {
+          status: 400,
+          statusText: "Bad Request"
+        });
     }
     const data = await request.json();
     const validationResult = TemplateSchema.safeParse(data);

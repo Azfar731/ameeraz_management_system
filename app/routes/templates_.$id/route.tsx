@@ -8,11 +8,17 @@ import { TemplateWithRelations } from "~/utils/templates/types";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("No Id provided in the URL");
+    throw new Response("No Id provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const template = await getTemplateById(id);
   if (!template) {
-    throw new Error(`No Template exists with id: ${id}`);
+    throw new Response(`No Template exists with id: ${id}`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   return { template };
 }

@@ -16,7 +16,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
 
   if (!id) {
-    throw new Error("Id parameter not provided in the URL");
+    throw new Response("Id parameter not provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
 
   const transaction = await getClientTransactionFromID({
@@ -24,7 +27,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
     includeRecord: true,
   });
   if (!transaction) {
-    throw new Error(`No transaction with id: ${id} exists`);
+    throw new Response(`No transaction with id: ${id} exists`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
   console.log("Transaction: ", transaction);
   return { transaction };
@@ -33,7 +39,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export async function action({ params, request }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("NO ID in the URL");
+    throw new Response("NO ID in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
 
   const transaction = await getClientTransactionFromID({
@@ -41,7 +50,10 @@ export async function action({ params, request }: ActionFunctionArgs) {
     includeRecord: true,
   });
   if (!transaction) {
-    throw new Error(`No transaction with id: ${id} exists`);
+    throw new Response(`No transaction with id: ${id} exists`, {
+      status: 404,
+      statusText: "Not Found"
+    });
   }
 
   const formData = await request.formData();

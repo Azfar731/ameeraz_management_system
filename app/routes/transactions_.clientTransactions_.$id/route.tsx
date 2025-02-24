@@ -9,13 +9,21 @@ import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
-    throw new Error("NO ID providedin the URL");
+    throw new Response("NO ID provided in the URL", {
+      status: 400,
+      statusText: "Bad Request"
+    });
   }
   const transaction = await getClientTransactionFromID({
     id,
     includeRecord: true,
   });
-  if (!transaction) throw new Error(`No transaction with id: ${id} exists`);
+  if (!transaction) {
+    throw new Response(`No transaction with id: ${id} exists`, {
+      status: 404,
+      statusText: "Not Found"
+    });
+  }
 
   return { transaction };
 }

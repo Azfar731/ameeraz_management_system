@@ -5,6 +5,7 @@ import {
   useOutletContext,
   useSubmit,
   useNavigation,
+  useActionData,
 } from "@remix-run/react";
 import Select from "react-select";
 import {
@@ -12,19 +13,22 @@ import {
   getSingleTransactionMenuOption,
 } from "~/utils/functions";
 import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
+import { productSaleRecordCreate1Schema } from "~/utils/productSaleRecord/validation.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const transaction_type = formData.get("transaction_type")?.toString() || "";
-  if (transaction_type === "") {
-    throw new Error("Transaction type is required");
+  
+  const transaction_type = formData.get("transaction_type");
+  const validationResult = productSaleRecordCreate1Schema.safeParse({transaction_type})
+  if (!validationResult.success) {
+    return { errors: validationResult.error.flatten().fieldErrors };
   }
-
   throw replace("part2");
 }
 
 export default function Product_Sale_Record_Create_Part1() {
   const navigation = useNavigation();
+  const actionData = useActionData<{errors: {transaction_type: string[]}}>()
   //hooks
   const submit = useSubmit();
   const { formData, setFormData } = useOutletContext<{
@@ -68,7 +72,13 @@ export default function Product_Sale_Record_Create_Part1() {
           classNamePrefix="select"
           required
         />
-
+        {
+          actionData?.errors.transaction_type && (
+            <p className="text-red-500 text-xs italic">
+              {actionData.errors.transaction_type.join(", ")}
+            </p>
+          )
+        }
         <button
           type="submit"
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"

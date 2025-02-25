@@ -43,13 +43,11 @@ import {
     const { fileType, name, type } = validationResult.data;
     try {
       const mediaId = await upload_media({filePath: file.filepath, type: fileType});
-      console.log("ID RETURNED:  ", mediaId);
       await createMedia({ id: mediaId, name, type });
-  
       return redirect("/dashboard/wp");
     } catch (error) {
       console.log("Error: ", error)
-      return { errors: { file: ["Failed to upload file to Meta Servers"] } };
+      return { errors: { file: ["Failed to upload file to Meta Servers."] } };
     }
   }
   
@@ -125,7 +123,7 @@ import {
           <input
             type="file"
             name="file"
-            accept=".mp4,.3gp,.png,.jpeg"
+            accept=".mp4,.3gp,.png,.jpeg, .jpg"
             className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
             required
           />

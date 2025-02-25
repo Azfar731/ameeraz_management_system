@@ -1,12 +1,11 @@
 ## Today:
 
-- Implement a global error catch and store errors.
-- see how I can implement logging
-- Explore telemetry/better stack
-- Save errors occuring in SendMessage function
+
+
 
 ## Things to do:
-
+- Add error handling in upload Media
+- Verify how errors are shown in build
 - Check file types before processing the file. add safety checks
 - Setup whatsapp number
 

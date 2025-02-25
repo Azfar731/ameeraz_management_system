@@ -212,7 +212,7 @@ export default function Product_Sale_Record_Create_Part3() {
     const expectedAmount = productsQuantity.reduce((acc, curr) => {
       const product = products.find((p) => p.prod_id === curr.product_id);
       if (!product) {
-        throw new Error(`Product with id: ${curr.product_id} not found`);
+        throw new Error(`Unexpected Error. Product not found while calculating expected amount. ID: ${curr.product_id}`);
       }
       return acc + product.prod_price * curr.quantity;
     }, 0);
@@ -298,7 +298,7 @@ export default function Product_Sale_Record_Create_Part3() {
               (p) => p.prod_id === entry.product_id
             );
             if (!product) {
-              throw new Error(`Product with id: ${entry.product_id} not found`);
+              throw new Error(`Unexpected Error. Product not found while setting defaultValue. ID: ${entry.product_id}`);
             }
             return { value: product.prod_id, label: product.prod_name };
           })}

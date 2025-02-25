@@ -3,8 +3,8 @@ import axios from "axios";
 import Bottleneck from "bottleneck";
 import { getTemplateByName } from "../templates/db.server";
 import { TemplateWithRelations } from "../templates/types";
-import { WP_ServiceError } from "../errorClasses";
-
+// import { WP_ServiceError } from "../errorClasses";
+import { captureException, captureMessage } from "@sentry/remix";
 const limiter = new Bottleneck({
     minTime: 1000 / 80, // 80 requests per second
     maxConcurrent: 80,
@@ -30,16 +30,21 @@ async function sendMessage(data: string) {
                 console.log("API Error Response:");
                 console.log("Status:", err.response.status);
                 console.log("Data:", err.response.data);
-            } else {
+                const errorData = err.response.data.error;
+                captureException(new Error(`WP API Error`), {
+                    extra: errorData,
+                });
+            } else if(err instanceof Error) {
+                captureException("WP API Non-Axios Error",{extra: {message: err.message}});
                 console.log("Non-Axios Error:", err);
+                
+            }else{
+                throw new Error("Uknwon Error");
             }
             return null;
         }
     });
 }
-
-
-
 
 async function sendFreeFormMessage(
     { recipient, msg }: { recipient: string; msg: string },
@@ -70,11 +75,11 @@ async function sendMultipleMessages({
     variablesArray: { key: string; value: string; type: string }[]; // Allows additional properties for each template
 }) {
     if (clientsList.length < 1) {
-        throw new WP_ServiceError("Empty Recipient list provided to Whatsapp API");
+        throw new Error("Empty Recipient list provided to Whatsapp API");
     }
     const template = await getTemplateByName(template_name);
     if (!template) {
-        throw new WP_ServiceError(`No template found with name ${template_name}`);
+        throw new Error(`No template found with name ${template_name}`);
     }
 
     const messages = clientsList.map((client) => {
@@ -99,70 +104,6 @@ async function sendMultipleMessages({
 
     return nullCount;
 }
-
-// function getInstaTemplateMessageInput(
-//     { client, variablesArray }: {
-//         client: Client;
-//         variablesArray: { key: string; value: string; type: string }[];
-//     },
-// ) {
-//     return JSON.stringify({
-//         "messaging_product": "whatsapp",
-//         "to": _convertMobileNumber(client.client_mobile_num),
-//         "type": "template",
-//         "template": {
-//             "name": "deals_insta_link",
-//             "language": {
-//                 "code": "en_GB",
-//             },
-//             "components": [
-//                 {
-//                     "type": "header",
-//                     "parameters": [
-//                         {
-//                             "type": "image",
-//                             "image": {
-//                                 "link": variablesArray[0].value,
-//                             },
-//                         },
-//                     ],
-//                 },
-//                 {
-//                     "type": "body",
-//                     "parameters": [
-//                         {
-//                             "type": "text",
-//                             "parameter_name": "customer_fname",
-//                             "text": client.client_fname,
-//                         },
-//                     ],
-//                 },
-//             ],
-//         },
-//     });
-// }
-
-// function getMessageInput(
-//     { template_name, recipient }: { template_name: string; recipient: string },
-// ) {
-//     return JSON.stringify({
-//         "messaging_product": "whatsapp",
-//         "to": recipient,
-//         "type": "template",
-//         "template": {
-//             "name": template_name,
-//             "language": {
-//                 "code": "en_GB",
-//             },
-//         },
-//     });
-// }
-
-// Define your dictionary with string keys and function values
-// const templatesWithVariables: { [key: string]: TemplateFunctionWithVariables } =
-//     {
-//         "deals_insta_link": getInstaTemplateMessageInput, // Make sure getInstaTemplateMessageInput matches the TemplateFunction type
-//     };
 
 // function for creating variables array
 function _generateVariablesArray({
@@ -297,7 +238,7 @@ function _getDynamicTemplateBody({
 function _convertMobileNumber(mobileNumber: string): string {
     // Validate the input
     if (!/^0\d{10}$/.test(mobileNumber)) {
-        throw new WP_ServiceError(
+        throw new Error(
             "Invalid mobile number format in client list. It must be 11 digits long and start with '0'.",
         );
     }
@@ -305,8 +246,5 @@ function _convertMobileNumber(mobileNumber: string): string {
     // Replace the first "0" with "92"
     return mobileNumber.replace(/^0/, "92");
 }
-
-
-
 
 export { sendFreeFormMessage, sendMultipleMessages };

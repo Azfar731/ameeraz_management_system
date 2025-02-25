@@ -228,14 +228,14 @@ export default function Service_Sale_Record_Update_Form({
       dealsQuantity.reduce((acc, curr) => {
         const deal = deals.find((deal) => deal.deal_id === curr.id);
         if (!deal) {
-          throw new Error(`Product with id: ${curr.id} not found`);
+          throw new Error(`Unexpected Error. Deal not found while calculating expected amount. ID: ${curr.id}`);
         }
         return acc + deal.deal_price * curr.quantity;
       }, 0) +
       servicesQuantity.reduce((acc, curr) => {
         const service = deals.find((deal) => deal.deal_id === curr.id);
         if (!service) {
-          throw new Error(`Service with id: ${curr.id} not found`);
+          throw new Error(`Unexpected Error. Service not found while calculating expected amount. ID: ${curr.id}`);
         }
         return acc + service.deal_price * curr.quantity;
       }, 0)

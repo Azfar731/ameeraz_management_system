@@ -16,7 +16,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { Boolean_Strings, Client } from "@prisma/client";
 import { formatDate } from "shared/utilityFunctions";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
-import * as Sentry from "@sentry/remix";
+// import * as Sentry from "@sentry/remix";
 import { getSearchParams } from "~/utils/client/functions";
 import { getClients } from "~/utils/client/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -37,10 +37,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   // const promiseRes =  await Sentry.flush()
   // console.log("Sentry Promise result", promiseRes)
   
-  throw new Response("Testing Response Error Boundary New", {
-    status: 500,
-    statusText: "Internal Server Error"
-  });
+  // throw new Response("Testing Response Error Boundary New", {
+  //   status: 500,
+  //   statusText: "Internal Server Error"
+  // });
   // throw new Error("This is the error thrown from loader")
   const searchParams = new URL(request.url).searchParams;
   const { mobile_num, fname, lname, areas, subscribe } =

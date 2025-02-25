@@ -40,7 +40,7 @@ export default function Product_Sale_Record_Form({
   const expectedAmount = productsQuantity.reduce((acc, entry) => {
     const product = products.find((p) => p.prod_id === entry.product_id);
     if (!product) {
-      throw new Error(`Product with id: ${entry.product_id} not found`);
+      throw new Error(`Product not found while calcalutaing expected Amount. ID: ${entry.product_id} `);
     }
     return acc + product.prod_price * entry.quantity;
   }, 0);
@@ -167,7 +167,7 @@ export default function Product_Sale_Record_Form({
         defaultValue={products_record.map((entry) => {
           const product = products.find((p) => p.prod_id === entry.prod_id);
           if (!product) {
-            throw new Error(`Product with id: ${entry.prod_id} not found`);
+            throw new Error(`Product not found while setting default Value of Menu. ID: ${entry.prod_id}`);
           }
           return { value: product.prod_id, label: product.prod_name };
         })}

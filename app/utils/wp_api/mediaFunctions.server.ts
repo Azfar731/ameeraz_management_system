@@ -4,8 +4,6 @@ import axios from "axios";
 async function upload_media(
     { filePath, type }: { filePath: string; type: string },
 ) {
-    
-
     const formData = new FormData();
     formData.append("messaging_product", "whatsapp");
     formData.append("file", fs.createReadStream(filePath), {
@@ -30,8 +28,9 @@ async function upload_media(
             console.error(
                 "Meta API Error:",
                 error.response.status,
-                error.response.data,
+                
             );
+            console.error("Meta API Error Data:", error.response.data);
         } else {
             console.error("Upload Error:", error);
         }
@@ -69,4 +68,4 @@ async function send_delete_request(id: string) {
     }
 }
 
-export { send_delete_request , upload_media };
+export { send_delete_request, upload_media };

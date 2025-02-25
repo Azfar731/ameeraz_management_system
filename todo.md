@@ -1,22 +1,27 @@
+## Today:
 
-Today:
-Implement a global error catch and store errors.
-see how I can implement logging
-Explore telemetry/better stack
-Save errors occuring in SendMessage function
+- Implement a global error catch and store errors.
+- see how I can implement logging
+- Explore telemetry/better stack
+- Save errors occuring in SendMessage function
 
-Things to do:
+## Things to do:
 
-Check file types before processing the file. add safety checks
-Setup whatsapp number
+- Check file types before processing the file. add safety checks
+- Setup whatsapp number
 
-See how I can implement authentication based on environemnt(production, development)
+- See how I can implement authentication based on environemnt(production, development)
 
+## Bugs:
 
-frontend:
-  
-   
-Done:
+- salesRecord create: paid amount is reset to amount_charged automatically
+
+## frontend:
+
+## backend
+
+## Tasks Done:
+
 - fixed issues in CLientTransaction caused due to change in Service Sale Record schema
 - add elements in navbar
 - make clientTransactions the default in transactions
@@ -29,58 +34,52 @@ Done:
 - create an All transaction page
 - added pending value param to product sale record fetch form
 
-Improvements:
-Services:
+## Improvements:
+
+### Services:
+
 1. save search parameters when going from "/services" to "/services/$id"
 2. Disable buttons while form is submitting
 3. Figure out how to provide data to refine function messages in zod
 
-Webhooks:
-- find a way to provide real time updates for data coming from webhooks. Currently, I have only found one solution which uses sockets.io, but sockets.io requires the remix app to run on express, because it can't run on serverless environemnt(servers that sleep within requests).
-
-Client:
+### Client:
 
 - Add validation to clients route loader
 
-Client Transactions:
+### Client Transactions:
+
 - Replace table in Client Transaction create to use SalesRecordTableComponent
 
+## Update logic:
 
-Update logic:
 - users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner
 - profile page => Can update password too.
-Owner can update manager and worker information and also disbale their accounts.
-Admin can update every role information or disbale account.
-
-
-Create a seperate route for updating password. 
-    - ask for old password
-    - ask for new password
-
-
-Forms overlapping with navbar:
-- update employee
-
+  Owner can update manager and worker information and also disbale their accounts.
+  Admin can update every role information or disbale account.
 
 Sections that need fixing:
 
-remove route client._id.transactions
+## Delete Files:
 
-
-
-Delete Files:
+remove route client.\_id.transactions
 app/server/utilityFunctions
 components/Entity.tsx
 
+## Other information
 
-Prompt for replacing error instances with Response:
+### Prompt for replacing error instances with Response:
 
 In the files selected in the working set, search loader and action functions for thrown error instances: "throw new Error("<Error Message>") and replace them with the following:
-  throw new Response("<Error Message>", {
-    status: errorStatus,
-    statusText: "<statusText>"
-   });
+throw new Response("<Error Message>", {
+status: errorStatus,
+statusText: "<statusText>"
+});
 Replace:
 Error Message: with the message in error instance
 status: with an appropriate status for example 400 for bad user input, 404 for data not found etc.
 statusText: with an appropriate Text for status
+
+## Original Lines in package.json:
+
+    "dev": "remix vite:dev",
+    "start": "NODE_OPTIONS='--import ./instrumentation.server.mjs' remix-serve ./build/server/index.js",

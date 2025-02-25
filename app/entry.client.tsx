@@ -8,7 +8,6 @@ import * as Sentry from "@sentry/remix";
 import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
 import { startTransition, StrictMode, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
-import { PrismaInstrumentation } from "@prisma/instrumentation";
 
 Sentry.init({
   dsn: "https://58c7e19649f0cbbd6b2b94f356bbdb68@o4508878615937024.ingest.de.sentry.io/4508878626488400",
@@ -23,10 +22,6 @@ Sentry.init({
     Sentry.replayIntegration({
       maskAllText: true,
       blockAllMedia: true,
-    }),
-    Sentry.prismaIntegration({
-      // Override the default instrumentation that Sentry uses
-      prismaInstrumentation: new PrismaInstrumentation(),
     }),
   ],
 

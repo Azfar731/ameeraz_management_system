@@ -70,6 +70,7 @@ function validatePayment(amount_paid: number, amount_charged: number) {
 }
 
 export default function Part2() {
+  
   const navigation = useNavigation();
   //context
   const { formData, setFormData } = useOutletContext<{

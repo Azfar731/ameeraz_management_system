@@ -6,3 +6,5 @@ node_modules
 commands.md
 todo
 random.json
+# Sentry Config File
+.env.sentry-build-plugin

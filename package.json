@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
-    "dev": "set NODE_OPTIONS=--import ./instrumentation.server.mjs &&  remix vite:dev",
+    "dev": "dotenv -e .env.development -- remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "set NODE_OPTIONS=--import ./instrumentation.server.mjs && remix-serve ./build/server/index.js",
     "typecheck": "tsc",
@@ -25,7 +25,13 @@
     "posttest:i": "npm run db:down",
     "pretest:i:ui": "npm run script \"npm run db:up && npx prisma migrate deploy\" test",
     "test:i:ui": "npm run script \"vitest run --config ./vitest.config.integration.ts --ui --api 9527\" test",
-    "posttest:i:ui": "npm run db:down"
+    "posttest:i:ui": "npm run db:down",
+    "start:dev": "dotenv -e .env.development -- remix-serve ./build/server/index.js",
+    "start:staging": "dotenv -e .env.staging -- remix-serve ./build/server/index.js",
+    "start:prod": "dotenv -e .env.production -- remix-serve ./build/server/index.js",
+    "build:dev": "dotenv -e .env.development -- remix vite:build",
+    "build:staging": "dotenv -e .env.staging -- remix vite:build",
+    "build:prod": "dotenv -e .env.production -- remix vite:build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -51,7 +57,8 @@
     "react-select": "^5.8.1",
     "remix-auth": "^4.1.0",
     "remix-auth-form": "^3.0.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "dotenv-cli": "^7.4.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.2.0",

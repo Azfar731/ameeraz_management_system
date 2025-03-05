@@ -3,6 +3,7 @@ import axios from "axios";
 import Bottleneck from "bottleneck";
 import { getTemplateByName } from "../templates/db.server";
 import { TemplateWithRelations } from "../templates/types";
+import { env } from "~/config/env.server";
 // import { WP_ServiceError } from "../errorClasses";
 import { captureException, captureMessage } from "@sentry/remix";
 const limiter = new Bottleneck({
@@ -13,9 +14,9 @@ const limiter = new Bottleneck({
 async function sendMessage(data: string) {
     const config = {
         method: "post",
-        url: `https://graph.facebook.com/${process.env.VERSION}/${process.env.PHONE_NUMBER_ID}/messages`,
+        url: `https://graph.facebook.com/${env.VERSION}/${env.PHONE_NUMBER_ID}/messages`,
         headers: {
-            "Authorization": `Bearer ${process.env.ACCESS_TOKEN}`,
+            "Authorization": `Bearer ${env.ACCESS_TOKEN}`,
             "Content-Type": "application/json",
         },
         data: data,

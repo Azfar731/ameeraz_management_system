@@ -3,7 +3,8 @@ import { changeClientSubscribeStatus } from "~/utils/client/db.server";
 import { recordFailedMessage } from "~/utils/upstash_redis/failedMgsFunctions.server";
 import { WebhookObj } from "~/utils/webhooks/types.server";
 import { sendFreeFormMessage } from "~/utils/wp_api/functions.server";
-import { env } from "~/config/env.server";
+
+
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);

@@ -23,6 +23,7 @@ import { WP_ErrorMessages } from "~/utils/wp_api/types";
 import { sendMultipleMessages } from "~/utils/wp_api/functions.server";
 import { renderZodErrors } from "~/utils/render_functions";
 import { getAllMedia } from "~/utils/media/db.server";
+import { env } from "~/config/env.server";
 // import {
 //   getInstaTemplateMessageInput,
 //   sendMessage,
@@ -46,7 +47,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
   const data = validationResult.data;
   const daily_limit = parseInt(
-    process.env.WP_DAILY_LIMIT ? process.env.WP_DAILY_LIMIT : "230"
+    env.WP_DAILY_LIMIT ? env.WP_DAILY_LIMIT : "230"
   );
   const clients = await getRangeofClients({
     startIndex: (data.client_batch - 1) * daily_limit,

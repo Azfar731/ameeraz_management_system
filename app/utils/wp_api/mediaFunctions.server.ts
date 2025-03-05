@@ -1,6 +1,7 @@
 import FormData from "form-data";
 import fs from "fs";
 import axios from "axios";
+import { env } from "~/config/env.server";
 async function upload_media(
     { filePath, type }: { filePath: string; type: string },
 ) {
@@ -12,9 +13,9 @@ async function upload_media(
 
     const config = {
         method: "post",
-        url: `https://graph.facebook.com/${process.env.VERSION}/${process.env.PHONE_NUMBER_ID}/media`,
+        url: `https://graph.facebook.com/${env.VERSION}/${env.PHONE_NUMBER_ID}/media`,
         headers: {
-            Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+            Authorization: `Bearer ${env.ACCESS_TOKEN}`,
             ...formData.getHeaders(),
         },
         data: formData,
@@ -43,9 +44,9 @@ async function upload_media(
 async function send_delete_request(id: string) {
     const config = {
         method: "delete",
-        url: `https://graph.facebook.com/${process.env.VERSION}/${id}`,
+        url: `https://graph.facebook.com/${env.VERSION}/${id}`,
         headers: {
-            Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+            Authorization: `Bearer ${env.ACCESS_TOKEN}`,
         },
     };
     try {

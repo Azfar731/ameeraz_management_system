@@ -15,7 +15,7 @@
     "env": "npm run script scripts/test.ts",
     "confirm": "npm run script scripts/test.ts confirm",
     "db:gen": "prisma generate",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "prisma migrate development",
     "db:seed": "npm run script \"prisma db seed\" confirm",
     "db:studio": "npm run script \"prisma studio\"",
     "db:up": "docker compose up -d db",
@@ -49,6 +49,8 @@
     "argon2": "^0.41.1",
     "axios": "^1.7.9",
     "bottleneck": "^2.19.5",
+    "dotenv": "^16.4.7",
+    "dotenv-cli": "^7.4.1",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -57,8 +59,7 @@
     "react-select": "^5.8.1",
     "remix-auth": "^4.1.0",
     "remix-auth-form": "^3.0.0",
-    "zod": "^3.23.8",
-    "dotenv-cli": "^7.4.1"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.2.0",

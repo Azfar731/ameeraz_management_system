@@ -3,15 +3,15 @@ import prompt from "prompt"
 import dotenv from "dotenv";
 import chalk from "chalk";
 // add all the env you wish here
-const ENVIRONMENTS = ["stage", "prod", "test"];
+const ENVIRONMENTS = ["staging", "production", "test"];
 
 const getEnvInfo = () => {
   // Gets the environment from the command line arguments if set, otherwise defaults to dev
   const env = process.argv.find((arg) => ENVIRONMENTS.includes(arg)) ?? "";
   // Sets the environment name to be console logged for info
-  const envName = env !== "" ? env : "dev";
+  const envName = env !== "" ? env : "development";
   // Allows for reading from .env .env.prod .env.stage etc
-  const path = `.env${env ? `.${env}` : ""}`;
+  const path = `.env${env ? `.${env}` : ".development"}`;
   return { env, envName, path };
 };
 

@@ -24,7 +24,7 @@ async function canSendMessages(count: number) {
   return currentCount + count <= DAILY_LIMIT;
 }
 
-async function remainingDailyLimit(){
+async function remainingDailyLimit() {
   const now = Date.now();
   const oldestAllowedTimestamp = now - WINDOW_DURATION;
 
@@ -44,13 +44,13 @@ async function recordMessage(count: number) {
   // Add each message with its timestamp as the score
   const commands = [];
   for (let i = 0; i < count; i++) {
-    commands.push(redis.zadd(ZSET_KEY, { score: now, member: `message:${now}:${i}` }));
+    commands.push(
+      redis.zadd(ZSET_KEY, { score: now, member: `message:${now}:${i}` }),
+    );
   }
 
   // Execute all commands (Upstash handles batching internally)
   await Promise.all(commands);
 }
 
-
-
-export { remainingDailyLimit, canSendMessages, recordMessage };
+export { canSendMessages, recordMessage, remainingDailyLimit };

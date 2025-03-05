@@ -35,11 +35,12 @@ async function sendMessage(data: string) {
                 captureException(new Error(`WP API Error`), {
                     extra: errorData,
                 });
-            } else if(err instanceof Error) {
-                captureException("WP API Non-Axios Error",{extra: {message: err.message}});
+            } else if (err instanceof Error) {
+                captureException("WP API Non-Axios Error", {
+                    extra: { message: err.message },
+                });
                 console.log("Non-Axios Error:", err);
-                
-            }else{
+            } else {
                 throw new Error("Uknwon Error");
             }
             return null;

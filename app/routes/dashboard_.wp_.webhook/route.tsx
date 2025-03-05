@@ -81,23 +81,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                 }
               });
             }
-            if(change.value.statuses){
-              change.value.statuses.forEach(statusObj =>{
-                if(statusObj.status === "failed"){
+            if (change.value.statuses) {
+              change.value.statuses.forEach((statusObj) => {
+                if (statusObj.status === "failed") {
                   recordFailedMessage({
                     status: statusObj.status,
                     mobile_num: statusObj.recipient_id,
                     timestamp: statusObj.timestamp,
-                    errors: statusObj.errors?.map(err => {
+                    errors: statusObj.errors?.map((err) => {
                       return {
                         code: err.code,
-                        description: err.error_data.details
-                      }
-                    })
-                    
-                  })
+                        description: err.error_data.details,
+                      };
+                    }),
+                  });
                 }
-              })
+              });
             }
           }
         });

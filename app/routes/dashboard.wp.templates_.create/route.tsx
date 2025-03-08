@@ -6,6 +6,10 @@ import { TemplateErrorMessages } from "~/utils/templates/types";
 import { TemplateSchema } from "~/utils/templates/validation.server";
 
 
+export async function loader(){
+  console.log("Loader function called");
+  return null;
+}
 
 export async function action({request}: ActionFunctionArgs){
     const data = await request.json();
@@ -15,7 +19,7 @@ export async function action({request}: ActionFunctionArgs){
     }
     //create template
     const new_template = await createTemplate(validationResult.data)
-    throw replace(`/templates/${new_template.id}`);
+    throw replace(`/dashboard/wp/templates/${new_template.id}`);
 }
 
 

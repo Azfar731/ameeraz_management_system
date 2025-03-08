@@ -113,11 +113,11 @@ export default function Failed_Messages() {
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
-        <h1 className=" font-semibold text-6xl text-gray-700">
+        <h1 className=" font-semibold text-4xl text-gray-700">
           Failed Messages
         </h1>
       </div>
-      <div className="mt-20">
+      <div className="mt-10">
         <div className="w-full flex justify-between items-right">
           <Form method="delete">
             <button

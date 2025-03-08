@@ -44,7 +44,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     id,
     ...validationResult.data,
   });
-  throw replace(`/templates/${modified_template.id}`);
+  throw replace(`/dashboard/wp/templates/${modified_template.id}`);
 }
 
 export default function Update_Template() {

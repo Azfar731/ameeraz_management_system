@@ -9,7 +9,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
+    <header className="flex h-16 justify-between items-center p-4 bg-gray-800 text-white">
       {/* Hamburger icon */}
       <button className="text-2xl" onClick={toggleNav}>
         &#9776;

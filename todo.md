@@ -1,6 +1,6 @@
 ## Today:
 Implement Dashboard
-Figure out environments
+
 
 
 
@@ -8,8 +8,6 @@ Figure out environments
 - Add error handling in upload Media
 - Verify how errors are shown in build
 - Check file types before processing the file. add safety checks
-- Setup whatsapp number
-
 - See how I can implement authentication based on environemnt(production, development)
 
 ## Bugs:

@@ -67,12 +67,12 @@ export default function Templates() {
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
-        <h1 className=" font-semibold text-6xl text-gray-700">Templates</h1>
+        <h1 className=" font-semibold text-4xl text-gray-700">Templates</h1>
       </div>
-      <div className="mt-20">
+      <div className="mt-10">
         <div className="w-full flex justify-between items-center">
           <Link
-            to="/templates/create" 
+            to="create" 
             className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
           >
             Create Template <FaPlus />

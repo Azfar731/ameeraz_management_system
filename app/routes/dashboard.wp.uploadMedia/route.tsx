@@ -111,11 +111,11 @@ export default function All_Media() {
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
-        <h1 className=" font-semibold text-6xl text-gray-700">
-          Whatsapp Media Files
+        <h1 className=" font-semibold text-4xl text-gray-700">
+          Media Files
         </h1>
       </div>
-      <div className="mt-20">
+      <div className="mt-10">
         <Link
           to="create"
           className="w-44 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"

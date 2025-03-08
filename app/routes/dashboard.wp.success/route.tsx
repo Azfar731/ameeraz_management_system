@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { FaLongArrowAltLeft } from "react-icons/fa";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -24,6 +25,13 @@ export default function Success_Message() {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
+       <Link
+        to={`/dashboard/wp`}
+        className="bg-green-400 text-white font-semibold py-2 px-4 absolute top-4 left-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
+      >
+        <FaLongArrowAltLeft className="" />
+        Go Back
+      </Link>
       <div className="bg-white p-6 rounded shadow-md w-120">
         <div className="block text-gray-700 text-sm font-bold mb-2">
           Successfull Messages:{" "}

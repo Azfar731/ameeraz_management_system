@@ -35,10 +35,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <>
+    <div className="flex flex-col h-screen">
       <Header />
       <Outlet />
-    </>
+    </div>
   );
 }
 

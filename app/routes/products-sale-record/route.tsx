@@ -59,7 +59,7 @@ export default function View_Product_Sale_Record() {
   }>();
 
   return (
-    <div className="m-8">
+    <div className="m-8 flex-1 p-4">
       <div className="w-full flex justify-center items-center ">
         <h1 className=" font-semibold text-6xl text-gray-700">
           Product Sales Page

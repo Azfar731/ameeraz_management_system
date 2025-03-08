@@ -40,9 +40,9 @@ export default function Template_Details() {
     });
   }
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
+    <div className="flex flex-col justify-center items-center relative">
       <Link
-        to="/templates"
+        to="/dashboard/wp/templates/"
         className="bg-green-400 text-white font-semibold py-2 px-4 absolute top-4 left-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
       >
         <FaLongArrowAltLeft className="" />
@@ -71,7 +71,7 @@ export default function Template_Details() {
 
         <Link
           to={`update`}
-          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+          className="mt-6 w-2/4 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
         >
           Edit <FaEdit />
         </Link>

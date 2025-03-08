@@ -21,7 +21,7 @@ export async function action({ request }: ActionFunctionArgs) {
   }
   const new_user = await createUser(validationResult.data)
 
-  throw replace(`/users/${new_user.id}`)
+  throw replace(`/dashboard/users/${new_user.id}`)
 }
 
 export default function Create_User() {

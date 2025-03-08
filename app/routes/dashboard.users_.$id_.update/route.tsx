@@ -52,7 +52,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
   const updated_user = await updateUser({ id, updates: validationResult.data });
-  throw replace(`/users/${updated_user.id}`);
+  throw replace(`/dashboard/users/${updated_user.id}`);
 }
 
 export default function Update_User() {

@@ -7,7 +7,7 @@ const DashboardLayout = () => {
         <h2 className="text-xl font-bold mb-4">Dashboard</h2>
         <nav>
           <ul>
-            <li className="mb-2"><Link to={`whatsapp`} className="hover:text-gray-300">Whatsapp</Link></li>
+            <li className="mb-2"><Link to={`wp`} className="hover:text-gray-300">Whatsapp</Link></li>
             <li className="mb-2"><Link to={`users`} className="hover:text-gray-300">Users</Link></li>
             
           </ul>

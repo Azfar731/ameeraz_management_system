@@ -24,10 +24,10 @@ export default function Success_Message() {
   }>();
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="p-4 flex flex-col justify-center items-center relative h-72">
        <Link
         to={`/dashboard/wp`}
-        className="bg-green-400 text-white font-semibold py-2 px-4 absolute top-4 left-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
+        className="absolute top-4 left-4   bg-green-400 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
       >
         <FaLongArrowAltLeft className="" />
         Go Back

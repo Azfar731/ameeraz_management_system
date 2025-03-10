@@ -144,7 +144,7 @@ export default function Deals() {
   };
 
   return (
-    <div className="m-8">
+    <div className="m-4 pb-4">
       <div className="w-full flex justify-center items-center ">
         <h1 className=" font-semibold text-6xl text-gray-700">Deals</h1>
       </div>

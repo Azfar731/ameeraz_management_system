@@ -15,7 +15,7 @@
     "env": "npm run script scripts/test.ts",
     "confirm": "npm run script scripts/test.ts confirm",
     "db:gen": "prisma generate",
-    "db:migrate": "prisma migrate development",
+    "db:migrate": "dotenv -e .env.development prisma migrate dev",
     "db:seed": "npm run script \"prisma db seed\" confirm",
     "db:studio": "npm run script \"prisma studio\"",
     "db:up": "docker compose up -d db",

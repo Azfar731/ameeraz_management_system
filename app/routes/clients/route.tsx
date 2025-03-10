@@ -201,7 +201,7 @@ export default function Clients() {
   };
 
   return (
-    <div className="m-8">
+    <div className="m-8 p-4">
       <div className="w-full flex justify-center items-center ">
         <h1 className=" font-semibold text-6xl text-gray-700">Clients</h1>
       </div>

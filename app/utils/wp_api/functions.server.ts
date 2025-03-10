@@ -227,7 +227,7 @@ function _getDynamicTemplateBody({
         template: {
             name: template.name,
             language: {
-                code: "en_US",
+                code: "en_GB",
             },
             components: components,
         },

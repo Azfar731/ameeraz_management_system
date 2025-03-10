@@ -278,6 +278,10 @@ model Media{
   created_at DateTime @default(now())
 }
 
+model Mobile_number_record{
+  mobile_number String @id 
+}
+
 
 
 

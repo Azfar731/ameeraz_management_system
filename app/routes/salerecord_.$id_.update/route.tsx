@@ -14,7 +14,10 @@ import {
 } from "~/utils/serviceSaleRecord/types";
 import Service_Sale_Record_Update_Form from "./Service_Sale_Record_Update_Form";
 import { serviceSaleRecordUpdateSchema } from "~/utils/serviceSaleRecord/validation.server";
-export async function loader({ params }: LoaderFunctionArgs) {
+import { authenticate } from "~/utils/auth/functions.server";
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+  
   const { id } = params;
   if (!id) {
     throw new Response("No id Provided in the URL", {

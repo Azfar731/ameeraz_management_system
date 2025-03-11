@@ -10,8 +10,11 @@ import { serviceSchema } from "~/utils/service/validation.server";
 import { getServiceFormData } from "~/utils/service/functions.server";
 import { createService } from "~/utils/service/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader() {
+export async function loader({ request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 2 });
+
   const categories = await prisma_client.category.findMany();
   return { categories };
 }

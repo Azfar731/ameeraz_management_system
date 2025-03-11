@@ -6,8 +6,11 @@ import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
+  
   const searchParams = new URL(request.url).searchParams;
   const getAll = searchParams.get("getAllEmployees");
   let employees;

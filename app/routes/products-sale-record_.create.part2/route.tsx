@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
   replace,
@@ -13,6 +13,14 @@ import { getClientByMobile } from "~/utils/client/db.server";
 import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
 import Select from "react-select";
 import { findVendorByMobileNumber } from "~/utils/vendors/db.server";
+import { authenticate } from "~/utils/auth/functions.server";
+
+
+export async function loader({request}: LoaderFunctionArgs){
+    await authenticate({request, requiredClearanceLevel: 2 });
+  return null;
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const mobile_num = formData.get("mobile_num")?.toString() || "";

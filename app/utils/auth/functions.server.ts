@@ -4,12 +4,23 @@ import { commitSession, getSession } from "~/sessions";
 import { redirect } from "@remix-run/react";
 import { getClearanceLevel } from "./functions";
 import { captureException } from "@sentry/remix";
+import { env } from "~/config/env.server";
 const authenticate = async (
     { request, requiredClearanceLevel }: {
         request: Request;
         requiredClearanceLevel: number;
     },
 ) => {
+
+    if( env.ENV === "development"){
+       const user =  await getUserFromUserName("azfar");
+        if(user){
+            return user.id;
+        }else{
+            return "12345"
+        }
+    }
+
     const session = await getSession(request.headers.get("cookie"));
     const userId = session.get("userId");
 

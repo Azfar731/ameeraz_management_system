@@ -3,8 +3,11 @@ import { useLoaderData, Link, useLocation } from "@remix-run/react";
 import { ClientWithRelations } from "~/utils/client/types";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { getClientFromId } from "~/utils/client/db.server";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const { id } = params;
   if (!id) {
     throw new Response("Id not provided in URL", {

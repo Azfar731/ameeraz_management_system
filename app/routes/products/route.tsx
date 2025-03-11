@@ -1,12 +1,16 @@
 import { Product } from "@prisma/client";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { FaExternalLinkAlt, FaPlus } from "react-icons/fa";
+import { authenticate } from "~/utils/auth/functions.server";
 import { getAllProducts } from "~/utils/products/db.server";
 
-export async function loader() {
+export async function loader({request}: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const products = await getAllProducts();
   return { products };
 }

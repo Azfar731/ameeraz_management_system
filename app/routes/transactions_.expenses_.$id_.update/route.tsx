@@ -2,6 +2,7 @@ import { Operational_Expenses } from "@prisma/client";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Expense_Form from "~/components/expenses/Expenses_Form";
+import { authenticate } from "~/utils/auth/functions.server";
 import {
   getOperationalExpenseById,
   updateOperationalExpense,
@@ -10,7 +11,9 @@ import { getExpenseFormData } from "~/utils/expenses/functions.server";
 import { ExpenseErrors } from "~/utils/expenses/types";
 import { expensesSchema } from "~/utils/expenses/validation.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+  
   const { id } = params;
   if (!id) {
     throw new Response("Id not provided in URL", {

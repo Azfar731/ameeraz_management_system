@@ -5,8 +5,11 @@ import { getClientTransactionFromID } from "~/utils/clientTransaction/db.server"
 import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
 import { generate_heading } from "~/utils/render_functions";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const { id } = params;
   if (!id) {
     throw new Response("NO ID provided in the URL", {

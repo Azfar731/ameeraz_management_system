@@ -7,8 +7,13 @@ import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
+import { authenticate } from "~/utils/auth/functions.server";
+import { LoaderFunctionArgs } from "@remix-run/node";
 
-export async function loader() {
+export async function loader({request}: LoaderFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 1})  
+
   const categories = await prisma_client.category.findMany({
     include: { services: true },
   });

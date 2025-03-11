@@ -1,6 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import ProductTransactionForm from "~/components/productTransactions/ProductTransactionsForm";
+import { authenticate } from "~/utils/auth/functions.server";
 import {
   getProductTransactionFromId,
   getProductTransactionWithRelationsFromId,
@@ -12,7 +13,9 @@ import {
   ProductTransactionWithRelations,
 } from "~/utils/productTransaction/types";
 import { productTransactionSchema } from "~/utils/productTransaction/validation.server";
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const { id } = params;
   if (!id) {
     throw new Response("No ID provided in the URL", {

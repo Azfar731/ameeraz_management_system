@@ -1,4 +1,14 @@
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet, NavLink } from "@remix-run/react";
+import { authenticate } from "~/utils/auth/functions.server";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
+  return null;
+}
+
+
 export default function Transactions() {
   return (
     <div className="m-4 pb-4">

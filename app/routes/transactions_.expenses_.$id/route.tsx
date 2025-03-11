@@ -4,8 +4,11 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { getOperationalExpenseById } from "~/utils/expenses/db.server";
 import { formatDate } from "shared/utilityFunctions";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+    await authenticate({request, requiredClearanceLevel: 1 });
+  
   const { id } = params;
   if (!id) {
     throw new Response("Id not provided in URL", {

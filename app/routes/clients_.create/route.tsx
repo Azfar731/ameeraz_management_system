@@ -6,7 +6,10 @@ import { getClientFormData } from "~/utils/client/functions.server";
 import { ClientErrorData } from "~/utils/client/types";
 import { createClient } from "~/utils/client/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { authenticate } from "~/utils/auth/functions.server";
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const formData = await request.formData();
   const clientData = getClientFormData(formData);
 

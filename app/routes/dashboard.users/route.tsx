@@ -6,8 +6,14 @@ import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import { formatDate } from "shared/utilityFunctions";
+import { authenticate } from "~/utils/auth/functions.server";
+import { LoaderFunctionArgs } from "@remix-run/node";
 
-export async function loader() {
+export async function loader({request}: LoaderFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 3 });
+
+
   const users = await getAllUsers();
   return { users };
 }

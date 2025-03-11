@@ -13,7 +13,10 @@ import {
 } from "~/utils/productSaleRecord/types";
 import { ProductSaleRecordUpdateSchema } from "~/utils/productSaleRecord/validation.server";
 import Product_Sale_Record_Form from "./product_Sale_Record_Form";
-export async function loader({ params }: LoaderFunctionArgs) {
+import { authenticate } from "~/utils/auth/functions.server";
+export async function loader({request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
+  
   const { id } = params;
   if (!id) {
     throw new Response("ID not provided in the URL", {

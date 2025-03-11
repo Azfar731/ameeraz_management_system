@@ -6,8 +6,12 @@ import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { categorySchema } from "~/utils/category/validation";
 import { createCategory } from "~/utils/category/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const formData = await request.formData();
   const cat_name = formData.get("name");
 

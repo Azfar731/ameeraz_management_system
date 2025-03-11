@@ -1,6 +1,7 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import ClientTransaction_Form from "~/components/clientTransactions/clientTransactionForm";
+import { authenticate } from "~/utils/auth/functions.server";
 import {
   getClientTransactionFromID,
   updateClientTransaction,
@@ -12,7 +13,9 @@ import {
 } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
 import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const { id } = params;
 
   if (!id) {

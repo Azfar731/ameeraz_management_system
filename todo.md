@@ -14,7 +14,9 @@
 - Verify how errors are shown in build
  - set different file limits for images and videos
 - See how I can implement authentication based on environemnt(production, development)
-
+- Find a subset for PrismaClientKnownRequestError package as it is very heavy
+- Start authentication from transactions_.product-transactions_.$id_.update
+- Apply authentication to create and update route action functions. Also create loaders.
 ## Bugs:
 
 - salesRecord create: paid amount is reset to amount_charged automatically
@@ -86,3 +88,7 @@ statusText: with an appropriate Text for status
 
     "dev": "remix vite:dev",
     "start": "NODE_OPTIONS='--import ./instrumentation.server.mjs' remix-serve ./build/server/index.js",
+
+
+
+

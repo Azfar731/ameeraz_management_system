@@ -5,7 +5,10 @@ import { getProductSaleRecordByIdWithRelations } from "~/utils/productSaleRecord
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import { generate_heading } from "~/utils/render_functions";
 import { FaLongArrowAltLeft, FaEdit } from "react-icons/fa";
-export async function loader({ params }: LoaderFunctionArgs) {
+import { authenticate } from "~/utils/auth/functions.server";
+export async function loader({request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const { id } = params;
   if (!id) {
     throw new Response("ID not provided in the URL", {

@@ -1,5 +1,5 @@
 import { TransactionType } from "@prisma/client";
-import { ActionFunctionArgs, replace } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
 import {
   Form,
   useOutletContext,
@@ -8,12 +8,19 @@ import {
   useActionData,
 } from "@remix-run/react";
 import Select from "react-select";
+import { authenticate } from "~/utils/auth/functions.server";
 import {
   getAllTransactionMenuOptions,
   getSingleTransactionMenuOption,
 } from "~/utils/functions";
 import { ProductSaleRecordCreateFormType } from "~/utils/productSaleRecord/types";
 import { productSaleRecordCreate1Schema } from "~/utils/productSaleRecord/validation.server";
+
+export async function loader({request}: LoaderFunctionArgs){
+  await authenticate({request, requiredClearanceLevel: 2 });
+return null;  
+}
+
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();

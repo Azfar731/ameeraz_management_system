@@ -2,6 +2,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Template_Form from "~/components/templates/TemplateForm";
+import { authenticate } from "~/utils/auth/functions.server";
 import { getTemplateById, updateTemplate } from "~/utils/templates/db.server";
 import {
   TemplateErrorMessages,
@@ -9,7 +10,8 @@ import {
 } from "~/utils/templates/types";
 import { TemplateSchema } from "~/utils/templates/validation.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
   const { id } = params;
   if (!id) {
     throw new Response("Id not given in URL", {

@@ -11,12 +11,15 @@ import {
   useSubmit,
 } from "@remix-run/react";
 import { FaPlus } from "react-icons/fa";
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { send_delete_request } from "~/utils/wp_api/mediaFunctions.server";
 import { formatDate } from "shared/utilityFunctions";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
-export async function loader() {
+import { authenticate } from "~/utils/auth/functions.server";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
   const media = await getAllMedia();
   return { media };
 }
@@ -111,9 +114,7 @@ export default function All_Media() {
   return (
     <div className="m-8">
       <div className="w-full flex justify-center items-center ">
-        <h1 className=" font-semibold text-4xl text-gray-700">
-          Media Files
-        </h1>
+        <h1 className=" font-semibold text-4xl text-gray-700">Media Files</h1>
       </div>
       <div className="mt-10">
         <Link

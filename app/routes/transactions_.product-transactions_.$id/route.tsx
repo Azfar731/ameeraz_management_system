@@ -2,11 +2,14 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { FaEdit, FaExternalLinkAlt, FaLongArrowAltLeft } from "react-icons/fa";
 import { formatDate } from "shared/utilityFunctions";
+import { authenticate } from "~/utils/auth/functions.server";
 import { getProductTransactionWithRelationsFromId } from "~/utils/productTransaction/db.server";
 import { ProductTransactionWithRelations } from "~/utils/productTransaction/types";
 import { generate_heading } from "~/utils/render_functions";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request ,params }: LoaderFunctionArgs) {
+    await authenticate({request, requiredClearanceLevel: 1 });
+  
   const { id } = params;
   if (!id) {
     throw new Response("No ID provided in the URL", {

@@ -10,7 +10,9 @@ import { getTheme } from "@table-library/react-table-library/baseline";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 import { DealWithServices } from "~/utils/deal/types";
 import { formatDate } from "shared/utilityFunctions";
+import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
   const searchParams = new URL(request.url).searchParams;
   const fetchAllDeals = searchParams.get("fetchAllDeals");
   const current_date = new Date();

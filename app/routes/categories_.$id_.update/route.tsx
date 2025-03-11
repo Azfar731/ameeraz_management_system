@@ -11,7 +11,11 @@ import { categorySchema } from "~/utils/category/validation";
 import { Category } from "@prisma/client";
 import { getCategoryFromId, updateCategory } from "~/utils/category/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-export async function loader({ params }: LoaderFunctionArgs) {
+import { authenticate } from "~/utils/auth/functions.server";
+export async function loader({ request, params }: LoaderFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const { id } = params;
   if (!id) {
     throw new Response("No id provided in the URL", {

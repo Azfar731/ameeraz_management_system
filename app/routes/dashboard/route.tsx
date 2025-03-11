@@ -1,4 +1,12 @@
-import { Outlet, Link, NavLink } from "@remix-run/react";
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { Outlet, NavLink } from "@remix-run/react";
+import { authenticate } from "~/utils/auth/functions.server";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
+  return null;
+}
+
 const DashboardLayout = () => {
   return (
     <div className="flex flex-1 p-4 gap-4 bg-gray-200">
@@ -13,9 +21,10 @@ const DashboardLayout = () => {
               <NavLink
                 to={`wp`}
                 className={({ isActive }) =>
-                  isActive ? "underline font-bold text-blue-300 text-xl" : "hover:underline hover:text-gray-300 text-xl font-semibold"
+                  isActive
+                    ? "underline font-bold text-blue-300 text-xl"
+                    : "hover:underline hover:text-gray-300 text-xl font-semibold"
                 }
-                
               >
                 Whatsapp
               </NavLink>
@@ -24,7 +33,9 @@ const DashboardLayout = () => {
               <NavLink
                 to={`users`}
                 className={({ isActive }) =>
-                  isActive ? "underline font-bold text-blue-300 text-xl" : "hover:underline hover:text-gray-300 text-xl font-semibold"
+                  isActive
+                    ? "underline font-bold text-blue-300 text-xl"
+                    : "hover:underline hover:text-gray-300 text-xl font-semibold"
                 }
               >
                 Users

@@ -19,8 +19,11 @@ import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 // import * as Sentry from "@sentry/remix";
 import { getSearchParams } from "~/utils/client/functions";
 import { getClients } from "~/utils/client/db.server";
+import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   
   
   // if (!Sentry.getClient()) {

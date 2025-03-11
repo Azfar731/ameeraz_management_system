@@ -3,12 +3,15 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Product_Form from "~/components/products/Product_Form";
+import { authenticate } from "~/utils/auth/functions.server";
 import { getProductFromId, updateProduct } from "~/utils/products/db.server";
 import { fetchProductFormData } from "~/utils/products/functions.server";
 import { ProductErrors } from "~/utils/products/types";
 import { ProductSchema } from "~/utils/products/validation.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
+
   const { id } = params;
   if (!id) {
     throw new Response("No Id provided in the URL", {

@@ -14,8 +14,11 @@ import { serviceSchema } from "~/utils/service/validation.server";
 import { getServiceFormData } from "~/utils/service/functions.server";
 import { getServiceFromId, updateService } from "~/utils/service/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const { id } = params;
   if (!id) {
     throw new Response("No ID provided in the parameter", {

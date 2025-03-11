@@ -1,8 +1,11 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { FaLongArrowAltLeft } from "react-icons/fa";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 3 });
   const searchParams = new URL(request.url).searchParams;
   const failed_messages = searchParams.get("failed_messages");
   const total_messages = searchParams.get("total_messages");

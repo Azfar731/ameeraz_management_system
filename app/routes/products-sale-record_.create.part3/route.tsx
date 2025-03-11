@@ -13,6 +13,7 @@ import {
 } from "@remix-run/react";
 import { useEffect, useRef, useState } from "react";
 import Select, { OnChangeValue } from "react-select";
+import { authenticate } from "~/utils/auth/functions.server";
 import { getClientByMobile } from "~/utils/client/db.server";
 import {
   getAllPaymentMenuOptions,
@@ -28,6 +29,8 @@ import { productSaleRecordSchema } from "~/utils/productSaleRecord/validation.se
 import { findVendorByMobileNumber } from "~/utils/vendors/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+  
   const searchParams = new URL(request.url).searchParams;
   const mobile_num = searchParams.get("mobile_num");
   if (!mobile_num) {

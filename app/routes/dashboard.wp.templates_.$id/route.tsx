@@ -1,11 +1,13 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
+import { authenticate } from "~/utils/auth/functions.server";
 import { generate_heading } from "~/utils/render_functions";
 import { getTemplateById } from "~/utils/templates/db.server";
 import { TemplateWithRelations } from "~/utils/templates/types";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
   const { id } = params;
   if (!id) {
     throw new Response("No Id provided in the URL", {

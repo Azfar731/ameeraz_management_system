@@ -8,8 +8,10 @@ import { dealSchema } from "~/utils/deal/validation";
 import { getActiveServices } from "~/utils/service/db.server";
 import { getDealFromId, updateDeal } from "~/utils/deal/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
   const { id } = params;
   if (!id) {
     throw new Response("Id parameter not found in URL", {

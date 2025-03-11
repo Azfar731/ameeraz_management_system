@@ -1,6 +1,6 @@
 // import { ActionFunctionArgs } from "@remix-run/node";
 import { Media, Template_Variable } from "@prisma/client";
-import { ActionFunctionArgs, SerializeFrom } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
 import {
   Form,
   redirect,
@@ -25,12 +25,14 @@ import { sendMultipleMessages } from "~/utils/wp_api/functions.server";
 import { renderZodErrors } from "~/utils/render_functions";
 import { getAllMedia } from "~/utils/media/db.server";
 import { env } from "~/config/env.server";
+import { authenticate } from "~/utils/auth/functions.server";
 // import {
 //   getInstaTemplateMessageInput,
 //   sendMessage,
 // } from "~/utils/wp_api/functions.server";
 
-export async function loader() {
+export async function loader({request}: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
   const templates = await getAllTemplates();
   const remainingLimit = await remainingDailyLimit();
   const clientCount = await getClientCount();

@@ -6,9 +6,11 @@ import { failed_message } from "~/utils/upstash_redis/types";
 import { CompactTable } from "@table-library/react-table-library/compact";
 import { useTheme } from "@table-library/react-table-library/theme";
 import { getTheme } from "@table-library/react-table-library/baseline";
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader() {
+export async function loader({request}: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
   const failed_messages = await getFailedMessages();
 
   return { failed_messages };

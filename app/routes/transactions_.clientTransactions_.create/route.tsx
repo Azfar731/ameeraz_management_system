@@ -2,7 +2,12 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { fetchServiceSaleRecords, } from "~/utils/serviceSaleRecord/db.server";
 import SalesRecordTable from "../_index/SalesRecordTable";
-export async function loader() {
+import {  LoaderFunctionArgs } from "@remix-run/node";
+import { authenticate } from "~/utils/auth/functions.server";
+
+export async function loader({request}: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const pending_records = await fetchServiceSaleRecords({payment_cleared: false});
   return { pending_records };
 }

@@ -11,7 +11,10 @@ import {
 } from "~/utils/productSaleRecord/types";
 import { FaPlus } from "react-icons/fa";
 import ProductSaleRecordTable from "./ProductSaleRecordTable";
+import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const products = await getAllProducts();
   const searchParams = new URL(request.url).searchParams;
   const formValues = fetchsearchParams(searchParams);

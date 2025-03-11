@@ -6,8 +6,11 @@ import { getEmployeeFormData } from "~/utils/employee/functions.server";
 import { employeeSchema } from "~/utils/employee/validation";
 import { createEmployee } from "~/utils/employee/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
+  
   const formData = await request.formData();
   const employeeData = getEmployeeFormData(formData);
 

@@ -8,8 +8,11 @@ import { clientTransactionSchema } from "~/utils/clientTransaction/validation.se
 import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { getServiceSaleRecordFromId } from "~/utils/serviceSaleRecord/db.server";
 import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
+import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+    await authenticate({request, requiredClearanceLevel: 1 });
+  
   const { serviceRecordId } = params;
   if (!serviceRecordId) {
     throw new Response("No Id provided in the URL", {

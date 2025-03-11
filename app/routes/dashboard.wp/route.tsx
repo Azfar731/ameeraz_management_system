@@ -1,5 +1,15 @@
+
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { Outlet, NavLink } from "@remix-run/react";
-export default function Transactions() {
+import { authenticate } from "~/utils/auth/functions.server";
+
+
+export async function loader({request}: LoaderFunctionArgs){
+  await authenticate({request, requiredClearanceLevel: 3 });
+  return null;
+}
+
+export default function Whatsapp() {
   return (
     <div className="m-1">
       <div className="w-full flex justify-center items-center ">

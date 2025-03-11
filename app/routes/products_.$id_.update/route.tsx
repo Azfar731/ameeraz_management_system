@@ -1,4 +1,5 @@
 import { Product } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Product_Form from "~/components/products/Product_Form";
@@ -42,12 +43,30 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
-  const updated_product = await updateProduct({
-    prod_id: id,
-    ...validationResult.data,
-  });
+  try {
+    const updated_product = await updateProduct({
+      prod_id: id,
+      ...validationResult.data,
+    });
 
-  throw replace(`/products/${updated_product.prod_id}`);
+    throw replace(`/products/${updated_product.prod_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            prod_name: [
+              `Product with name: ${validationResult.data.prod_name} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Products() {

@@ -1,9 +1,8 @@
 ## Today:
-- find a way to add phone numbers from excel into supabase, and run a query before adding each phone number.
-  - created a function and trigger to automatically run query
-  - find a way to match the pattern 
-- find how to find a permanent authorization token. 
-- 
+- Use error handling for unique value constraint
+- Implement authorization
+- Implement user logs
+- Add error handling for file upload
 
 
 

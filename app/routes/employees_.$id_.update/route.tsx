@@ -11,6 +11,7 @@ import { Employee } from "@prisma/client";
 import { employeeSchema } from "~/utils/employee/validation";
 
 import { getEmployeeFromId, updateEmployee } from "~/utils/employee/db.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -54,17 +55,35 @@ export async function action({ request, params }: ActionFunctionArgs) {
     percentage,
   } = validationResult.data;
 
-  const updated_employee = await updateEmployee({
-    emp_id: id,
-    emp_fname,
-    emp_lname,
-    emp_mobile_num,
-    base_salary,
-    percentage,
-    emp_status,
-  });
+  try {
+    const updated_employee = await updateEmployee({
+      emp_id: id,
+      emp_fname,
+      emp_lname,
+      emp_mobile_num,
+      base_salary,
+      percentage,
+      emp_status,
+    });
 
-  throw replace(`/employees/${updated_employee.emp_id}`);
+    throw replace(`/employees/${updated_employee.emp_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            emp_mobile_num: [
+              `Employee with mobile number: ${validationResult.data.emp_mobile_num} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Employee() {

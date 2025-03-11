@@ -10,6 +10,7 @@ import {
 import { categorySchema } from "~/utils/category/validation";
 import { Category } from "@prisma/client";
 import { getCategoryFromId, updateCategory } from "~/utils/category/db.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -46,9 +47,26 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 
   const { cat_name } = validationResult.data;
-
-  const updated_cateogry = await updateCategory({ cat_name, cat_id: id });
-  throw replace(`/categories/${updated_cateogry.cat_id}`);
+  try {
+    const updated_cateogry = await updateCategory({ cat_name, cat_id: id });
+    throw replace(`/categories/${updated_cateogry.cat_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            cat_name: [
+              `Category with name: ${validationResult.data.cat_name} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Category() {

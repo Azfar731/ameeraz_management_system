@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Template_Form from "~/components/templates/TemplateForm";
@@ -40,11 +41,29 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
   //update template
-  const modified_template = await updateTemplate({
-    id,
-    ...validationResult.data,
-  });
-  throw replace(`/dashboard/wp/templates/${modified_template.id}`);
+  try {
+    const modified_template = await updateTemplate({
+      id,
+      ...validationResult.data,
+    });
+    throw replace(`/dashboard/wp/templates/${modified_template.id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errorMessages: {
+            name: [
+              `Template with name: ${validationResult.data.name} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Template() {

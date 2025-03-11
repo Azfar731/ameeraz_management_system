@@ -5,6 +5,7 @@ import { ActionFunctionArgs } from "@remix-run/node";
 import { getEmployeeFormData } from "~/utils/employee/functions.server";
 import { employeeSchema } from "~/utils/employee/validation";
 import { createEmployee } from "~/utils/employee/db.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -17,15 +18,33 @@ export async function action({ request }: ActionFunctionArgs) {
   const { emp_fname, emp_lname, emp_mobile_num, base_salary, percentage } =
     validationResult.data;
 
-  const employee = await createEmployee({
-    emp_fname,
-    emp_lname,
-    emp_mobile_num,
-    base_salary,
-    percentage,
-  });
+  try {
+    const employee = await createEmployee({
+      emp_fname,
+      emp_lname,
+      emp_mobile_num,
+      base_salary,
+      percentage,
+    });
 
-  throw replace(`/employees/${employee.emp_id}`);
+    throw replace(`/employees/${employee.emp_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            emp_mobile_num: [
+              `Employee with mobile number: ${validationResult.data.emp_mobile_num} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Create_Employee() {

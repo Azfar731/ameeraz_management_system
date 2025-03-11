@@ -7,6 +7,7 @@ import { getDealFormData } from "~/utils/deal/functions.server";
 import { dealSchema } from "~/utils/deal/validation";
 import { getActiveServices } from "~/utils/service/db.server";
 import { getDealFromId, updateDeal } from "~/utils/deal/db.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
@@ -42,12 +43,30 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
 
-  const newDeal = await updateDeal({
-    deal_id: id,
-    ...validationResult.data,
-  });
+  try {
+    const updatedDeal = await updateDeal({
+      deal_id: id,
+      ...validationResult.data,
+    });
 
-  throw replace(`/deals/${newDeal.deal_id}`);
+    throw replace(`/deals/${updatedDeal.deal_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            deal_name: [
+              `Deal with name: ${validationResult.data.deal_name} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Deal() {

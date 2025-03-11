@@ -6,6 +6,7 @@ import User_Form from "~/components/users/user_form";
 import { getClearanceLevel } from "~/utils/auth/functions";
 import { UpdateUserErrorMessages } from "~/utils/user/types";
 import { UpdateUserValidation } from "~/utils/user/validation.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -51,8 +52,29 @@ export async function action({ params, request }: ActionFunctionArgs) {
   if (!validationResult.success) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
-  const updated_user = await updateUser({ id, updates: validationResult.data });
-  throw replace(`/dashboard/users/${updated_user.id}`);
+  try {
+    const updated_user = await updateUser({
+      id,
+      updates: validationResult.data,
+    });
+    throw replace(`/dashboard/users/${updated_user.id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errorMessages: {
+            userName: [
+              `User with username ${validationResult.data.userName} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_User() {

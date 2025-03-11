@@ -13,6 +13,7 @@ import { Category } from "@prisma/client";
 import { serviceSchema } from "~/utils/service/validation.server";
 import { getServiceFormData } from "~/utils/service/functions.server";
 import { getServiceFromId, updateService } from "~/utils/service/db.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
@@ -53,14 +54,32 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   const { serv_name, serv_category, serv_price, serv_status } =
     validationResult.data;
-  const updated_service = await updateService({
-    serv_id: id,
-    serv_name,
-    serv_category,
-    serv_price,
-    serv_status,
-  });
-  throw replace(`/services/${updated_service.serv_id}`);
+  try {
+    const updated_service = await updateService({
+      serv_id: id,
+      serv_name,
+      serv_category,
+      serv_price,
+      serv_status,
+    });
+    throw replace(`/services/${updated_service.serv_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            serv_name: [
+              `Service with name: ${validationResult.data.serv_name} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Service() {

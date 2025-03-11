@@ -9,6 +9,7 @@ import { Category } from "@prisma/client";
 import { serviceSchema } from "~/utils/service/validation.server";
 import { getServiceFormData } from "~/utils/service/functions.server";
 import { createService } from "~/utils/service/db.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function loader() {
   const categories = await prisma_client.category.findMany();
@@ -23,11 +24,27 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
-
-  const new_service = await createService(validationResult.data);
-  throw replace(`/services/${new_service.serv_id}`);
+  try {
+    const new_service = await createService(validationResult.data);
+    throw replace(`/services/${new_service.serv_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            serv_name: [
+              `Service with name: ${validationResult.data.serv_name} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
-
 
 export default function Create_Service() {
   const { categories } = useLoaderData<{ categories: Category[] }>();

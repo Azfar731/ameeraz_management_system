@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import User_Form from "~/components/users/user_form";
@@ -15,13 +16,32 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const dataObject = Object.fromEntries(formData.entries());
   console.log("Form Object: ", dataObject);
-  const validationResult = NewUserValidation({loggedInUserClearance: getClearanceLevel("admin"),}).safeParse(dataObject);
+  const validationResult = NewUserValidation({
+    loggedInUserClearance: getClearanceLevel("admin"),
+  }).safeParse(dataObject);
   if (!validationResult.success) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
-  const new_user = await createUser(validationResult.data)
-
-  throw replace(`/dashboard/users/${new_user.id}`)
+  try {
+    const new_user = await createUser(validationResult.data);
+    throw replace(`/dashboard/users/${new_user.id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errorMessages: {
+            userName: [
+              `User with username ${validationResult.data.userName} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Create_User() {

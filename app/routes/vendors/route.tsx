@@ -75,7 +75,23 @@ export default function Vendors() {
     },
   ];
 
-  const theme = useTheme([getTheme()]);
+  const theme = useTheme([
+    getTheme(),
+    {
+      HeaderRow: `
+              background-color: #eaf5fd;
+            `,
+      Row: `
+              &:nth-of-type(odd) {
+                background-color: #d2e9fb;
+              }
+
+              &:nth-of-type(even) {
+                background-color: #eaf5fd;
+              }
+            `,
+    },
+  ]);
 
   const getFormData = (form: HTMLFormElement) => {
     const formData = new FormData(form);

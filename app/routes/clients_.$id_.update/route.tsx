@@ -10,6 +10,7 @@ import { getClientFormData } from "~/utils/client/functions.server";
 import { clientSchema } from "~/utils/client/validation";
 import { ClientErrorData } from "~/utils/client/types";
 import { getClientFromId, updateClient } from "~/utils/client/db.server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { id } = params;
   if (!id) {
@@ -42,13 +43,29 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!validationResult.success) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
-
-  const { updatedClient } = await updateClient({
-    client_id: id,
-    ...validationResult.data,
-  });
-  console.log("Updated Client", updatedClient);
-  throw redirect(`/clients/${updatedClient.client_id}`);
+  try {
+    const { updatedClient } = await updateClient({
+      client_id: id,
+      ...validationResult.data,
+    });
+    throw redirect(`/clients/${updatedClient.client_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errorMessages: {
+            client_mobile_num: [
+              `Client with mobile number: ${validationResult.data.client_mobile_num} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Client() {

@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { replace, useActionData } from "@remix-run/react";
 import Product_Form from "~/components/products/Product_Form";
@@ -14,11 +15,29 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
-  const new_product = await createProduct({
-    ...validationResult.data,
-  });
+  try {
+    const new_product = await createProduct({
+      ...validationResult.data,
+    });
 
-  throw replace(`/products/${new_product.prod_id}`);
+    throw replace(`/products/${new_product.prod_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            prod_name: [
+              `Product with name: ${validationResult.data.prod_name} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Create_Products() {

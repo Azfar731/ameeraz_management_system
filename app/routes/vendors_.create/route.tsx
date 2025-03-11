@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { replace, useActionData } from "@remix-run/react";
 import Vendor_Form from "~/components/vendors/Vendor_Form";
@@ -13,10 +14,26 @@ export async function action({ request }: ActionFunctionArgs) {
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
-
-  const vendor = await createVendor(validationResult.data);
-
-  throw replace(`/vendors/${vendor.vendor_id}`);
+  try {
+    const vendor = await createVendor(validationResult.data);
+    throw replace(`/vendors/${vendor.vendor_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            vendor_mobile_num: [
+              `Vendor with mobile number: ${validationResult.data.vendor_mobile_num} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Create_Vendor() {

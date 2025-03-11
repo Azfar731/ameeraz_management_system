@@ -1,4 +1,5 @@
 import { Vendor } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Vendor_Form from "~/components/vendors/Vendor_Form";
@@ -41,12 +42,30 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }
 
-  const vendor = await updateVendor({
-    vendor_id: id,
-    ...validationResult.data,
-  });
+  try {
+    const vendor = await updateVendor({
+      vendor_id: id,
+      ...validationResult.data,
+    });
 
-  throw replace(`/vendors/${vendor.vendor_id}`);
+    throw replace(`/vendors/${vendor.vendor_id}`);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          errors: {
+            vendor_mobile_num: [
+              `Vendor with mobile number: ${validationResult.data.vendor_mobile_num} already exists`,
+            ],
+          },
+        };
+      } else {
+        throw error;
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 export default function Update_Vendor() {

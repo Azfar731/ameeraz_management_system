@@ -10,48 +10,89 @@ import Select from "react-select";
 import { createMedia } from "~/utils/media/db.server";
 import { MediaValidation } from "~/utils/media/validation";
 import { upload_media } from "~/utils/wp_api/mediaFunctions.server";
+import { captureException } from "@sentry/remix";
 
 export async function action({ request }: ActionFunctionArgs) {
-  const uploadHandler = unstable_composeUploadHandlers(
-    unstable_createFileUploadHandler({
-      directory: "/tmp",
-      file: ({ filename }) => filename,
-      maxPartSize: 5_000_000, // 5MB limit
-    }),
-    unstable_createMemoryUploadHandler()
-  );
-
-  const formData = await unstable_parseMultipartFormData(
-    request,
-    uploadHandler
-  );
-  const file = formData.get("file");
-  if (!file) {
-    return { errors: { file: ["File couldn't be parsed"] } };
-  }
-
-  // Convert formData to an object but manually add the file
-  const formObject = Object.fromEntries(formData.entries());
-
-  const validationResult = await MediaValidation.safeParseAsync({
-    ...formObject,
-    fileType: file.type,
-  });
-  if (!validationResult.success) {
-    return { errors: validationResult.error.flatten().fieldErrors };
-  }
-
-  const { fileType, name, type } = validationResult.data;
   try {
-    const mediaId = await upload_media({
-      filePath: file.filepath,
-      type: fileType,
+    const uploadHandler = unstable_composeUploadHandlers(
+      unstable_createFileUploadHandler({
+        directory: "/tmp",
+        file: ({ filename }) => filename,
+        maxPartSize: 5_000_000, // 5MB limit
+        //allow files of types: image/png, image/jpeg, video/mp4, video/3gp
+        filter: ({ contentType }) => {
+          console.log("File content Type: ", contentType);
+          return (
+            contentType === "image/png" ||
+            contentType === "image/jpeg" ||
+            contentType === "video/mp4" ||
+            contentType === "video/3gp"
+          );
+        },
+      }),
+      unstable_createMemoryUploadHandler()
+    );
+
+    const formData = await unstable_parseMultipartFormData(
+      request,
+      uploadHandler
+    );
+
+    const file = formData.get("file") as File & { filepath: string };
+    if (!file?.filepath) {
+      return {
+        errors: {
+          file: [
+            "File couldn't be parsed. Make sure the file type is: png, jpg/jepg, mp4 or 3gp",
+          ],
+        },
+      };
+    }
+
+    // Convert formData to an object but manually add the file
+    const formObject = Object.fromEntries(formData.entries());
+
+    const validationResult = await MediaValidation.safeParseAsync({
+      ...formObject,
+      fileType: file.type,
     });
-    await createMedia({ id: mediaId, name, type });
-    return redirect("/dashboard/wp");
+    if (!validationResult.success) {
+      return { errors: validationResult.error.flatten().fieldErrors };
+    }
+
+    const { fileType, name, type } = validationResult.data;
+    try {
+      const mediaId = await upload_media({
+        filePath: file.filepath,
+        type: fileType,
+      });
+      await createMedia({ id: mediaId, name, type });
+      return redirect("/dashboard/wp");
+    } catch (error) {
+      if (error instanceof Error) {
+        captureException(error);
+      } else {
+        captureException(
+          new Error(
+            `Unknown Error occurred while uploading File to Meta Server. Error: ${error}`
+          )
+        );
+      }
+
+      return { errors: { file: ["Failed to upload file to Meta Servers."] } };
+    }
   } catch (error) {
-    console.log("Error: ", error);
-    return { errors: { file: ["Failed to upload file to Meta Servers."] } };
+    if (error instanceof Error) {
+      if (error.message.includes("exceeded upload size")) {
+        return {
+          errors: { file: ["File size exceeds the 5MB limit."] },
+        };
+      }
+
+      throw error;
+    } else {
+      throw error;
+    }
   }
 }
 
@@ -126,7 +167,7 @@ export default function Upload_Media() {
         <input
           type="file"
           name="file"
-          accept=".mp4,.3gp,.png,.jpeg"
+          accept=".mp4,.3gp,.png,.jpeg,.jpg,"
           className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
           required
         />

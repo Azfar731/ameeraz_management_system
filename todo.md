@@ -1,16 +1,18 @@
 ## Today:
-- Use error handling for unique value constraint
 - Implement authorization
 - Implement user logs
+
+
+## Done
+- Use error handling for unique value constraint
+- Check file types before processing the file. add safety checks
 - Add error handling for file upload
-
-
-
+  - handle max size error
 
 ## Things to do:
 - Add error handling in upload Media
 - Verify how errors are shown in build
-- Check file types before processing the file. add safety checks
+ - set different file limits for images and videos
 - See how I can implement authentication based on environemnt(production, development)
 
 ## Bugs:

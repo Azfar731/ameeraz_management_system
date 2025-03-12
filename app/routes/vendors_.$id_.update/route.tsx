@@ -3,12 +3,14 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Vendor_Form from "~/components/vendors/Vendor_Form";
+import { authenticate } from "~/utils/auth/functions.server";
 import { getVendorFromId, updateVendor } from "~/utils/vendors/db.server";
 import { getVendorFormData } from "~/utils/vendors/functions.server";
 import { VendorErrors } from "~/utils/vendors/types";
 import { vendorSchema } from "~/utils/vendors/validations.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
   const { id } = params;
   if (!id) {
     throw new Response("Id not provided in URL", {

@@ -2,11 +2,14 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { replace, useActionData } from "@remix-run/react";
 import Vendor_Form from "~/components/vendors/Vendor_Form";
+import { authenticate } from "~/utils/auth/functions.server";
 import { createVendor } from "~/utils/vendors/db.server";
 import { getVendorFormData } from "~/utils/vendors/functions.server";
 import { VendorErrors } from "~/utils/vendors/types";
 import { vendorSchema } from "~/utils/vendors/validations.server";
 export async function action({ request }: ActionFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 2 });
   const formData = await request.formData();
   const vendorData = getVendorFormData(formData);
 

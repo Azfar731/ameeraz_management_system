@@ -2,9 +2,11 @@ import { Vendor } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
+import { authenticate } from "~/utils/auth/functions.server";
 import { getVendorFromId } from "~/utils/vendors/db.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 1 });
   const { id } = params;
   if (!id) {
     throw new Response("Id not provided in URL", {

@@ -11,8 +11,12 @@ import {
 import { productTransactionFetchSchema } from "~/utils/productTransaction/validation.server";
 import Product_Transaction_FetchForm from "./FetchForm";
 import ProductTransactionTable from "./ProductTransactionTable";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const searchParams = new URL(request.url).searchParams;
   const products = await getAllProducts();
   const formValues = fetchFormValues(searchParams);

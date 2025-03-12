@@ -18,8 +18,12 @@ import {
   setSearchParameters,
 } from "~/utils/functions";
 import ClientTransactionsTable from "./ClientTransactionsTable";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const searchParams = new URL(request.url).searchParams;
   const formValues = fetchFormValues(searchParams);
 

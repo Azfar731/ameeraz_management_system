@@ -15,8 +15,12 @@ import { setSearchParameters } from "~/utils/functions";
 import { FaPlus } from "react-icons/fa";
 import { ExpenseDateErrors } from "~/utils/expenses/types";
 import CompactTableComponent from "./ExpensesTable";
+import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 1 });
+
   const searchParams = new URL(request.url).searchParams;
 
   const start_date = searchParams.get("start_date") || undefined;

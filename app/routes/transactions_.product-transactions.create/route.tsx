@@ -2,7 +2,11 @@ import { useLoaderData } from "@remix-run/react";
 import { getProductSaleRecords } from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import ProductSaleRecordTable from "../products-sale-record/ProductSaleRecordTable";
-export async function loader() {
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { authenticate } from "~/utils/auth/functions.server";
+
+export async function loader({request}: LoaderFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
   const pending_records = await getProductSaleRecords({
     payment_cleared: false,
   });

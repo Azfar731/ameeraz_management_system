@@ -14,7 +14,7 @@ import {
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
 import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+  await authenticate({ request, requiredClearanceLevel: 2 });
 
   const { id } = params;
 
@@ -40,6 +40,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 2 });
+
   const { id } = params;
   if (!id) {
     throw new Response("NO ID in the URL", {

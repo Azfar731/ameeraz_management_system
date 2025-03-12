@@ -18,7 +18,8 @@ export async function loader({request}: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   
-  console.log("formData MEthod: ", request.method)
+  await authenticate({request, requiredClearanceLevel: 3 });
+  
   if (request.method === "DELETE") {
     console.log("Delete request received");
     const deletedCount = await cleanupFailedMessages(0)

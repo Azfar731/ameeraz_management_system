@@ -10,10 +10,9 @@
   - handle max size error
 
 ## Things to do:
-- Add error handling in upload Media
+
 - Verify how errors are shown in build
  - set different file limits for images and videos
-- See how I can implement authentication based on environemnt(production, development)
 - Find a subset for PrismaClientKnownRequestError package as it is very heavy
 - Start authentication from transactions_.product-transactions_.$id_.update
 - Apply authentication to create and update route action functions. Also create loaders.

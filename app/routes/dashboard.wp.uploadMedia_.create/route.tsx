@@ -1,5 +1,6 @@
 import {
   ActionFunctionArgs,
+  LoaderFunctionArgs,
   unstable_composeUploadHandlers,
   unstable_createFileUploadHandler,
   unstable_createMemoryUploadHandler,
@@ -11,10 +12,19 @@ import { createMedia } from "~/utils/media/db.server";
 import { MediaValidation } from "~/utils/media/validation";
 import { upload_media } from "~/utils/wp_api/mediaFunctions.server";
 import { captureException } from "@sentry/remix";
+import { authenticate } from "~/utils/auth/functions.server";
+
+export async function loader({request}: LoaderFunctionArgs){
+  await authenticate({request, requiredClearanceLevel: 3 });
+}
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
+
+ 
   try {
     const uploadHandler = unstable_composeUploadHandlers(
+      
       unstable_createFileUploadHandler({
         directory: "/tmp",
         file: ({ filename }) => filename,

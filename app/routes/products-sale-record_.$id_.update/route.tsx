@@ -14,9 +14,9 @@ import {
 import { ProductSaleRecordUpdateSchema } from "~/utils/productSaleRecord/validation.server";
 import Product_Sale_Record_Form from "./product_Sale_Record_Form";
 import { authenticate } from "~/utils/auth/functions.server";
-export async function loader({request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 3 });
-  
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
+
   const { id } = params;
   if (!id) {
     throw new Response("ID not provided in the URL", {
@@ -49,6 +49,8 @@ type ActionDataObject = {
 };
 
 export async function action({ request, params }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
+
   const { id } = params;
   if (!id) {
     throw new Response("ID not provided in the URL", {

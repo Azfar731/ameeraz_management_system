@@ -11,8 +11,8 @@ import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    await authenticate({request, requiredClearanceLevel: 1 });
-  
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const { serviceRecordId } = params;
   if (!serviceRecordId) {
     throw new Response("No Id provided in the URL", {
@@ -35,6 +35,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const { serviceRecordId } = params;
   if (!serviceRecordId) {
     throw new Response("No Id provided in the URL", {

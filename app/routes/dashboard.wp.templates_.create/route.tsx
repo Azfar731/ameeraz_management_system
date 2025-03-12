@@ -14,6 +14,8 @@ export async function loader({request}: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 3 });
+
   const data = await request.json();
   const validationResult = TemplateSchema.safeParse(data);
   if (!validationResult.success) {

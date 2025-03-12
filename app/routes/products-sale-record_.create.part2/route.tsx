@@ -22,6 +22,8 @@ export async function loader({request}: LoaderFunctionArgs){
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const formData = await request.formData();
   const mobile_num = formData.get("mobile_num")?.toString() || "";
   if (!mobile_num) {

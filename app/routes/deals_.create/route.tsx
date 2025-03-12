@@ -17,6 +17,8 @@ export async function loader({request}: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const formData = await request.formData();
   const dealFormData = getDealFormData(formData);
   const validationResult = dealSchema.safeParse(dealFormData);

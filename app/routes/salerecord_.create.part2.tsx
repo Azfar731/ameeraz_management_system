@@ -42,6 +42,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const json: Omit<FormType, "employees" | "mobile_num"> = await request.json();
 
   // Validate payment details
@@ -70,7 +72,6 @@ function validatePayment(amount_paid: number, amount_charged: number) {
 }
 
 export default function Part2() {
-  
   const navigation = useNavigation();
   //context
   const { formData, setFormData } = useOutletContext<{
@@ -231,14 +232,18 @@ export default function Part2() {
       dealsQuantity.reduce((acc, curr) => {
         const deal = deals.find((deal) => deal.deal_id === curr.id);
         if (!deal) {
-          throw new Error(`Deal not found while calcaluating expected amount. ID: ${curr.id}`);
+          throw new Error(
+            `Deal not found while calcaluating expected amount. ID: ${curr.id}`
+          );
         }
         return acc + deal.deal_price * curr.quantity;
       }, 0) +
       servicesQuantity.reduce((acc, curr) => {
         const service = deals.find((deal) => deal.deal_id === curr.id);
         if (!service) {
-          throw new Error(`Service not found while calcaluating expected amount. ID: ${curr.id}`);
+          throw new Error(
+            `Service not found while calcaluating expected amount. ID: ${curr.id}`
+          );
         }
         return acc + service.deal_price * curr.quantity;
       }, 0);

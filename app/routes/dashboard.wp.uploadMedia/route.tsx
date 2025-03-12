@@ -25,6 +25,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
+
   if (request.method === "DELETE") {
     console.log("recieved a delete request");
     const { id } = await request.json();

@@ -20,6 +20,8 @@ export async function loader({ request }: ActionFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 2 });
+
   const formData = await request.formData();
   const serviceFormData = getServiceFormData(formData);
 

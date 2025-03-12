@@ -33,6 +33,9 @@ export async function loader({request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
+
+  await authenticate({request, requiredClearanceLevel: 2 });
+
   const { id } = params;
   if (!id) {
     throw new Response("Id not found in URL", {

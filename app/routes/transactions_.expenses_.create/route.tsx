@@ -8,10 +8,12 @@ import { ExpenseErrors } from "~/utils/expenses/types";
 import { expensesSchema } from "~/utils/expenses/validation.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+  await authenticate({ request, requiredClearanceLevel: 2 });
   return null;
 }
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 2 });
+
   const formData = await request.formData();
   const vendorData = getExpenseFormData(formData);
 

@@ -10,7 +10,7 @@ import { ProductTransactionErrorData } from "~/utils/productTransaction/types";
 import { productTransactionSchema } from "~/utils/productTransaction/validation.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+  await authenticate({ request, requiredClearanceLevel: 2 });
   const { productSaleRecordId } = params;
   if (!productSaleRecordId) {
     throw new Response("NO ID provided in the URL", {
@@ -34,6 +34,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 2 });
+
   const { productSaleRecordId } = params;
   if (!productSaleRecordId) {
     throw new Response("NO ID provided in the URL", {

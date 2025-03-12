@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, replace } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
 import Client_Form from "~/components/clients/client_form";
 import { useActionData } from "@remix-run/react";
 import { clientSchema } from "../../utils/client/validation";
@@ -7,6 +7,12 @@ import { ClientErrorData } from "~/utils/client/types";
 import { createClient } from "~/utils/client/db.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
+
+
+export async function loader({request}: LoaderFunctionArgs){
+  await authenticate({request, requiredClearanceLevel: 1 });
+  return null;
+}
 export async function action({ request }: ActionFunctionArgs) {
   await authenticate({request, requiredClearanceLevel: 1 });
 

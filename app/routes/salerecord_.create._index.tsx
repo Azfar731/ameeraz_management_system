@@ -21,6 +21,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const formData = await request.formData();
   const mobile_num = formData.get("mobile_num")?.toString() || "";
   if (!mobile_num) {
@@ -86,7 +88,9 @@ export default function Part1() {
         <button
           type="submit"
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
-          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
         >
           Next
         </button>

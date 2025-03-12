@@ -5,7 +5,6 @@ import { WebhookObj } from "~/utils/webhooks/types.server";
 import { sendFreeFormMessage } from "~/utils/wp_api/functions.server";
 import { env } from "~/config/env.server";
 
-
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const mode = url.searchParams.get("hub.mode");
@@ -70,15 +69,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                       status: true,
                       mobile_num: phoneNumber,
                     });
+
+                    console.log(
+                      `Client with phone ${phoneNumber} subscribed to promotions`
+                    );
+                    // Send confirmation message to user
+                    await sendFreeFormMessage({
+                      recipient: phoneNumber,
+                      msg: `You have been successfully subscribed to promotions`,
+                    });
                   }
-                  console.log(
-                    `Client with phone ${phoneNumber} subscribed to promotions`
-                  );
-                  // Send confirmation message to user
-                  await sendFreeFormMessage({
-                    recipient: phoneNumber,
-                    msg: `You have been successfully subscribed to promotions`,
-                  });
                 }
               });
             }

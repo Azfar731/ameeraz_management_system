@@ -5,12 +5,12 @@ import { ActionFunctionArgs, replace } from "@remix-run/node";
 import { prisma_client } from "~/.server/db";
 
 import { ServiceErrors } from "~/utils/service/types";
-import { Category } from "@prisma/client";
+import { Prisma, Category } from "@prisma/client";
 import { serviceSchema } from "~/utils/service/validation.server";
 import { getServiceFormData } from "~/utils/service/functions.server";
 import { createService } from "~/utils/service/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
+
 
 export async function loader({ request }: ActionFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 2 });
@@ -33,7 +33,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const new_service = await createService(validationResult.data);
     throw replace(`/services/${new_service.serv_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

@@ -1,4 +1,3 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData } from "@remix-run/react";
 import Template_Form from "~/components/templates/TemplateForm";
@@ -6,6 +5,7 @@ import { authenticate } from "~/utils/auth/functions.server";
 import { createTemplate } from "~/utils/templates/db.server";
 import { TemplateErrorMessages } from "~/utils/templates/types";
 import { TemplateSchema } from "~/utils/templates/validation.server";
+import { Prisma } from "@prisma/client";
 
 export async function loader({request}: LoaderFunctionArgs) {
   await authenticate({request, requiredClearanceLevel: 3 });
@@ -26,7 +26,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const new_template = await createTemplate(validationResult.data);
     throw replace(`/dashboard/wp/templates/${new_template.id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errorMessages: {

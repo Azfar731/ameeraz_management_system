@@ -1,5 +1,5 @@
-import Service_Form from "~/components/services/service_form";
 import { useActionData, useLoaderData } from "@remix-run/react";
+import Service_Form from "~/components/services/service_form";
 
 import {
   ActionFunctionArgs,
@@ -8,14 +8,12 @@ import {
 } from "@remix-run/node";
 import { prisma_client } from "~/.server/db";
 
-import { ServiceErrors, ServiceWithRelations } from "~/utils/service/types";
-import { Category } from "@prisma/client";
-import { serviceSchema } from "~/utils/service/validation.server";
-import { getServiceFormData } from "~/utils/service/functions.server";
-import { getServiceFromId, updateService } from "~/utils/service/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Category, Prisma } from "@prisma/client";
 import { authenticate } from "~/utils/auth/functions.server";
-
+import { getServiceFromId, updateService } from "~/utils/service/db.server";
+import { getServiceFormData } from "~/utils/service/functions.server";
+import { ServiceErrors, ServiceWithRelations } from "~/utils/service/types";
+import { serviceSchema } from "~/utils/service/validation.server";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await authenticate({request, requiredClearanceLevel: 2 });
 
@@ -69,7 +67,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     });
     throw replace(`/services/${updated_service.serv_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

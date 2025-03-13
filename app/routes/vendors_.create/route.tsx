@@ -1,5 +1,5 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { Prisma } from "@prisma/client";
 import { replace, useActionData } from "@remix-run/react";
 import Vendor_Form from "~/components/vendors/Vendor_Form";
 import { authenticate } from "~/utils/auth/functions.server";
@@ -26,7 +26,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const vendor = await createVendor(validationResult.data);
     throw replace(`/vendors/${vendor.vendor_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

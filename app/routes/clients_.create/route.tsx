@@ -5,9 +5,8 @@ import { clientSchema } from "../../utils/client/validation";
 import { getClientFormData } from "~/utils/client/functions.server";
 import { ClientErrorData } from "~/utils/client/types";
 import { createClient } from "~/utils/client/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
-
+import { Prisma } from "@prisma/client";
 
 export async function loader({request}: LoaderFunctionArgs){
   await authenticate({request, requiredClearanceLevel: 1 });
@@ -28,7 +27,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const client = await createClient(validationResult.data);
     throw replace(`/clients/${client.client_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errorMessages: {

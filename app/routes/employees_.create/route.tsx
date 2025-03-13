@@ -5,9 +5,8 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { getEmployeeFormData } from "~/utils/employee/functions.server";
 import { employeeSchema } from "~/utils/employee/validation";
 import { createEmployee } from "~/utils/employee/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
-
+import { Prisma } from "@prisma/client";
 
 export async function loader({request}: LoaderFunctionArgs){
   await authenticate({request, requiredClearanceLevel: 3 });
@@ -37,7 +36,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
     throw replace(`/employees/${employee.emp_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

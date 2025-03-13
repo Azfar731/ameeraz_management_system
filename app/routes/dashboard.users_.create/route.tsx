@@ -1,4 +1,3 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import User_Form from "~/components/users/user_form";
@@ -6,7 +5,7 @@ import { getClearanceLevel } from "~/utils/auth/functions";
 import { createUser } from "~/utils/user/db.server";
 import { CreateUserErrorMessages } from "~/utils/user/types";
 import { NewUserValidation } from "~/utils/user/validation.server";
-
+import { Prisma } from "@prisma/client";
 export async function loader() {
   const loggedInUserClearanceLevel = 4;
   return { loggedInUserClearanceLevel };
@@ -26,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const new_user = await createUser(validationResult.data);
     throw replace(`/dashboard/users/${new_user.id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errorMessages: {

@@ -7,11 +7,10 @@ import {
   replace,
 } from "@remix-run/node";
 import { getEmployeeFormData } from "~/utils/employee/functions.server";
-import { Employee } from "@prisma/client";
+import { Prisma, Employee } from "@prisma/client";
 import { employeeSchema } from "~/utils/employee/validation";
 
 import { getEmployeeFromId, updateEmployee } from "~/utils/employee/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({request, params }: LoaderFunctionArgs) {
   await authenticate({request, requiredClearanceLevel: 3 });
@@ -73,7 +72,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     throw replace(`/employees/${updated_employee.emp_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

@@ -1,5 +1,4 @@
-import { Product } from "@prisma/client";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { Prisma, Product } from "@prisma/client";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import Product_Form from "~/components/products/Product_Form";
@@ -56,7 +55,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     throw replace(`/products/${updated_product.prod_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

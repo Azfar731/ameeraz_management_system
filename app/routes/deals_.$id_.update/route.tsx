@@ -1,4 +1,4 @@
-import { Service } from "@prisma/client";
+import { Prisma, Service } from "@prisma/client";
 import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
 import Deal_Form from "~/components/deals/deal_form";
@@ -7,7 +7,6 @@ import { getDealFormData } from "~/utils/deal/functions.server";
 import { dealSchema } from "~/utils/deal/validation";
 import { getActiveServices } from "~/utils/service/db.server";
 import { getDealFromId, updateDeal } from "~/utils/deal/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({request, params }: LoaderFunctionArgs) {
@@ -55,7 +54,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     throw replace(`/deals/${updatedDeal.deal_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

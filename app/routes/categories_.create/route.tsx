@@ -5,9 +5,8 @@ import { CategoryErrors } from "~/utils/category/types";
 import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
 import { categorySchema } from "~/utils/category/validation";
 import { createCategory } from "~/utils/category/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
-
+import { Prisma } from "@prisma/client";
 
 export async function loader({request}: LoaderFunctionArgs){
   await authenticate({request, requiredClearanceLevel: 2 });
@@ -28,7 +27,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const new_cateogry = await createCategory(validationResult.data);
     throw replace(`/categories/${new_cateogry.cat_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

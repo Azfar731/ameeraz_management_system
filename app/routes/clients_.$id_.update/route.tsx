@@ -1,17 +1,16 @@
+import { Client, Prisma } from "@prisma/client";
 import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import Client_Form from "~/components/clients/client_form";
-import { useLoaderData, useActionData } from "@remix-run/react";
-import { Client } from "@prisma/client";
-import { getClientFormData } from "~/utils/client/functions.server";
-import { clientSchema } from "~/utils/client/validation";
-import { ClientErrorData } from "~/utils/client/types";
-import { getClientFromId, updateClient } from "~/utils/client/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authenticate } from "~/utils/auth/functions.server";
+import { getClientFromId, updateClient } from "~/utils/client/db.server";
+import { getClientFormData } from "~/utils/client/functions.server";
+import { ClientErrorData } from "~/utils/client/types";
+import { clientSchema } from "~/utils/client/validation";
 export async function loader({request, params }: LoaderFunctionArgs) {
     await authenticate({request, requiredClearanceLevel: 2 });
   
@@ -56,7 +55,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     });
     throw redirect(`/clients/${updatedClient.client_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errorMessages: {

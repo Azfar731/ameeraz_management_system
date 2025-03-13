@@ -1,16 +1,14 @@
-import Category_Form from "~/components/categories/category_form";
-
-import { useActionData, useLoaderData } from "@remix-run/react";
-import { CategoryErrors } from "~/utils/category/types";
+import { Prisma ,Category } from "@prisma/client";
 import {
   ActionFunctionArgs,
   LoaderFunctionArgs,
   replace,
 } from "@remix-run/node";
-import { categorySchema } from "~/utils/category/validation";
-import { Category } from "@prisma/client";
+import { useActionData, useLoaderData } from "@remix-run/react";
+import Category_Form from "~/components/categories/category_form";
 import { getCategoryFromId, updateCategory } from "~/utils/category/db.server";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { CategoryErrors } from "~/utils/category/types";
+import { categorySchema } from "~/utils/category/validation";
 import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({ request, params }: LoaderFunctionArgs) {
 
@@ -58,7 +56,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const updated_cateogry = await updateCategory({ cat_name, cat_id: id });
     throw replace(`/categories/${updated_cateogry.cat_id}`);
   } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
           errors: {

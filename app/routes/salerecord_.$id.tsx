@@ -81,7 +81,7 @@ export default function Record() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative ">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <Link
         to={`/`}
         className="bg-green-400 text-white font-semibold py-2 px-4 absolute top-4 left-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"

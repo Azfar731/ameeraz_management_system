@@ -5,9 +5,15 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
+    "build:dev": "dotenv -e .env.development -- remix vite:build",
+    "build:staging": "dotenv -e .env.staging -- remix vite:build",
+    "build:prod": "dotenv -e .env.production -- remix vite:build",
     "dev": "dotenv -e .env.development -- remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "set NODE_OPTIONS=--import ./instrumentation.server.mjs && remix-serve ./build/server/index.js",
+    "start:dev": "dotenv -e .env.development -- remix-serve ./build/server/index.js",
+    "start:staging": "dotenv -e .env.staging -- remix-serve ./build/server/index.js",
+    "start:prod": "set NODE_OPTIONS=--import ./instrumentation.server.mjs && dotenv -e .env.production -- remix-serve ./build/server/index.js",
     "typecheck": "tsc",
     "db-stop": "npx supabase stop --backup",
     "execute": "node --no-warnings --experimental-specifier-resolution=node --loader ./loader.js",
@@ -25,13 +31,7 @@
     "posttest:i": "npm run db:down",
     "pretest:i:ui": "npm run script \"npm run db:up && npx prisma migrate deploy\" test",
     "test:i:ui": "npm run script \"vitest run --config ./vitest.config.integration.ts --ui --api 9527\" test",
-    "posttest:i:ui": "npm run db:down",
-    "start:dev": "dotenv -e .env.development -- remix-serve ./build/server/index.js",
-    "start:staging": "dotenv -e .env.staging -- remix-serve ./build/server/index.js",
-    "start:prod": "dotenv -e .env.production -- remix-serve ./build/server/index.js",
-    "build:dev": "dotenv -e .env.development -- remix vite:build",
-    "build:staging": "dotenv -e .env.staging -- remix vite:build",
-    "build:prod": "dotenv -e .env.production -- remix vite:build"
+    "posttest:i:ui": "npm run db:down"    
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

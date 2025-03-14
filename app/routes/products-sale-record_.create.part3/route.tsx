@@ -19,6 +19,7 @@ import {
   getAllPaymentMenuOptions,
   getSinglePaymentMenuOption,
 } from "~/utils/functions";
+import { createLog } from "~/utils/logs/db.server";
 import { getAllProducts } from "~/utils/products/db.server";
 import { createProductSaleRecord } from "~/utils/productSaleRecord/db.server";
 import {
@@ -66,7 +67,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  await authenticate({ request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 2 });
 
   const data: ProductSaleRecordCreateFormType = await request.json();
 
@@ -80,7 +81,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
   // Save the data to the database
   const record = await createProductSaleRecord(validationResult.data);
-  console.log("Record created: ", record);
+  await createLog({
+    userId,
+    log_type: "create",
+    log_message: `Created Product Sale Record. Link: /products-sale-record/${record.product_record_id}`,
+  });
   throw replace(`/products-sale-record/${record.product_record_id}`);
 };
 

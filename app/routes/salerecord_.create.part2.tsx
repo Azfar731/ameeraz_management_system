@@ -291,6 +291,8 @@ export default function Part2() {
     const { amount_charged, amount_paid, payment_mode } =
       extractFormData(formData);
 
+    console.log("AmountCharged: ", amount_charged)
+    console.log("amount Paid", amount_paid)
     // Determine the mode of payment
     const mode_of_payment = getSinglePaymentMenuOption(
       payment_mode as PaymentModes
@@ -304,9 +306,9 @@ export default function Part2() {
       amount_paid,
       mode_of_payment,
     };
-
+    console.log("FormDataObject: ", formDataObj)
     // Update form data state
-    setFormData((prev) => ({ ...prev, ...formDataObj }));
+    setFormData((prev) => ({ ...prev, ...formDataObj}));
 
     // Submit form
     submit(formDataObj, { method: "post", encType: "application/json" });

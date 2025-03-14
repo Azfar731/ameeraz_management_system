@@ -67,6 +67,15 @@ enum Client_Property {
 }
 
 
+enum Log_Type {
+  loggedIn
+  loggedOut
+  create
+  read
+  update
+  delete
+}
+
 model User {
   id       String    @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
   userName String    @unique
@@ -77,6 +86,8 @@ model User {
   account_status  Account_Status @default(active)
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
+
+  logs Logs[]
 }
 
 
@@ -282,6 +293,17 @@ model Mobile_number_record{
   mobile_number String @id 
 }
 
+
+//model for logging information
+model Logs {
+  id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  userId String @db.Uuid
+  log_type Log_Type
+  log_message String
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
 
 
 

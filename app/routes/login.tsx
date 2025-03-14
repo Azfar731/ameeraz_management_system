@@ -6,6 +6,7 @@ import {
 import { Form, useLoaderData } from "@remix-run/react";
 import { authenticator } from "~/auth.server";
 import { commitSession, getSession } from "~/sessions";
+import { createLog } from "~/utils/logs/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("cookie"));
   const userId = session.get("userId");
@@ -26,6 +27,11 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   }
   session.set("userId", userId);
+  await createLog({
+    userId,
+    log_type: "loggedIn",
+    log_message: "User logged in",
+  });
   throw redirect("/", {
     headers: { "Set-Cookie": await commitSession(session) },
   });
@@ -35,7 +41,6 @@ export default function Login() {
   const loaderData = useLoaderData<{ error: string | undefined }>();
   return (
     <div className="flex justify-center">
-      
       <Form
         method="post"
         className="flex flex-col  bg-white mt-14 p-6 rounded shadow-md w-80 "

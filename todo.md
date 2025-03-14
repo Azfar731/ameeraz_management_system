@@ -2,18 +2,19 @@
 
 - Implement user logs
 
-
 ## Done
+
 - Use error handling for unique value constraint
 - Check file types before processing the file. add safety checks
 - Add error handling for file upload
   - handle max size error
+- Find a subset for PrismaClientKnownRequestError package as it is very heavy
+- Verify how errors are shown in build
 
 ## Things to do:
 
-- Verify how errors are shown in build
- - set different file limits for images and videos
-- Find a subset for PrismaClientKnownRequestError package as it is very heavy
+- set different file limits for images and videos
+
 
 ## Bugs:
 
@@ -22,7 +23,9 @@
 ## frontend:
 
 ## backend
+
 585697
+
 ## Tasks Done:
 
 - fixed issues in CLientTransaction caused due to change in Service Sale Record schema
@@ -70,6 +73,10 @@ components/Entity.tsx
 
 ## Other information
 
+### Known bugs:
+Compact table has a value of 1 < z-index > 10, so it sometimes obsturcuts the Select  menu
+
+
 ### Prompt for replacing error instances with Response:
 
 In the files selected in the working set, search loader and action functions for thrown error instances: "throw new Error("<Error Message>") and replace them with the following:
@@ -86,7 +93,5 @@ statusText: with an appropriate Text for status
 
     "dev": "remix vite:dev",
     "start": "NODE_OPTIONS='--import ./instrumentation.server.mjs' remix-serve ./build/server/index.js",
-
-
 
 

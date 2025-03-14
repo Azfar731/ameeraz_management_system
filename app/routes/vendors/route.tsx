@@ -51,6 +51,7 @@ export default function Vendors() {
   const navigation = useNavigation();
   console.log("Vendors Fetched: ", vendors);
 
+  //table values
   const nodes = [...vendors];
   const data = { nodes };
 

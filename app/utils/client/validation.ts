@@ -23,5 +23,11 @@ const clientSchema = z.object({
     client_area: z.string().min(1, "Area is required."),
     subscribed: z.enum(["true","false"])
   });
+
+const partialClientSchema = clientSchema.omit({ client_area: true }).partial()
   
-export {clientSchema}
+const fetchClientSchema = partialClientSchema.extend({
+  client_areas: z.array(z.string()).optional()
+})
+
+export {clientSchema, fetchClientSchema}

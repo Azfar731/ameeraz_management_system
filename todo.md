@@ -11,6 +11,8 @@
 - Find a subset for PrismaClientKnownRequestError package as it is very heavy
 - Verify how errors are shown in build
 
+
+
 ## Things to do:
 
 - set different file limits for images and videos
@@ -18,35 +20,16 @@
 
 ## Bugs:
 
-- salesRecord create: paid amount is reset to amount_charged automatically
+- salesRecord create: paid amount is reset to amount_charged automatically(in dev only cause useEffect runs twice on react strict mode)
 
-## frontend:
 
-## backend
-
-585697
-
-## Tasks Done:
-
-- fixed issues in CLientTransaction caused due to change in Service Sale Record schema
-- add elements in navbar
-- make clientTransactions the default in transactions
-- added icons to sale record page.
-- fix params issue in sales record page
-- add payment cleared parameter to sale record page
-- added show all employees functionality in employees page
-- fix form overlapping navbar by changing h-screen to min-h-screen so that if the forms or anything else exceeds the screen height, it doesn't overlap with navbar
-- seperated Client Transactions and Operational Expenses route form and table logic into seperate components
-- create an All transaction page
-- added pending value param to product sale record fetch form
 
 ## Improvements:
 
 ### Services:
 
 1. save search parameters when going from "/services" to "/services/$id"
-2. Disable buttons while form is submitting
-3. Figure out how to provide data to refine function messages in zod
+2. Figure out how to provide data to refine function messages in zod
 
 ### Client:
 

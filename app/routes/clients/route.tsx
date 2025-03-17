@@ -13,61 +13,44 @@ import Select, { OnChangeValue } from "react-select";
 
 import areasList from "../../components/clients/areas.json";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Boolean_Strings, Client } from "@prisma/client";
+import { Client } from "@prisma/client";
 import { formatDate } from "shared/utilityFunctions";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 // import * as Sentry from "@sentry/remix";
 import { getSearchParams } from "~/utils/client/functions";
 import { getClients } from "~/utils/client/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
+import { fetchClientSchema } from "~/utils/client/validation";
 export async function loader({ request }: LoaderFunctionArgs) {
-  
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
-  
-  
-  // if (!Sentry.getClient()) {
-  //   console.error("No Sentry client initialized!");
-  //   throw new Response("Sentry is not configured correctly", {
-  //     status: 500,
-  //     statusText: "Internal Server Error"
-  //   });
-  // }
-  
-  // const errorID = Sentry.captureException(new Error("Exception thrown from client"))
-  // console.log("Error ID: ", errorID)
-
-  // const promiseRes =  await Sentry.flush()
-  // console.log("Sentry Promise result", promiseRes)
-  
-  // throw new Response("Testing Response Error Boundary New", {
-  //   status: 500,
-  //   statusText: "Internal Server Error"
-  // });
-  // throw new Error("This is the error thrown from loader")
   const searchParams = new URL(request.url).searchParams;
-  const { mobile_num, fname, lname, areas, subscribe } =
-    getSearchParams(searchParams);
-  if (mobile_num || fname || lname || areas || subscribe) {
-    const clients = await getClients({
-      mobile_num,
-      fname,
-      lname,
-      areas,
-      subscribe: subscribe as Boolean_Strings,
-    });
-    return { clients };
+  const data = getSearchParams(searchParams);
+
+  const validationResult = fetchClientSchema.safeParse(data);
+  if (!validationResult.success) {
+    return { errors: validationResult.error.flatten().fieldErrors };
   }
-  return { clients: [] };
+  const valueProvided = !Object.values(validationResult.data).every(
+    (value) => value === undefined || value === null
+  );
+  console.log("Validation Result: ", validationResult.data);
+  if (valueProvided) {
+    const clients = await getClients(validationResult.data);
+    return { clients };
+  } else {
+    return { clients: [] };
+  }
 }
 
 export default function Clients() {
   const [searchParams, setSearchParams] = useSearchParams();
   const {
-    mobile_num: sp_mobile_num,
-    fname: sp_fname,
-    lname: sp_lname,
-    areas: sp_areas,
+    client_mobile_num: sp_mobile_num,
+    client_fname: sp_fname,
+    client_lname: sp_lname,
+    client_areas: sp_areas,
+    subscribed: sp_subscribed,
   } = getSearchParams(searchParams);
   const { clients } = useLoaderData<{ clients: Client[] }>();
   const navigation = useNavigation();
@@ -285,6 +268,11 @@ export default function Clients() {
             { value: "true", label: "true" },
             { value: "false", label: "false" },
           ]}
+          defaultValue={
+            sp_subscribed
+              ? { value: sp_subscribed, label: sp_subscribed }
+              : undefined
+          }
           isClearable
           className="basic-multi-select mt-2 "
           classNamePrefix="select"

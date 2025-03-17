@@ -12,7 +12,9 @@ const createClient = async ({
     client_mobile_num,
     client_area,
     subscribed = "true",
-}: Omit<Client, "client_id" | "created_at" | "points" | "subscribed"> & { subscribed?: Boolean_Strings }) => {
+}: Omit<Client, "client_id" | "created_at" | "points" | "subscribed"> & {
+    subscribed?: Boolean_Strings;
+}) => {
     const client = await prisma_client.client.create({
         data: {
             client_fname: (client_fname.toLowerCase()),
@@ -42,7 +44,7 @@ const updateClient = async ({
             client_lname: (client_lname.toLowerCase()),
             client_mobile_num,
             client_area,
-            subscribed
+            subscribed,
         },
     });
     return { updatedClient };
@@ -86,34 +88,34 @@ function _removeInternationalCode(mobile_num: string) {
 }
 
 const getClients = async ({
-    mobile_num,
-    fname,
-    lname,
-    subscribe,
-    areas,
+    client_mobile_num,
+    client_fname,
+    client_lname,
+    subscribed,
+    client_areas,
 }: {
-    mobile_num: string | undefined;
-    fname: string | undefined;
-    lname: string | undefined;
-    subscribe: Boolean_Strings | undefined;
-    areas: string[] | undefined;
+    client_mobile_num?: string;
+    client_fname?: string ;
+    client_lname?: string ;
+    subscribed?: Boolean_Strings;
+    client_areas?: string[];
 }) => {
-    if (mobile_num) {
+    if (client_mobile_num) {
         const client = await prisma_client.client.findFirst({
             where: {
-                client_mobile_num: mobile_num,
+                client_mobile_num: client_mobile_num,
             },
         });
 
         return client ? [client] : [];
     } else {
-        console.log("Areas: ", areas);
+        console.log("Areas: ", client_areas);
         const clients = await prisma_client.client.findMany({
             where: {
-                client_area: { in: areas },
-                client_fname: fname?.toLowerCase(),
-                client_lname: lname?.toLowerCase(),
-                subscribed: subscribe,
+                client_area: { in: client_areas },
+                client_fname: client_fname?.toLowerCase(),
+                client_lname: client_lname?.toLowerCase(),
+                subscribed: subscribed,
             },
         });
 
@@ -130,7 +132,7 @@ const getRangeofClients = async (
     { startIndex, total }: { startIndex: number; total: number },
 ) => {
     const clients = await prisma_client.client.findMany({
-        where: {subscribed: "true"},
+        where: { subscribed: "true" },
         orderBy: { created_at: "asc" }, // Sort in ascending order
         skip: startIndex, // Skip the first 250 clients
         take: total, // Fetch the next 50 clients (from 251 to 300)

@@ -98,6 +98,8 @@ export default function Clients() {
         <Link
           to={`${item.client_id}`}
           state={{ sp_mobile_num, sp_areas, sp_fname, sp_lname }}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <FaExternalLinkAlt />
         </Link>

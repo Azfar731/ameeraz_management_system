@@ -12,3 +12,7 @@ random.json
 
 # Local Netlify folder
 .netlify
+
+.vercel
+
+public/build/

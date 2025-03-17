@@ -12,7 +12,7 @@ interface EnvConfig {
 }
 
 function getEnvConfig(): EnvConfig {
-    // const env = process.env.NODE_ENV as Environment || "development";
+    const env = process.env.NODE_ENV as Environment || "development";
 
     // Validate required environment variables
     const requiredVars = [
@@ -42,7 +42,7 @@ function getEnvConfig(): EnvConfig {
         UPSTASH_WP_MESSAGE_LOG_DB_TOKEN: process.env
             .UPSTASH_WP_MESSAGE_LOG_DB_TOKEN!,
         DATABASE_URL: process.env.DATABASE_URL!,
-        ENV: "production",
+        ENV: env,
     };
 }
 

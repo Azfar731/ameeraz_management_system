@@ -212,25 +212,27 @@ async function create_products() {
 }
 
 async function create_users(){
-    const users=[{userName:"azfar",password:"astayuno",fname:"azfar",lname:"razzaq",role:"admin" as Role},
-        {userName:"lailma",password:"astayuno",fname:"lailma",lname:"razzaq",role:"owner" as Role},
-        {userName:"irha",password:"astayuno",fname:"irha",lname:"razzaq",role:"manager" as Role},
-        {userName: "haleemah", password: "bunny", fname: "haleemah", lname: "anwary", role: "worker" as Role}]
+    // const users=[{userName:"azfar",password:"astayuno",fname:"azfar",lname:"razzaq",role:"admin" as Role},
+    //     {userName:"lailma",password:"astayuno",fname:"lailma",lname:"razzaq",role:"owner" as Role},
+    //     {userName:"irha",password:"astayuno",fname:"irha",lname:"razzaq",role:"manager" as Role},
+    //     {userName: "haleemah", password: "bunny", fname: "haleemah", lname: "anwary", role: "worker" as Role}]
     
+    const users = [{userName:"arbiter",password:"Vanitas10@",fname:"azfar",lname:"razzaq",role:"admin" as Role}]
+
         const user_records = await Promise.all(users.map((user) => createUser(user)));
         return user_records
 }
 
 async function main() {
-    const clients = await create_clients();
-    const employees = await create_employees();
-    const categories = await create_categories();
-    const services = await create_services();
-    const deals = await create_deals();
-    const vendors = await create_vendors();
-    const products = await create_products();
+    // const clients = await create_clients();
+    // const employees = await create_employees();
+    // const categories = await create_categories();
+    // const services = await create_services();
+    // const deals = await create_deals();
+    // const vendors = await create_vendors();
+    // const products = await create_products();
     await create_users();
-    console.log(clients, employees, categories, services, deals, vendors, products);
+    // console.log(clients, employees, categories, services, deals, vendors, products);
     
     prisma_client.$disconnect();
 }

@@ -1,8 +1,8 @@
 import { deleteMedia, getAllMedia } from "~/utils/media/db.server";
 import { Media } from "@prisma/client";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
+import { CompactTable } from "@table-library/react-table-library/compact.js";
+import { useTheme } from "@table-library/react-table-library/theme.js";
+import { getTheme } from "@table-library/react-table-library/baseline.js";
 import {
   Link,
   useActionData,

@@ -1,15 +1,15 @@
 import { Category } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
-import { getTheme } from "@table-library/react-table-library/baseline";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
+import { getTheme } from "@table-library/react-table-library/baseline.js";
+import { CompactTable } from "@table-library/react-table-library/compact.js";
+import { useTheme } from "@table-library/react-table-library/theme.js";
 import { FaExternalLinkAlt, FaPlus } from "react-icons/fa";
 import { prisma_client } from "~/.server/db";
 import { authenticate } from "~/utils/auth/functions.server";
 import { DealWithServices } from "~/utils/deal/types";
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const searchParams = new URL(request.url).searchParams;
   const fetchAllServices = searchParams.get("fetchAllServices");

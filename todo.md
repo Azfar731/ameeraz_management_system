@@ -1,5 +1,7 @@
 ## Today:
 
+- Resolve React Table ts errors
+- Resolve styles not loading in vercel
 - Implement user logs
 
 ## Done
@@ -11,18 +13,13 @@
 - Find a subset for PrismaClientKnownRequestError package as it is very heavy
 - Verify how errors are shown in build
 
-
-
 ## Things to do:
 
 - set different file limits for images and videos
 
-
 ## Bugs:
 
 - salesRecord create: paid amount is reset to amount_charged automatically(in dev only cause useEffect runs twice on react strict mode)
-
-
 
 ## Improvements:
 
@@ -33,25 +30,18 @@
 1. save search parameters when going from "/services" to "/services/$id"
 2. Figure out how to provide data to refine function messages in zod
 
-
-
-
 ## Sections that need fixing:
 
 ## Other information
 
 ### Known bugs:
-Compact table has a value of 1 < z-index > 10, so it sometimes obsturcuts the Select  menu
 
-
-
-
+Compact table has a value of 1 < z-index > 10, so it sometimes obsturcuts the Select menu
 
 ## Original Lines in package.json:
 
     "dev": "remix vite:dev",
     "start": "NODE_OPTIONS='--import ./instrumentation.server.mjs' remix-serve ./build/server/index.js",
-
 
 ## Steps for Production
 

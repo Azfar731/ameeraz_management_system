@@ -6,9 +6,9 @@ import {
   useNavigation,
   useSearchParams,
 } from "@remix-run/react";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
+import { CompactTable } from "@table-library/react-table-library/compact.js";
+import { useTheme } from "@table-library/react-table-library/theme.js";
+import { getTheme } from "@table-library/react-table-library/baseline.js";
 import Select, { OnChangeValue } from "react-select";
 
 import areasList from "../../components/clients/areas.json";
@@ -301,11 +301,7 @@ export default function Clients() {
           Register Client <FaPlus />
         </Link>
         <div className="mt-6">
-          <CompactTable
-            columns={COLUMNS}
-            data={data}
-            theme={theme}
-          />
+          <CompactTable columns={COLUMNS} data={data} theme={theme} />
         </div>
       </div>
     </div>

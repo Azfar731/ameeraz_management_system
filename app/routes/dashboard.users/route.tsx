@@ -2,17 +2,15 @@ import { User } from "@prisma/client";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAllUsers } from "~/utils/user/db.server";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
+import { CompactTable } from "@table-library/react-table-library/compact.js";
+import { useTheme } from "@table-library/react-table-library/theme.js";
+import { getTheme } from "@table-library/react-table-library/baseline.js";
 import { formatDate } from "shared/utilityFunctions";
 import { authenticate } from "~/utils/auth/functions.server";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
-export async function loader({request}: LoaderFunctionArgs) {
-
-  await authenticate({request, requiredClearanceLevel: 3 });
-
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
 
   const users = await getAllUsers();
   return { users };
@@ -28,23 +26,23 @@ export default function Users() {
   const COLUMNS = [
     {
       label: "User Name",
-      renderCell: (item: User) => item.userName
+      renderCell: (item: User) => item.userName,
     },
     {
       label: "First Name",
-      renderCell: (item: User) => item.fname
+      renderCell: (item: User) => item.fname,
     },
     {
       label: "Last Name",
-      renderCell: (item: User) => item.lname
+      renderCell: (item: User) => item.lname,
     },
     {
       label: "Role",
-      renderCell: (item: User) => item.role
+      renderCell: (item: User) => item.role,
     },
     {
       label: "Account Status",
-      renderCell: (item: User) => item.account_status
+      renderCell: (item: User) => item.account_status,
     },
     {
       label: "Registrated On",

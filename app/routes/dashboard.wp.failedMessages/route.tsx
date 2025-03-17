@@ -1,39 +1,41 @@
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
-import { cleanupFailedMessages, getFailedMessages } from "~/utils/upstash_redis/failedMgsFunctions.server";
+import {
+  cleanupFailedMessages,
+  getFailedMessages,
+} from "~/utils/upstash_redis/failedMgsFunctions.server";
 import { failed_message } from "~/utils/upstash_redis/types";
 
-import { CompactTable } from "@table-library/react-table-library/compact";
-import { useTheme } from "@table-library/react-table-library/theme";
-import { getTheme } from "@table-library/react-table-library/baseline";
+import { CompactTable } from "@table-library/react-table-library/compact.js";
+import { useTheme } from "@table-library/react-table-library/theme.js";
+import { getTheme } from "@table-library/react-table-library/baseline.js";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({request}: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 3 });
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
   const failed_messages = await getFailedMessages();
 
   return { failed_messages };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  
-  await authenticate({request, requiredClearanceLevel: 3 });
-  
+  await authenticate({ request, requiredClearanceLevel: 3 });
+
   if (request.method === "DELETE") {
     console.log("Delete request received");
-    const deletedCount = await cleanupFailedMessages(0)
-    return {deletedCount}
+    const deletedCount = await cleanupFailedMessages(0);
+    return { deletedCount };
   }
-  return null
+  return null;
 }
 
 export default function Failed_Messages() {
   const { failed_messages } = useLoaderData<{
     failed_messages: failed_message[];
   }>();
-  const actionData = useActionData<{deletedCount: number}>()
- 
+  const actionData = useActionData<{ deletedCount: number }>();
+
   const [ids, setIds] = useState<string[]>([]);
   const nodes = [...failed_messages];
   const data = { nodes };
@@ -123,14 +125,18 @@ export default function Failed_Messages() {
       <div className="mt-10">
         <div className="w-full flex justify-between items-right">
           <Form method="delete">
-            <button
-              className="w-60 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-            >
+            <button className="w-60 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
               Clear Messages
             </button>
           </Form>
         </div>
-        {actionData &&  <p className="text-red-500 font-semibold">{actionData.deletedCount > 0 ? `Deleted ${actionData.deletedCount} Messages` : "No Messages to Delete"}</p>}
+        {actionData && (
+          <p className="text-red-500 font-semibold">
+            {actionData.deletedCount > 0
+              ? `Deleted ${actionData.deletedCount} Messages`
+              : "No Messages to Delete"}
+          </p>
+        )}
         <div className="mt-6">
           <CompactTable
             columns={COLUMNS}

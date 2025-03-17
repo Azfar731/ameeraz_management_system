@@ -26,33 +26,17 @@
 
 ## Improvements:
 
+1. Open id tabs in new windows
+
 ### Services:
 
 1. save search parameters when going from "/services" to "/services/$id"
 2. Figure out how to provide data to refine function messages in zod
 
-### Client:
 
-- Add validation to clients route loader
 
-### Client Transactions:
 
-- Replace table in Client Transaction create to use SalesRecordTableComponent
-
-## Update logic:
-
-- users/:id page => Can only update userName, fname, lname. User clearance must be higher or equal to owner
-- profile page => Can update password too.
-  Owner can update manager and worker information and also disbale their accounts.
-  Admin can update every role information or disbale account.
-
-Sections that need fixing:
-
-## Delete Files:
-
-remove route client.\_id.transactions
-app/server/utilityFunctions
-components/Entity.tsx
+## Sections that need fixing:
 
 ## Other information
 
@@ -60,17 +44,8 @@ components/Entity.tsx
 Compact table has a value of 1 < z-index > 10, so it sometimes obsturcuts the Select  menu
 
 
-### Prompt for replacing error instances with Response:
 
-In the files selected in the working set, search loader and action functions for thrown error instances: "throw new Error("<Error Message>") and replace them with the following:
-throw new Response("<Error Message>", {
-status: errorStatus,
-statusText: "<statusText>"
-});
-Replace:
-Error Message: with the message in error instance
-status: with an appropriate status for example 400 for bad user input, 404 for data not found etc.
-statusText: with an appropriate Text for status
+
 
 ## Original Lines in package.json:
 

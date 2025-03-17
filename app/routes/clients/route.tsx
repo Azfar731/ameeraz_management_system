@@ -303,8 +303,6 @@ export default function Clients() {
             columns={COLUMNS}
             data={data}
             theme={theme}
-            // rowProps={ROW_PROPS}
-            // rowOptions={ROW_OPTIONS}
           />
         </div>
       </div>

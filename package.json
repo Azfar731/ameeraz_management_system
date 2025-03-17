@@ -31,7 +31,7 @@
     "posttest:i": "npm run db:down",
     "pretest:i:ui": "npm run script \"npm run db:up && npx prisma migrate deploy\" test",
     "test:i:ui": "npm run script \"vitest run --config ./vitest.config.integration.ts --ui --api 9527\" test",
-    "posttest:i:ui": "npm run db:down"    
+    "posttest:i:ui": "npm run db:down"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.2.0",
+    "@netlify/remix-adapter": "^2.6.0",
     "@remix-run/dev": "^2.12.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.2.0",

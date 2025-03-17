@@ -3,10 +3,9 @@
 
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { netlifyPlugin } from "@netlify/remix-adapter/plugin";
 
 export default defineConfig({
-    plugins: [tsconfigPaths(),netlifyPlugin()],
+    plugins: [tsconfigPaths()],
     test: {
         globals: true,
         environment: "jsdom",

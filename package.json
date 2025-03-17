@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "remix vite:build",
+    "postinstall": "prisma generate",
     "build:dev": "dotenv -e .env.development -- remix vite:build",
     "build:staging": "dotenv -e .env.staging -- remix vite:build",
     "build:prod": "dotenv -e .env.production -- remix vite:build",

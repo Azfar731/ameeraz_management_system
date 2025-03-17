@@ -53,3 +53,7 @@ Compact table has a value of 1 < z-index > 10, so it sometimes obsturcuts the Se
     "start": "NODE_OPTIONS='--import ./instrumentation.server.mjs' remix-serve ./build/server/index.js",
 
 
+## Steps for Production
+
+- create user in db
+- create triggers and function in db

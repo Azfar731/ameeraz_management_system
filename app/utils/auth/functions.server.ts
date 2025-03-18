@@ -12,15 +12,16 @@ const authenticate = async (
     },
 ) => {
 
-    if( env.ENV === "development"){
-       const user =  await getUserFromUserName("azfar");
-        if(user){
-            return user.id;
-        }else{
-            return "12345"
-        }
-    }
-
+    // if( env.ENV === "development"){
+    //    const user =  await getUserFromUserName("azfar");
+    //     if(user){
+    //         return user.id;
+    //     }else{
+    //         return "12345"
+    //     }
+    // }
+    console.log("Dev env: ", env.ENV)
+    console.log("DB: ", env.DATABASE_URL)
     const session = await getSession(request.headers.get("cookie"));
     const userId = session.get("userId");
 

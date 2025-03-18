@@ -3,7 +3,7 @@ import {
   LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { authenticator } from "~/auth.server";
 import { commitSession, getSession } from "~/sessions";
 import { createLog } from "~/utils/logs/db.server";
@@ -11,6 +11,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("cookie"));
   const userId = session.get("userId");
   const error = session.get("error");
+  
   if (userId) {
     throw redirect("/");
   }
@@ -39,6 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Login() {
   const loaderData = useLoaderData<{ error: string | undefined }>();
+  const navigation = useNavigation()
   return (
     <div className="flex justify-center">
       <Form
@@ -73,7 +75,10 @@ export default function Login() {
 
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {" "}
           Login

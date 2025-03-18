@@ -20,8 +20,7 @@ const authenticate = async (
     //         return "12345"
     //     }
     // }
-    console.log("Dev env: ", env.ENV)
-    console.log("DB: ", env.DATABASE_URL)
+    
     const session = await getSession(request.headers.get("cookie"));
     const userId = session.get("userId");
 

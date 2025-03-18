@@ -1,9 +1,10 @@
 ## Today:
-
+- add disabled property to create and update buttons
+- add authentication in user section routes
 - Resolve React Table ts errors
 - Resolve styles not loading in vercel
 - Implement user logs
-
+- allow the same user to edit his/her own data
 ## Done
 
 - Use error handling for unique value constraint

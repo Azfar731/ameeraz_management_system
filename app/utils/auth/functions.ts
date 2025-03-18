@@ -1,16 +1,13 @@
 import { Role } from "@prisma/client";
 
-
-
- const ClearanceLevel = {
+const ClearanceLevel = {
     Worker: 1,
     Manager: 2,
     Owner: 3,
     Admin: 4,
 } as const;
 
-
-const getClearanceLevel =  (role: Role): number => {
+const getClearanceLevel = (role: Role): number => {
     const clearanceLevels = {
         admin: ClearanceLevel.Admin,
         owner: ClearanceLevel.Owner,
@@ -22,5 +19,4 @@ const getClearanceLevel =  (role: Role): number => {
         ClearanceLevel.Worker;
 };
 
-
-export {ClearanceLevel, getClearanceLevel}
+export { ClearanceLevel, getClearanceLevel };

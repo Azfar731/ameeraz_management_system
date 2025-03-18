@@ -1,22 +1,33 @@
-import { ActionFunctionArgs } from "@remix-run/node";
+import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import User_Form from "~/components/users/user_form";
 import { getClearanceLevel } from "~/utils/auth/functions";
-import { createUser } from "~/utils/user/db.server";
+import { createUser, getUserFromId } from "~/utils/user/db.server";
 import { CreateUserErrorMessages } from "~/utils/user/types";
 import { NewUserValidation } from "~/utils/user/validation.server";
 import { Prisma } from "@prisma/client";
-export async function loader() {
-  const loggedInUserClearanceLevel = 4;
+import { authenticate } from "~/utils/auth/functions.server";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const userId = await authenticate({ request, requiredClearanceLevel: 3 });
+  const user = await getUserFromId(userId);
+  if (!user) {
+    throw new Error("No User exists for id returned by authenticate function");
+  }
+  const loggedInUserClearanceLevel = getClearanceLevel(user.role);
   return { loggedInUserClearanceLevel };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  const userId = await authenticate({ request, requiredClearanceLevel: 3 });
+  const user = await getUserFromId(userId);
+  if (!user) {
+    throw new Error("No User exists for id returned by authenticate function");
+  }
   const formData = await request.formData();
   const dataObject = Object.fromEntries(formData.entries());
-  console.log("Form Object: ", dataObject);
   const validationResult = NewUserValidation({
-    loggedInUserClearance: getClearanceLevel("admin"),
+    loggedInUserClearance: getClearanceLevel(user.role),
   }).safeParse(dataObject);
   if (!validationResult.success) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };

@@ -1,5 +1,6 @@
 import { prisma_client } from "~/.server/db";
 import { Service } from "@prisma/client";
+import { captureException } from "@sentry/remix";
 const getServiceFromId = async (
     { id, includeCategory }: { id: string; includeCategory: boolean },
 ) => {
@@ -60,36 +61,44 @@ const updateService = async ({
 }: Omit<Service, "created_at"> & { serv_status: boolean }) => {
     const lowerCaseName = serv_name.toLowerCase();
     const current_date = new Date();
-    const service = await prisma_client.service.update({
-        where: { serv_id },
-        data: {
-            serv_name: lowerCaseName,
-            serv_category,
-            serv_price,
-        },
-    });
-    const deal = await prisma_client.deal.findFirst({
-        where: {
-            services: {
-                some: {
-                    serv_id,
-                },
+    return await prisma_client.$transaction(async (tx) => {
+        const service = await tx.service.update({
+            where: { serv_id },
+            data: {
+                serv_name: lowerCaseName,
+                serv_category,
+                serv_price,
             },
-            auto_generated: true,
-        },
-    });
-    //if serv_status is false, it means that the service has been updated
-    // to be inactive, so we assign activate_till a value of current date
-    await prisma_client.deal.update({
-        where: { deal_id: deal?.deal_id },
-        data: {
-            deal_name: lowerCaseName,
-            deal_price: serv_price,
-            activate_till: serv_status ? null : current_date,
-        },
-    });
+        });
 
-    return service;
+        const deal = await tx.deal.findFirst({
+            where: {
+                services: {
+                    some: { serv_id },
+                },
+                auto_generated: true,
+            },
+        });
+
+        if (deal) {
+            await tx.deal.update({
+                where: { deal_id: deal.deal_id },
+                data: {
+                    deal_name: lowerCaseName,
+                    deal_price: serv_price,
+                    activate_till: serv_status ? null : current_date,
+                },
+            });
+        } else {
+            captureException(
+                new Error(
+                    `Couldn't find a deal attached with the service. Service_ID: ${serv_id}`,
+                ),
+            );
+        }
+
+        return service;
+    });
 };
 
 export { createService, getActiveServices, getServiceFromId, updateService };

@@ -66,4 +66,17 @@ const getAllDeals = async () => {
     return deals;
 };
 
-export { createDeal, getDealFromId, updateDeal, getAllDeals };
+const getActiveDeals = async() => {
+    
+    const deals = await prisma_client.deal.findMany({
+        where: {
+            OR: [
+                { activate_till: { gte: new Date() } },
+                { activate_till: null }
+            ]
+        }
+    })
+    return deals;
+}
+
+export { createDeal, getDealFromId, updateDeal, getAllDeals, getActiveDeals };

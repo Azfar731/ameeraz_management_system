@@ -13,7 +13,6 @@ import {
   useNavigate,
   useNavigation,
 } from "@remix-run/react";
-import { prisma_client } from "~/.server/db";
 import { Client, Deal } from "@prisma/client";
 import Select, { OnChangeValue } from "react-select";
 import { FormType, PaymentModes } from "~/utils/types";
@@ -24,6 +23,7 @@ import {
   getSinglePaymentMenuOption,
 } from "~/utils/functions";
 import { authenticate } from "~/utils/auth/functions.server";
+import { getActiveDeals } from "~/utils/deal/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 1 });
@@ -36,7 +36,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
   const client = await getClientByMobile(client_mobile_num);
-  const deals = await prisma_client.deal.findMany();
+  const deals = await getActiveDeals();
 
   return { deals, client };
 }

@@ -2,7 +2,7 @@
 
 - Resolve styles not loading in vercel
 - Implement user logs
-
+- adjust the time for cookies
 
 
 

@@ -1,6 +1,6 @@
 import { Product } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { getTheme } from "@table-library/react-table-library/baseline.js";
 import { CompactTable } from "@table-library/react-table-library/compact.js";
 import { useTheme } from "@table-library/react-table-library/theme.js";
@@ -16,6 +16,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Products() {
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   const { products } = useLoaderData<{ products: Product[] }>();
 
   //table values
@@ -69,12 +72,18 @@ export default function Products() {
         <h1 className=" font-semibold text-6xl text-gray-700">Products</h1>
       </div>
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Create Product <FaPlus />
-        </Link>
+          <Link
+            to="create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Create Product <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <CompactTable columns={COLUMNS} data={data} theme={theme} />
         </div>

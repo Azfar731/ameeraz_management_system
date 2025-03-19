@@ -1,6 +1,6 @@
 import { Product } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { FaPlus } from "react-icons/fa";
 import { getAllProducts } from "~/utils/products/db.server";
 import { getProductTransactions } from "~/utils/productTransaction/db.server";
@@ -64,6 +64,9 @@ const formValues = {
 
 
 export default function Product_Transactions() {
+  const navigation = useNavigation();
+  const isNavigating = 
+    navigation.state === "loading" || navigation.state === "submitting";
   const { transactions, products, errorMessages } = useLoaderData<{
     transactions: ProductTransactionWithRelations[];
     products: Product[];
@@ -82,12 +85,18 @@ export default function Product_Transactions() {
         errorMessages={errorMessages}
       />
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Create Transaction <FaPlus />
-        </Link>
+          <Link
+            to="create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Create Transaction <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <ProductTransactionTable transactions={transactions} />
         </div>

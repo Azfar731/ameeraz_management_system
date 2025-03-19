@@ -110,11 +110,15 @@ export default function Categories() {
         <h1 className=" font-semibold text-6xl text-gray-700">Categories</h1>
       </div>
       <div className="mt-20">
-      <button
+        <button
           disabled={isNavigating}
           className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          <Link to="create" className="flex items-center justify-around" aria-disabled={isNavigating}>
+          <Link
+            to="create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
             Create Category <FaPlus />
           </Link>
         </button>

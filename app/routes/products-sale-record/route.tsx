@@ -1,5 +1,5 @@
 import { Product } from "@prisma/client";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import FetchForm from "./FetchForm";
 import { getAllProducts } from "~/utils/products/db.server";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -55,6 +55,9 @@ const fetchsearchParams = (searchParams: URLSearchParams) => {
 };
 
 export default function View_Product_Sale_Record() {
+  const navigation = useNavigation();
+  const isNavigating = 
+    navigation.state === "loading" || navigation.state === "submitting";
   const { products, records, errors } = useLoaderData<{
     products: Product[];
     records: ProductSaleRecordWithRelations[];
@@ -70,12 +73,18 @@ export default function View_Product_Sale_Record() {
       </div>
       <FetchForm products={products} errorMessages={errors} />
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Create a new record <FaPlus />
-        </Link>
+          <Link
+            to="create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Create a new record <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <ProductSaleRecordTable records={records} />
         </div>

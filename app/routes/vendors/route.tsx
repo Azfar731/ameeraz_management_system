@@ -49,6 +49,8 @@ export default function Vendors() {
     errorMessages: VendorErrors;
   }>();
   const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   console.log("Vendors Fetched: ", vendors);
 
   //table values
@@ -186,21 +188,25 @@ export default function Vendors() {
         <button
           type="submit"
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
-          disabled={
-            navigation.state === "loading" || navigation.state === "submitting"
-          }
+          disabled={isNavigating}
         >
           Fetch
         </button>
       </Form>
 
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-44 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Register Vendor <FaPlus />
-        </Link>
+          <Link
+            to="create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Register Vendor <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <CompactTable columns={COLUMNS} data={data} theme={theme} />
         </div>

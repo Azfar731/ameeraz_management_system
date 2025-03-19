@@ -1,6 +1,6 @@
 import { Category } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Link, useLoaderData, useSearchParams, useNavigation } from "@remix-run/react";
 import { getTheme } from "@table-library/react-table-library/baseline.js";
 import { CompactTable } from "@table-library/react-table-library/compact.js";
 import { useTheme } from "@table-library/react-table-library/theme.js";
@@ -30,6 +30,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Services() {
+  const navigation = useNavigation();
+  const isNavigating = 
+    navigation.state === "loading" || navigation.state === "submitting";
   const [searchParams, setSearchParams] = useSearchParams();
   const { deals, categories } = useLoaderData<{
     deals: DealWithServices[];
@@ -112,12 +115,18 @@ export default function Services() {
       </div>
       <div className="mt-20">
         <div className="w-full flex justify-between items-center">
-          <Link
-            to="create"
-            className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+          <button
+            disabled={isNavigating}
+            className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Create Service <FaPlus />
-          </Link>
+            <Link
+              to="create"
+              className="flex items-center justify-around"
+              aria-disabled={isNavigating}
+            >
+              Create Service <FaPlus />
+            </Link>
+          </button>
           <button
             onClick={handleServices}
             className="w-60 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"

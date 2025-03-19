@@ -1,4 +1,6 @@
 ## Today:
+- change the server of vercel or supabase, to bring them closer
+- add defer and suspense to make things load quicker
 - add disabled property to create and update buttons
 - add authentication in user section routes
 - Resolve React Table ts errors

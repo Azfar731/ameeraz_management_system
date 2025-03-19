@@ -1,6 +1,6 @@
 import { getUserFromId, getUserFromUserName } from "../user/db.server";
 import argon2 from "argon2";
-import { commitSession, getSession } from "~/sessions";
+import { commitSession, getSession } from "~/sessions.server";
 import { redirect } from "@remix-run/react";
 import { getClearanceLevel } from "./functions";
 import { captureException } from "@sentry/remix";
@@ -11,7 +11,6 @@ const authenticate = async (
         requiredClearanceLevel: number;
     },
 ) => {
-
     // if( env.ENV === "development"){
     //    const user =  await getUserFromUserName("azfar");
     //     if(user){
@@ -20,7 +19,7 @@ const authenticate = async (
     //         return "12345"
     //     }
     // }
-    
+
     const session = await getSession(request.headers.get("cookie"));
     const userId = session.get("userId");
 

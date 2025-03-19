@@ -5,13 +5,13 @@ import {
 } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { authenticator } from "~/auth.server";
-import { commitSession, getSession } from "~/sessions";
+import { commitSession, getSession } from "~/sessions.server";
 import { createLog } from "~/utils/logs/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const session = await getSession(request.headers.get("cookie"));
   const userId = session.get("userId");
   const error = session.get("error");
-  
+
   if (userId) {
     throw redirect("/");
   }
@@ -40,7 +40,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Login() {
   const loaderData = useLoaderData<{ error: string | undefined }>();
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   return (
     <div className="flex justify-center">
       <Form

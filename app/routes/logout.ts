@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { captureMessage } from "@sentry/remix";
-import { destroySession, getSession } from "~/sessions";
+import { destroySession, getSession } from "~/sessions.server";
 import { createLog } from "~/utils/logs/db.server";
 
 export async function action({ request }: ActionFunctionArgs) {

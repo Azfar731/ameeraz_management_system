@@ -14,13 +14,11 @@ import ProductTransactionTable from "./ProductTransactionTable";
 import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const searchParams = new URL(request.url).searchParams;
   const products = await getAllProducts();
   const formValues = fetchFormValues(searchParams);
-  
 
   const validationResult = await productTransactionFetchSchema.safeParseAsync(
     formValues
@@ -46,26 +44,30 @@ const fetchFormValues = (searchParams: URLSearchParams) => {
     }
   }
 
-  const transaction_types = searchParams.getAll("transaction_types").filter(val => val !== "");
-  const products = searchParams.getAll("products").filter(val => val !== "");
-  const payment_options = searchParams.getAll("payment_options").filter(val => val !== "");
-const formValues = {
+  const transaction_types = searchParams
+    .getAll("transaction_types")
+    .filter((val) => val !== "");
+  const products = searchParams.getAll("products").filter((val) => val !== "");
+  const payment_options = searchParams
+    .getAll("payment_options")
+    .filter((val) => val !== "");
+  const formValues = {
     start_date: searchParams.get("start_date") || undefined,
     end_date: searchParams.get("end_date") || undefined,
     client_mobile_num: searchParams.get("client_mobile_num") || undefined,
     vendor_mobile_num: searchParams.get("vendor_mobile_num") || undefined,
-    transaction_types: transaction_types.length > 0 ? transaction_types : undefined,
+    transaction_types:
+      transaction_types.length > 0 ? transaction_types : undefined,
     products: products.length > 0 ? products : undefined,
     payment_options: payment_options.length > 0 ? payment_options : undefined,
     userType: searchParams.get("userType") || undefined,
-};
+  };
   return formValues;
 };
 
-
 export default function Product_Transactions() {
   const navigation = useNavigation();
-  const isNavigating = 
+  const isNavigating =
     navigation.state === "loading" || navigation.state === "submitting";
   const { transactions, products, errorMessages } = useLoaderData<{
     transactions: ProductTransactionWithRelations[];

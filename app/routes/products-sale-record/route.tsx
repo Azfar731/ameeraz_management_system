@@ -13,7 +13,7 @@ import { FaPlus } from "react-icons/fa";
 import ProductSaleRecordTable from "./ProductSaleRecordTable";
 import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({ request }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const products = await getAllProducts();
   const searchParams = new URL(request.url).searchParams;
@@ -26,13 +26,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
       records: [],
     };
   }
-  console.log(validationResult.data)
+  console.log(validationResult.data);
   const records = await getProductSaleRecords(validationResult.data);
 
   return { products, records, errors: {} };
 }
-
-
 
 const fetchsearchParams = (searchParams: URLSearchParams) => {
   const start_date = searchParams.get("start_date") || undefined;
@@ -56,7 +54,7 @@ const fetchsearchParams = (searchParams: URLSearchParams) => {
 
 export default function View_Product_Sale_Record() {
   const navigation = useNavigation();
-  const isNavigating = 
+  const isNavigating =
     navigation.state === "loading" || navigation.state === "submitting";
   const { products, records, errors } = useLoaderData<{
     products: Product[];

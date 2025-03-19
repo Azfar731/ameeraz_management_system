@@ -1,6 +1,11 @@
 import { Category } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData, useSearchParams, useNavigation } from "@remix-run/react";
+import {
+  Link,
+  useLoaderData,
+  useSearchParams,
+  useNavigation,
+} from "@remix-run/react";
 import { getTheme } from "@table-library/react-table-library/baseline.js";
 import { CompactTable } from "@table-library/react-table-library/compact.js";
 import { useTheme } from "@table-library/react-table-library/theme.js";
@@ -31,7 +36,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Services() {
   const navigation = useNavigation();
-  const isNavigating = 
+  const isNavigating =
     navigation.state === "loading" || navigation.state === "submitting";
   const [searchParams, setSearchParams] = useSearchParams();
   const { deals, categories } = useLoaderData<{

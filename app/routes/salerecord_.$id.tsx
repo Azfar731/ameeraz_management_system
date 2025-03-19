@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useNavigation } from "@remix-run/react";
 import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types";
 import { formatDate } from "shared/utilityFunctions";
 import { generate_heading } from "~/utils/render_functions";
@@ -38,6 +38,10 @@ export default function Record() {
   const { record } = useLoaderData<{
     record: ServiceSaleRecordWithRelations;
   }>();
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
+
   const { client, deal_records, employees, transactions } = record;
   const renderered_deals: JSX.Element[] = [];
 
@@ -120,12 +124,18 @@ export default function Record() {
 
         {generate_heading("Transactions", "Date", "Amount Paid")}
         {render_transactions()}
-        <Link
-          to={`update`}
-          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to="update"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

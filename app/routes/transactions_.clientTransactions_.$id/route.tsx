@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useNavigation } from "@remix-run/react";
 import { formatDate } from "shared/utilityFunctions";
 import { getClientTransactionFromID } from "~/utils/clientTransaction/db.server";
 import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
@@ -8,7 +8,7 @@ import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const { id } = params;
   if (!id) {
@@ -35,6 +35,10 @@ export default function View_Client_Transaction() {
   const { transaction } = useLoaderData<{
     transaction: ClientTransactionWithRelations;
   }>();
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
+
   const client = transaction.record.client;
   const deal_records = transaction.record.deal_records;
 
@@ -107,12 +111,18 @@ export default function View_Client_Transaction() {
             {render_transactions()}
           </>
         )}
-        <Link
-          to={`update`}
-          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to="update"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

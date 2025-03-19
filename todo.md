@@ -2,13 +2,12 @@
 - change the server of vercel or supabase, to bring them closer
 - add defer and suspense to make things load quicker
 - add disabled property to create and update buttons
-- add authentication in user section routes
 - Resolve React Table ts errors
-- Resolve styles not loading in vercel
+- Resolve styles not loading in vercel(local)
 - Implement user logs
 - allow the same user to edit his/her own data
-## Done
 
+## Done
 - Use error handling for unique value constraint
 - Check file types before processing the file. add safety checks
 - Add error handling for file upload

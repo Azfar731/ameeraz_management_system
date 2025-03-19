@@ -1,5 +1,5 @@
 import { ServiceErrors, ServiceWithRelations } from "~/utils/service/types";
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import Select from "react-select";
 import { Category } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
@@ -18,7 +18,12 @@ export default function Service_Form({
     label: category.cat_name,
   }));
 
-  const status_options = [{value: "true" , label: "Active"},{value: "false" , label: "Inactive"}]
+  const status_options = [
+    { value: "true", label: "Active" },
+    { value: "false", label: "Inactive" },
+  ];
+
+  const navigation = useNavigation();
 
   return (
     <Form method="post" className="bg-white mt-14 p-6 rounded shadow-md w-80 ">
@@ -102,7 +107,11 @@ export default function Service_Form({
             name="status"
             id="status"
             options={status_options}
-            defaultValue={service.deals[0].activate_till? status_options[1]: status_options[0]}
+            defaultValue={
+              service.deals[0].activate_till
+                ? status_options[1]
+                : status_options[0]
+            }
             className="basic-multi-select mb-4"
             classNamePrefix="select"
           />
@@ -111,7 +120,10 @@ export default function Service_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {service ? "Update" : "Create"}
         </button>

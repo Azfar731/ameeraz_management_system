@@ -4,7 +4,9 @@
 - Resolve styles not loading in vercel
 - Implement user logs
 - adjust the time for cookies
-
+- solve hydration error
+- check whether session.ts file should be server only
+- add a secret environment variable in ENV file.
 
 ## Done
 

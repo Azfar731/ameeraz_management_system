@@ -101,7 +101,7 @@ function extractFilters(searchParams: URLSearchParams) {
     client_mobile_num,
     start_date,
     end_date,
-    payment_cleared
+    payment_cleared,
   };
 }
 
@@ -114,6 +114,8 @@ export default function Index() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
 
   //loader Data
   const { service_records, deals, employees, categories, errorMessages } =
@@ -332,14 +334,16 @@ export default function Index() {
           options={[
             { value: "paid", label: "Paid" },
             { value: "pending", label: "Pending" },
-            {value: undefined, label: "Any"}
+            { value: undefined, label: "Any" },
           ]}
           className="basic-multi-select mt-2"
           classNamePrefix="select"
         />
         <button
           type="submit"
-          disabled={navigation.state === "submitting" || navigation.state === "loading"}
+          disabled={
+            navigation.state === "submitting" || navigation.state === "loading"
+          }
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           Fetch
@@ -347,12 +351,14 @@ export default function Index() {
       </Form>
 
       <div className="mt-20">
-        <Link
-          to="/salerecord/create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded "
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Create a new record <FaPlus />
-        </Link>
+          <Link to="/salerecord/create" className="flex items-center justify-around" aria-disabled={isNavigating}>
+            Create a new record <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <SalesRecordTable
             serviceRecords={service_records}

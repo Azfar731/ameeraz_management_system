@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { prisma_client } from "~/.server/db";
 import { Category } from "@prisma/client";
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useNavigation } from "@remix-run/react";
 import { CategoryWithServices } from "~/utils/category/types";
 import { CompactTable } from "@table-library/react-table-library/compact.js";
 import { useTheme } from "@table-library/react-table-library/theme.js";
@@ -20,6 +20,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Categories() {
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   const { categories } = useLoaderData<{
     categories: CategoryWithServices[];
   }>();
@@ -107,12 +110,14 @@ export default function Categories() {
         <h1 className=" font-semibold text-6xl text-gray-700">Categories</h1>
       </div>
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+      <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Create Category <FaPlus />
-        </Link>
+          <Link to="create" className="flex items-center justify-around" aria-disabled={isNavigating}>
+            Create Category <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <CompactTable
             columns={COLUMNS}

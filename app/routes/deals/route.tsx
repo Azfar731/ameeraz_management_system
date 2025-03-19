@@ -2,7 +2,12 @@ import { useState } from "react";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { prisma_client } from "~/.server/db";
 
-import { useLoaderData, useSearchParams, Link } from "@remix-run/react";
+import {
+  useLoaderData,
+  useSearchParams,
+  Link,
+  useNavigation,
+} from "@remix-run/react";
 
 import { CompactTable } from "@table-library/react-table-library/compact.js";
 import { useTheme } from "@table-library/react-table-library/theme.js";
@@ -33,6 +38,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Deals() {
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   const [searchParams, setSearchParams] = useSearchParams();
   const { deals } = useLoaderData<{ deals: DealWithServices[] }>();
   console.log(deals);
@@ -152,12 +160,14 @@ export default function Deals() {
       </div>
       <div className="mt-20">
         <div className="w-full flex justify-between items-center">
-          <Link
-            to="create"
-            className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
-          >
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          <Link to="create" className="flex items-center justify-around" aria-disabled={isNavigating}>
             Create Deal <FaPlus />
           </Link>
+        </button>
           <button
             onClick={handleDeals}
             className="w-60 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"

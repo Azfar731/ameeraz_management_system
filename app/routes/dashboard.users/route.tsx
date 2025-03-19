@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAllUsers } from "~/utils/user/db.server";
 import { FaPlus, FaExternalLinkAlt } from "react-icons/fa";
 import { CompactTable } from "@table-library/react-table-library/compact.js";
@@ -18,6 +18,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Users() {
   const { users } = useLoaderData<{ users: User[] }>();
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   // values for table
   //table values
   const nodes = [...users];
@@ -82,12 +85,18 @@ export default function Users() {
         <h1 className=" font-semibold text-6xl text-gray-700">Users</h1>
       </div>
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-44 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Create User <FaPlus />
-        </Link>
+          <Link
+            to="create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Create User <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <CompactTable columns={COLUMNS} data={data} theme={theme} />
         </div>

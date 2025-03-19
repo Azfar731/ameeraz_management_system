@@ -16,6 +16,7 @@ import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({request}: LoaderFunctionArgs){
   await authenticate({request, requiredClearanceLevel: 3 });
+  return null
 }
 
 export async function action({ request }: ActionFunctionArgs) {

@@ -1,5 +1,5 @@
 import { SerializeFrom } from "@remix-run/node";
-import { Form, useSubmit } from "@remix-run/react";
+import { Form, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import Select from "react-select";
 import {
@@ -24,12 +24,14 @@ export default function Template_Form({
   template?: SerializeFrom<TemplateWithRelations>;
   errorMessages?: TemplateErrorMessages;
 }) {
+  const navigation = useNavigation()
   const clientPropertyOptions =["client_fname","client_lname","client_mobile_num","client_area","points","none"].map(
     (property) => ({
       value: property,
       label: property,
     })
   );
+
   const [numVariables, setNumVariables] = useState(
     template?.variables.length || 0
   );
@@ -235,7 +237,8 @@ export default function Template_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {template ? "Update" : "Register"}
         </button>

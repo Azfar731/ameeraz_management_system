@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
-import { Form, useSubmit } from "@remix-run/react";
+import { Form, useNavigation, useSubmit } from "@remix-run/react";
 import { useState } from "react";
 import Select from "react-select";
 import { ClearanceLevel } from "~/utils/auth/functions";
@@ -28,7 +28,7 @@ export default function User_Form({
 }: UserFormProps) {
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const submit = useSubmit();
-
+  const navigation = useNavigation();
   const role_options = [
     { value: "worker", label: "Worker" },
     { value: "manager", label: "Manager" },
@@ -220,6 +220,9 @@ export default function User_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           {user ? "Update" : "Register"}

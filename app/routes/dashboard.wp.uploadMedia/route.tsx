@@ -50,7 +50,9 @@ export default function All_Media() {
   const actionData = useActionData<{ message: string }>();
   const submit = useSubmit();
   const navigation = useNavigation();
-
+  const isNavigating = 
+    navigation.state === "loading" || navigation.state === "submitting"
+  
   const handleDeletion = (id: string) => {
     submit({ id }, { method: "delete", encType: "application/json" });
   };
@@ -84,9 +86,7 @@ export default function All_Media() {
       renderCell: (item: Media) => (
         <button
           className="border px-2 py-1 rounded-md bg-red-500 hover:bg-red-600 text-sm font-semibold text-white disabled:bg-gray-400 disabled:cursor-not-allowed"
-          disabled={
-            navigation.state === "loading" || navigation.state === "submitting"
-          }
+          disabled= {isNavigating}
           onClick={() => handleDeletion(item.id)}
         >
           Delete
@@ -119,12 +119,18 @@ export default function All_Media() {
         <h1 className=" font-semibold text-4xl text-gray-700">Media Files</h1>
       </div>
       <div className="mt-10">
-        <Link
-          to="create"
-          className="w-44 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Upload Media <FaPlus />
-        </Link>
+          <Link
+            to="create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Upload Media <FaPlus />
+          </Link>
+        </button>
         <div className="mt-6">
           <CompactTable columns={COLUMNS} data={data} theme={theme} />
         </div>

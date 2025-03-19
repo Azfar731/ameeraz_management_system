@@ -1,4 +1,9 @@
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { useState } from "react";
 import {
   cleanupFailedMessages,
@@ -34,8 +39,9 @@ export default function Failed_Messages() {
   const { failed_messages } = useLoaderData<{
     failed_messages: failed_message[];
   }>();
-  const actionData = useActionData<{ deletedCount: number }>();
 
+  const actionData = useActionData<{ deletedCount: number }>();
+  const navigation = useNavigation();
   const [ids, setIds] = useState<string[]>([]);
   const nodes = [...failed_messages];
   const data = { nodes };
@@ -125,7 +131,13 @@ export default function Failed_Messages() {
       <div className="mt-10">
         <div className="w-full flex justify-between items-right">
           <Form method="delete">
-            <button className="w-60 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+            <button
+              disabled={
+                navigation.state === "loading" ||
+                navigation.state === "submitting"
+              }
+              className="w-60 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
               Clear Messages
             </button>
           </Form>

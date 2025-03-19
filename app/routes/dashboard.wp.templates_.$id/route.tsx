@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { authenticate } from "~/utils/auth/functions.server";
 import { generate_heading } from "~/utils/render_functions";
@@ -27,6 +27,8 @@ export async function loader({request, params }: LoaderFunctionArgs) {
 
 export default function Template_Details() {
   const { template } = useLoaderData<{ template: TemplateWithRelations }>();
+  const navigation = useNavigation();
+  const isNavigating = navigation.state === "loading" || navigation.state === "submitting";
   const renderered_variables: JSX.Element[] = [];
 
   if (template.variables?.length > 0) {
@@ -71,12 +73,18 @@ export default function Template_Details() {
           generate_heading("Variables", "Name", "Type")}
         {renderered_variables}
 
-        <Link
-          to={`update`}
-          className="mt-6 w-2/4 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-2/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to="update"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

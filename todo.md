@@ -1,12 +1,12 @@
 ## Today:
-- change the server of vercel or supabase, to bring them closer
-- add defer and suspense to make things load quicker
-- add disabled property to create and update buttons
-- add authentication in user section routes
-- Resolve React Table ts errors
+
 - Resolve styles not loading in vercel
 - Implement user logs
-- allow the same user to edit his/her own data
+
+
+
+
+
 ## Done
 
 - Use error handling for unique value constraint
@@ -27,11 +27,14 @@
 ## Improvements:
 
 1. Open id tabs in new windows
-
+2. Add defer and suspense to make things load quicker
 ### Services:
 
 1. save search parameters when going from "/services" to "/services/$id"
 2. Figure out how to provide data to refine function messages in zod
+
+### Users 
+- Allow the same user to edit his/her own name
 
 ## Sections that need fixing:
 

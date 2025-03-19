@@ -7,8 +7,8 @@ import { formatDate } from "shared/utilityFunctions";
 import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    await authenticate({request, requiredClearanceLevel: 1 });
-  
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const { id } = params;
   if (!id) {
     throw new Response("Id not provided in URL", {
@@ -29,7 +29,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function View_Expense() {
   const { expense } = useLoaderData<{ expense: Operational_Expenses }>();
   const navigation = useNavigation();
-  const isNavigating = navigation.state === "loading" || navigation.state === "submitting";
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">

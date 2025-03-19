@@ -6,8 +6,8 @@ import { generate_heading } from "~/utils/render_functions";
 import { getTemplateById } from "~/utils/templates/db.server";
 import { TemplateWithRelations } from "~/utils/templates/types";
 
-export async function loader({request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 3 });
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
   const { id } = params;
   if (!id) {
     throw new Response("No Id provided in the URL", {
@@ -28,7 +28,8 @@ export async function loader({request, params }: LoaderFunctionArgs) {
 export default function Template_Details() {
   const { template } = useLoaderData<{ template: TemplateWithRelations }>();
   const navigation = useNavigation();
-  const isNavigating = navigation.state === "loading" || navigation.state === "submitting";
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   const renderered_variables: JSX.Element[] = [];
 
   if (template.variables?.length > 0) {

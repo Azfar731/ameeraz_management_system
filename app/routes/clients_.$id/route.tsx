@@ -1,12 +1,17 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, Link, useLocation } from "@remix-run/react";
+import {
+  useLoaderData,
+  Link,
+  useLocation,
+  useNavigation,
+} from "@remix-run/react";
 import { ClientWithRelations } from "~/utils/client/types";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { getClientFromId } from "~/utils/client/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const { id } = params;
   if (!id) {
@@ -28,6 +33,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function View_Client() {
   const { client } = useLoaderData<{ client: ClientWithRelations }>();
   const location = useLocation();
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   const getLocationState = () => {
     const { sp_areas, sp_fname, sp_lname, sp_mobile_num } =
       location.state || {};
@@ -90,12 +98,18 @@ export default function View_Client() {
         <h3 className="text-gray-600">
           {client.subscribed === "true" ? "Yes" : "No"}
         </h3>
-        <Link
-          to={`update`}
-          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to={`update`}
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

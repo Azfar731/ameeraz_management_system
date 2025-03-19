@@ -1,14 +1,13 @@
 import { User } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { formatDate } from "shared/utilityFunctions";
 import { authenticate } from "~/utils/auth/functions.server";
 import { getUserFromId } from "~/utils/user/db.server";
 
-export async function loader({request, params }: LoaderFunctionArgs) {
-
-  await authenticate({request, requiredClearanceLevel: 3 });
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
   const { id } = params;
   if (!id) {
     throw new Response("No Id found in URL", {
@@ -28,6 +27,9 @@ export async function loader({request, params }: LoaderFunctionArgs) {
 
 export default function User_Details() {
   const { user } = useLoaderData<{ user: User }>();
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
 
   return (
     <div className="flex flex-col justify-center items-center relative">
@@ -57,12 +59,18 @@ export default function User_Details() {
         <h3 className="text-gray-600">{formatDate(user.created_at)}</h3>
         <h3 className="font-medium text-gray-700">Modified At</h3>
         <h3 className="text-gray-600">{formatDate(user.modified_at)}</h3>
-        <Link
-          to={`update`}
-          className="mt-6 w-2/4 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-2/4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to={`update`}
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

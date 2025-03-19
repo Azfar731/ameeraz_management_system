@@ -1,4 +1,4 @@
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useNavigation } from "@remix-run/react";
 import { DealWithServices } from "~/utils/deal/types";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -6,8 +6,8 @@ import { formatDate } from "shared/utilityFunctions";
 import { getDealFromId } from "~/utils/deal/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 1 });
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
   const { id } = params;
   if (!id) {
     throw new Response("Id not provided in the URL", {
@@ -27,7 +27,9 @@ export async function loader({request, params }: LoaderFunctionArgs) {
 
 export default function View_Deal() {
   const { deal } = useLoaderData<{ deal: DealWithServices }>();
-
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <Link
@@ -63,12 +65,18 @@ export default function View_Deal() {
           {deal.services.map((serv) => serv.serv_name).join(", ")}
         </h3>
 
-        <Link
-          to={`update`}
-          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to="update"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

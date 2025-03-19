@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { FaEdit, FaLongArrowAltLeft } from "react-icons/fa";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Employee } from "@prisma/client";
@@ -6,7 +6,7 @@ import { getEmployeeFromId } from "~/utils/employee/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 3 });
+  await authenticate({ request, requiredClearanceLevel: 3 });
 
   const { id } = params;
   if (!id) {
@@ -27,7 +27,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function View_Employee() {
   const { employee: emp } = useLoaderData<{ employee: Employee }>();
-  console.log(emp);
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
+
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <Link
@@ -58,12 +61,18 @@ export default function View_Employee() {
 
         <h3 className="font-medium text-gray-700">Status</h3>
         <h3 className="text-gray-600">{emp.emp_status ? "Active" : "Left"}</h3>
-        <Link
-          to={`update`}
-          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to={`update`}
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

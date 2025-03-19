@@ -1,5 +1,6 @@
 ## Today:
-
+- convert username into lowercase before comparing in login form
+- convert username into lowercase in db
 - Resolve styles not loading in vercel
 - Implement user logs
 - adjust the time for cookies

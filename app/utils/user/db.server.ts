@@ -23,7 +23,7 @@ const createUser = async (
     // Create the user in the database
     return prisma_client.user.create({
         data: {
-            userName,
+            userName: (userName.toLowerCase()),
             password: hashedPassword,
             role,
             fname,
@@ -50,8 +50,10 @@ const updateUser = async (
     if (updates.password) {
         updateData.password = await argon2.hash(updates.password);
     }
-
-    // Update the user in the database
+    //if username is changed convert it to lowercase
+    if (updateData.userName) {
+        updateData.userName = updateData.userName?.toLowerCase();
+    } // Update the user in the database
     return prisma_client.user.update({
         where: { id },
         data: updateData,

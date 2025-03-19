@@ -11,15 +11,15 @@ authenticator.use(
       // Here you can use `form` to access and input values from the form.
       const userName = form.get("username") as string; // or email... etc
       const password = form.get("password") as string;
-  
-      // You can validate the inputs however you want
+      
+      
       const validationResult = auth_schema.safeParse({ username: userName, password });
         if (!validationResult.success) {
             return "";
         }
 
-      // And finally, you can find, or create, the user
-      const userId = await getUserIdFromCreds({userName, password});
+      // Find User
+      const userId = await getUserIdFromCreds({userName: userName.toLowerCase(), password});
       
       // And return the user as the Authenticator expects it
       return userId;

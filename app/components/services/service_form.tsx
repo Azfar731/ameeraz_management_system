@@ -1,5 +1,5 @@
 import { ServiceErrors, ServiceWithRelations } from "~/utils/service/types";
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import Select from "react-select";
 import { Category } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
@@ -13,6 +13,7 @@ export default function Service_Form({
   service?: SerializeFrom<ServiceWithRelations>;
   errorMessage?: ServiceErrors;
 }) {
+  const navigation = useNavigation();
   const category_options = categories.map((category) => ({
     value: category.cat_id,
     label: category.cat_name,
@@ -111,7 +112,10 @@ export default function Service_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {service ? "Update" : "Create"}
         </button>

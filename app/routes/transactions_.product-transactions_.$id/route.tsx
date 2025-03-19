@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { FaEdit, FaExternalLinkAlt, FaLongArrowAltLeft } from "react-icons/fa";
 import { formatDate } from "shared/utilityFunctions";
 import { authenticate } from "~/utils/auth/functions.server";
@@ -7,9 +7,9 @@ import { getProductTransactionWithRelationsFromId } from "~/utils/productTransac
 import { ProductTransactionWithRelations } from "~/utils/productTransaction/types";
 import { generate_heading } from "~/utils/render_functions";
 
-export async function loader({ request ,params }: LoaderFunctionArgs) {
-    await authenticate({request, requiredClearanceLevel: 1 });
-  
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
+
   const { id } = params;
   if (!id) {
     throw new Response("No ID provided in the URL", {
@@ -32,6 +32,9 @@ export default function View_Product_Transaction() {
   const { transaction } = useLoaderData<{
     transaction: ProductTransactionWithRelations;
   }>();
+  const navigation = useNavigation();
+  const isNavigating =
+    navigation.state === "loading" || navigation.state === "submitting";
 
   const render_transactions = () => {
     const rendered_transactions: JSX.Element[] = [];
@@ -128,12 +131,18 @@ export default function View_Product_Transaction() {
             {render_transactions()}
           </>
         )}
-        <Link
-          to={`update`}
-          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"
+        <button
+          disabled={isNavigating}
+          className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Edit <FaEdit />
-        </Link>
+          <Link
+            to="update"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
+            Edit <FaEdit />
+          </Link>
+        </button>
       </div>
     </div>
   );

@@ -47,7 +47,7 @@ export default function View_Category() {
         <h3 className="text-gray-600">{category.cat_name}</h3>
 
         <h3 className="font-medium text-gray-700">Attached Services</h3>
-
+        <h3>{category.services.length > 0 ? category.services.map(service => service.serv_name).join(","): "No services exist"}</h3>
         <Link
           to={`update`}
           className="mt-6 w-1/3 bg-blue-500 hover:bg-blue-700 flex items-center justify-around text-white  font-bold py-2 px-4 rounded"

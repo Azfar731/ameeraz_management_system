@@ -5,8 +5,6 @@
 - adjust the time for cookies
 
 
-
-
 ## Done
 
 - Use error handling for unique value constraint
@@ -23,7 +21,7 @@
 ## Bugs:
 
 - salesRecord create: paid amount is reset to amount_charged automatically(in dev only cause useEffect runs twice on react strict mode)
-
+- Categories id route => Messes up the position of Edit button, when no service is present
 ## Improvements:
 
 1. Open id tabs in new windows

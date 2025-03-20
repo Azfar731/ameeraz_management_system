@@ -261,7 +261,7 @@ export default function Index() {
           name="services"
           options={fetchServices(deals)}
           defaultValue={def_services}
-          className="basic-multi-select mt-2"
+          className=" mt-2"
           classNamePrefix="select"
         />
         <label
@@ -276,7 +276,7 @@ export default function Index() {
           id="deal"
           options={fetchDeals(deals)}
           defaultValue={def_deals}
-          className="basic-multi-select mt-2"
+          className=" mt-2"
           classNamePrefix="select"
         />
         {errorMessages?.deal_ids && (
@@ -295,7 +295,7 @@ export default function Index() {
           name="employees"
           options={getEmployeeOptions(employees)}
           defaultValue={def_emp}
-          className="basic-multi-select mt-2"
+          className=" mt-2"
           classNamePrefix="select"
         />
         {errorMessages?.employee_ids && (
@@ -314,7 +314,7 @@ export default function Index() {
           name="categories"
           options={getCategoryOptions(categories)}
           defaultValue={def_categories}
-          className="basic-multi-select mt-2"
+          className=" mt-2"
           classNamePrefix="select"
         />
         {errorMessages?.category_ids && (
@@ -336,7 +336,7 @@ export default function Index() {
             { value: "pending", label: "Pending" },
             { value: undefined, label: "Any" },
           ]}
-          className="basic-multi-select mt-2"
+          className=" mt-2"
           classNamePrefix="select"
         />
         <button
@@ -355,7 +355,11 @@ export default function Index() {
           disabled={isNavigating}
           className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          <Link to="/salerecord/create" className="flex items-center justify-around" aria-disabled={isNavigating}>
+          <Link
+            to="/salerecord/create"
+            className="flex items-center justify-around"
+            aria-disabled={isNavigating}
+          >
             Create a new record <FaPlus />
           </Link>
         </button>

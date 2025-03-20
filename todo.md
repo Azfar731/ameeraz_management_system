@@ -1,9 +1,8 @@
 ## Todo:
 
-- solve hydration error
 - Resolve styles not loading in vercel
 - Implement user logs
-- add a secret environment variable in ENV file.
+- Implement client-list in whatsapp
 
 ## Done
 

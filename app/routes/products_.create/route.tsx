@@ -7,6 +7,7 @@ import { createProduct } from "~/utils/products/db.server";
 import { fetchProductFormData } from "~/utils/products/functions.server";
 import { ProductErrors } from "~/utils/products/types";
 import { ProductSchema } from "~/utils/products/validation.server";
+import { createLog } from "~/utils/logs/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 2 });
@@ -14,7 +15,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 2 });
 
   const formData = await request.formData();
   const formValues = fetchProductFormData(formData);
@@ -27,7 +28,11 @@ export async function action({ request }: ActionFunctionArgs) {
     const new_product = await createProduct({
       ...validationResult.data,
     });
-
+    await createLog({
+      userId,
+      log_type: "create",
+      log_message: `Created Product. Link: /products/${new_product.prod_id}`,
+    });
     throw replace(`/products/${new_product.prod_id}`);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

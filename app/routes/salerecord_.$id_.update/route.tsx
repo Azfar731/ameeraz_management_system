@@ -15,9 +15,10 @@ import {
 import Service_Sale_Record_Update_Form from "./Service_Sale_Record_Update_Form";
 import { serviceSaleRecordUpdateSchema } from "~/utils/serviceSaleRecord/validation.server";
 import { authenticate } from "~/utils/auth/functions.server";
+import { createLog } from "~/utils/logs/db.server";
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
-  
+  await authenticate({ request, requiredClearanceLevel: 2 });
+
   const { id } = params;
   if (!id) {
     throw new Response("No id Provided in the URL", {
@@ -44,7 +45,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 2 });
 
   const { id } = params;
   if (!id) {
@@ -80,6 +81,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const updated_record = await updateServiceSaleRecord({
     ...validationResult.data,
     service_record_id: id,
+  });
+
+  await createLog({
+    userId,
+    log_type: "update",
+    log_message: `updated Client Sale Record. Link: /salerecord/${updated_record.service_record_id}`,
   });
   throw replace(`/salerecord/${updated_record.service_record_id}`);
 }

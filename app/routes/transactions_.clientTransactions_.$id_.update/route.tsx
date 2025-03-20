@@ -12,6 +12,7 @@ import {
   ClientTransactionWithRelations,
 } from "~/utils/clientTransaction/types";
 import { clientTransactionSchema } from "~/utils/clientTransaction/validation.server";
+import { createLog } from "~/utils/logs/db.server";
 import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 2 });
@@ -40,7 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 2 });
 
   const { id } = params;
   if (!id) {
@@ -80,6 +81,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
     new_remaining_amount,
   });
 
+  await createLog({
+    userId,
+    log_type: "update",
+    log_message: `updated Client Transaction Record. Link: /transactions/clientTransactions/${updated_transaction.client_transaction_id}`,
+  });
   throw replace(
     `/transactions/clientTransactions/${updated_transaction.client_transaction_id}`
   );

@@ -1,4 +1,8 @@
-import { ActionFunctionArgs, LoaderFunctionArgs, replace } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  replace,
+} from "@remix-run/node";
 import Client_Form from "~/components/clients/client_form";
 import { useActionData } from "@remix-run/react";
 import { clientSchema } from "../../utils/client/validation";
@@ -7,13 +11,14 @@ import { ClientErrorData } from "~/utils/client/types";
 import { createClient } from "~/utils/client/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 import { Prisma } from "@prisma/client";
+import { createLog } from "~/utils/logs/db.server";
 
-export async function loader({request}: LoaderFunctionArgs){
-  await authenticate({request, requiredClearanceLevel: 1 });
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 1 });
   return null;
 }
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 1 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 1 });
 
   const formData = await request.formData();
   const clientData = getClientFormData(formData);
@@ -25,6 +30,11 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     const client = await createClient(validationResult.data);
+    await createLog({
+      userId,
+      log_type: "create",
+      log_message: `Created Client. Link: /clients/${client.client_id}`,
+    });
     throw replace(`/clients/${client.client_id}`);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

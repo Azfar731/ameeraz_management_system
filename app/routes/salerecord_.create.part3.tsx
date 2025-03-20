@@ -25,6 +25,7 @@ import { ServiceSaleRecordSchema } from "~/utils/serviceSaleRecord/validation.se
 import { ServiceSaleRecordCreateErrors } from "~/utils/serviceSaleRecord/types";
 import { renderZodErrors } from "~/utils/render_functions";
 import { authenticate } from "~/utils/auth/functions.server";
+import { createLog } from "~/utils/logs/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 1 });
@@ -33,7 +34,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 1 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 1 });
 
   const formData: FormType = await request.json();
 
@@ -47,6 +48,11 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const new_record = await createServiceSaleRecord(validationResult.data);
+  await createLog({
+    userId,
+    log_type: "create",
+    log_message: `Created Client Sale Record. Link: /salerecord/${new_record.service_record_id}`,
+  });
   return replace(`/salerecord/${new_record.service_record_id}`);
 }
 
@@ -229,7 +235,10 @@ export default function Part3() {
           <button
             type="submit"
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
-            disabled={navigation.state === "loading" || navigation.state === "submitting"}
+            disabled={
+              navigation.state === "loading" ||
+              navigation.state === "submitting"
+            }
           >
             Next
           </button>

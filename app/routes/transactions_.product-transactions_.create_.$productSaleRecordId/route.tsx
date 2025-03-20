@@ -2,6 +2,7 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import ProductTransactionForm from "~/components/productTransactions/ProductTransactionsForm";
 import { authenticate } from "~/utils/auth/functions.server";
+import { createLog } from "~/utils/logs/db.server";
 import { getProductSaleRecordByIdWithRelations } from "~/utils/productSaleRecord/db.server";
 import { ProductSaleRecordWithRelations } from "~/utils/productSaleRecord/types";
 import { createProductTransaction } from "~/utils/productTransaction/db.server";
@@ -34,7 +35,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 2 });
 
   const { productSaleRecordId } = params;
   if (!productSaleRecordId) {
@@ -57,7 +58,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
     ...validationResult.data,
     product_record_id: productSaleRecordId,
   });
-
+  await createLog({
+    userId,
+    log_type: "create",
+    log_message: `Created Product Transaction. Link: /transactions/product-transactions/${new_transaction.product_trans_id}`,
+  });
   throw replace(
     `/transactions/product-transactions/${new_transaction.product_trans_id}`
   );

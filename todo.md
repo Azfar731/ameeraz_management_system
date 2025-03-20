@@ -2,9 +2,10 @@
 
 - Resolve styles not loading in vercel
 - Implement user logs
-- Handle numbersList in addition to clients in webhook
 
 ## Done
+
+- Handle numbersList in addition to clients in webhook
 - Implement client-list in whatsapp
 - Use error handling for unique value constraint
 - Check file types before processing the file. add safety checks
@@ -14,7 +15,8 @@
 - Verify how errors are shown in build
 
 ## Things to do:
-- See if it is possible to have to index routes in the same route: dashboard.wp._index._index
+
+- See if it is possible to have to index routes in the same route: dashboard.wp.\_index.\_index
 - set different file limits for images and videos
 
 ## Bugs:
@@ -53,3 +55,11 @@ Compact table has a value of 1 < z-index > 10, so it sometimes obsturcuts the Se
 
 - create user in db
 - create triggers and function in db
+
+## Implemented User logs in:
+
+- Sale reecord
+- Product Sale record
+- Product
+- Client
+- Transactions(product,client,expenses)

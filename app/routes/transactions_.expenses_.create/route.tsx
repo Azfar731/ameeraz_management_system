@@ -6,13 +6,14 @@ import { createOperationalExpense } from "~/utils/expenses/db.server";
 import { getExpenseFormData } from "~/utils/expenses/functions.server";
 import { ExpenseErrors } from "~/utils/expenses/types";
 import { expensesSchema } from "~/utils/expenses/validation.server";
+import { createLog } from "~/utils/logs/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 2 });
   return null;
 }
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 2 });
 
   const formData = await request.formData();
   const vendorData = getExpenseFormData(formData);
@@ -23,7 +24,11 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const new_expense = await createOperationalExpense(validationResult.data);
-
+  await createLog({
+    userId,
+    log_type: "create",
+    log_message: `Created Expense Record. Link: /transactions/expenses/${new_expense.expense_id}`,
+  });
   throw replace(`/transactions/expenses/${new_expense.expense_id}`);
 }
 

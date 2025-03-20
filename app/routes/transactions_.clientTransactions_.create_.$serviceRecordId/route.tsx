@@ -9,6 +9,7 @@ import { ServiceSaleRecordWithRelations } from "~/utils/serviceSaleRecord/types"
 import { getServiceSaleRecordFromId } from "~/utils/serviceSaleRecord/db.server";
 import { getPendingAmount } from "~/utils/serviceSaleRecord/functions.server";
 import { authenticate } from "~/utils/auth/functions.server";
+import { createLog } from "~/utils/logs/db.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 1 });
@@ -35,7 +36,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 1 });
+  const userId =   await authenticate({ request, requiredClearanceLevel: 1 });
 
   const { serviceRecordId } = params;
   if (!serviceRecordId) {
@@ -59,7 +60,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
     ...validationResult.data,
     service_record_id: serviceRecordId,
   });
-
+  await createLog({
+      userId,
+      log_type: "create",
+      log_message: `Created Client Transaction Record. Link: /transactions/clientTransactions/${new_transaction.client_transaction_id}`,
+    });
   throw replace(
     `/transactions/clientTransactions/${new_transaction.client_transaction_id}`
   );

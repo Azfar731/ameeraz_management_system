@@ -2,6 +2,7 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { replace, useActionData, useLoaderData } from "@remix-run/react";
 import ProductTransactionForm from "~/components/productTransactions/ProductTransactionsForm";
 import { authenticate } from "~/utils/auth/functions.server";
+import { createLog } from "~/utils/logs/db.server";
 import {
   getProductTransactionFromId,
   getProductTransactionWithRelationsFromId,
@@ -35,7 +36,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 2 });
+  const userId =   await authenticate({ request, requiredClearanceLevel: 2 });
 
   const { id } = params;
   if (!id) {
@@ -68,6 +69,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
     new_remaining_amount,
   });
 
+  await createLog({
+    userId,
+    log_type: "update",
+    log_message: `updated Product Transaction Record. Link: /transactions/product-transactions/${updated_transaction.product_trans_id}`,
+  });
   throw replace(
     `/transactions/product-transactions/${updated_transaction.product_trans_id}`
   );

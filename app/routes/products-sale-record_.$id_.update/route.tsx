@@ -14,6 +14,7 @@ import {
 import { ProductSaleRecordUpdateSchema } from "~/utils/productSaleRecord/validation.server";
 import Product_Sale_Record_Form from "./product_Sale_Record_Form";
 import { authenticate } from "~/utils/auth/functions.server";
+import { createLog } from "~/utils/logs/db.server";
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 3 });
 
@@ -49,7 +50,7 @@ type ActionDataObject = {
 };
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 3 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 3 });
 
   const { id } = params;
   if (!id) {
@@ -86,7 +87,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
     id,
     oldProductSaleRecord,
   });
-
+  await createLog({
+    userId,
+    log_type: "update",
+    log_message: `updated Product. Link: /products-sale-record/${id}}`,
+  });
   throw replace(`/products-sale-record/${id}`);
 }
 

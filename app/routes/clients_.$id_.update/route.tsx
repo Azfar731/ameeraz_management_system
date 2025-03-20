@@ -11,6 +11,7 @@ import { getClientFromId, updateClient } from "~/utils/client/db.server";
 import { getClientFormData } from "~/utils/client/functions.server";
 import { ClientErrorData } from "~/utils/client/types";
 import { clientSchema } from "~/utils/client/validation";
+import { createLog } from "~/utils/logs/db.server";
 export async function loader({request, params }: LoaderFunctionArgs) {
     await authenticate({request, requiredClearanceLevel: 2 });
   
@@ -33,7 +34,7 @@ export async function loader({request, params }: LoaderFunctionArgs) {
 
 export async function action({ request, params }: ActionFunctionArgs) {
 
-  await authenticate({request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({request, requiredClearanceLevel: 2 });
 
   const { id } = params;
   if (!id) {
@@ -53,6 +54,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
       client_id: id,
       ...validationResult.data,
     });
+     await createLog({
+        userId,
+        log_type: "update",
+        log_message: `Updated client. Link: /clients/${updatedClient.client_id}`,
+      });
     throw redirect(`/clients/${updatedClient.client_id}`);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {

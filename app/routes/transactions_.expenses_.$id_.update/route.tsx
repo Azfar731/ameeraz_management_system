@@ -10,6 +10,7 @@ import {
 import { getExpenseFormData } from "~/utils/expenses/functions.server";
 import { ExpenseErrors } from "~/utils/expenses/types";
 import { expensesSchema } from "~/utils/expenses/validation.server";
+import { createLog } from "~/utils/logs/db.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 2 });
@@ -32,7 +33,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  await authenticate({ request, requiredClearanceLevel: 2 });
+  const userId = await authenticate({ request, requiredClearanceLevel: 2 });
 
   const { id } = params;
   if (!id) {
@@ -53,7 +54,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
     id,
     ...validationResult.data,
   });
-
+  await createLog({
+    userId,
+    log_type: "update",
+    log_message: `updated Expense Record. Link: /transactions/expenses/${updated_expense.expense_id}`,
+  });
   throw replace(`/transactions/expenses/${updated_expense.expense_id}`);
 }
 

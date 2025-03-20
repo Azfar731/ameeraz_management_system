@@ -1,11 +1,8 @@
-## Today:
-- convert username into lowercase before comparing in login form
-- convert username into lowercase in db
+## Todo:
+
+- solve hydration error
 - Resolve styles not loading in vercel
 - Implement user logs
-- adjust the time for cookies
-- solve hydration error
-- check whether session.ts file should be server only
 - add a secret environment variable in ENV file.
 
 ## Done
@@ -25,16 +22,19 @@
 
 - salesRecord create: paid amount is reset to amount_charged automatically(in dev only cause useEffect runs twice on react strict mode)
 - Categories id route => Messes up the position of Edit button, when no service is present
+
 ## Improvements:
 
 1. Open id tabs in new windows
 2. Add defer and suspense to make things load quicker
+
 ### Services:
 
 1. save search parameters when going from "/services" to "/services/$id"
 2. Figure out how to provide data to refine function messages in zod
 
-### Users 
+### Users
+
 - Allow the same user to edit his/her own name
 
 ## Sections that need fixing:

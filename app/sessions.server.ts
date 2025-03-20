@@ -25,8 +25,8 @@ const { getSession, commitSession, destroySession } =
         maxAge: 3600, // number of seconds in 1 hour
         path: "/",
         sameSite: "strict",
-        secrets: ["s3cret1"],
-        secure: true,
+        secrets: [process.env.COOKIE_SECRET!],
+        secure: process.env.NODE_ENV === "production",
       },
     }
   );

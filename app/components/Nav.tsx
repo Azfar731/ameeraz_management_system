@@ -105,7 +105,7 @@ const Nav: React.FC<NavProps> = ({ closeNav }: { closeNav: () => void }) => {
             Vendors
           </NavLink>
           <NavLink
-            to="/dashboard/wp"
+            to="/dashboard/wp/sendMessages"
             className={({ isActive }) =>
               isActive ? "underline font-bold text-pink-500" : "hover:underline"
             }

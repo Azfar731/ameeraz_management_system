@@ -2,10 +2,10 @@
 
 - Resolve styles not loading in vercel
 - Implement user logs
-- Implement client-list in whatsapp
+- Handle numbersList in addition to clients in webhook
 
 ## Done
-
+- Implement client-list in whatsapp
 - Use error handling for unique value constraint
 - Check file types before processing the file. add safety checks
 - Add error handling for file upload
@@ -14,7 +14,7 @@
 - Verify how errors are shown in build
 
 ## Things to do:
-
+- See if it is possible to have to index routes in the same route: dashboard.wp._index._index
 - set different file limits for images and videos
 
 ## Bugs:

@@ -78,7 +78,7 @@ export async function action({ request }: ActionFunctionArgs) {
         type: fileType,
       });
       await createMedia({ id: mediaId, name, type });
-      return redirect("/dashboard/wp");
+      return redirect("/dashboard/wp/sendMessages");
     } catch (error) {
       if (error instanceof Error) {
         captureException(error);

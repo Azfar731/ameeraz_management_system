@@ -1,6 +1,10 @@
 // import { ActionFunctionArgs } from "@remix-run/node";
 import { Media, Template_Variable } from "@prisma/client";
-import { ActionFunctionArgs, LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  SerializeFrom,
+} from "@remix-run/node";
 import {
   Form,
   redirect,
@@ -11,8 +15,7 @@ import {
 } from "@remix-run/react";
 import { useState } from "react";
 import Select from "react-select";
-import { getClientCount, getRangeofClients } from "~/utils/client/db.server";
-import { getAllTemplates } from "~/utils/templates/db.server";
+import { getClientVarLessTemplates } from "~/utils/templates/db.server";
 import { TemplateWithRelations } from "~/utils/templates/types";
 import {
   canSendMessages,
@@ -21,24 +24,28 @@ import {
 } from "~/utils/upstash_redis/functions.server";
 import { WhatsappTemplateDataValidation } from "~/utils/wp_api/validations.server";
 import { WP_ErrorMessages } from "~/utils/wp_api/types";
-import { sendMultipleMessages } from "~/utils/wp_api/functions.server";
+import { sendMultipleMessagestoNumbers } from "~/utils/wp_api/functions.server";
 import { renderZodErrors } from "~/utils/render_functions";
 import { getAllMedia } from "~/utils/media/db.server";
 import { env } from "~/config/env.server";
 import { authenticate } from "~/utils/auth/functions.server";
+import {
+  getMobileNumbersCount,
+  getRangeofNumberRecords,
+} from "~/utils/mobile_number_record/db.server";
 // import {
 //   getInstaTemplateMessageInput,
 //   sendMessage,
 // } from "~/utils/wp_api/functions.server";
 
-export async function loader({request}: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 3 });
-  const templates = await getAllTemplates();
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
+  const templates = await getClientVarLessTemplates(); //get templates without client Variables
   const remainingLimit = await remainingDailyLimit();
-  const clientCount = await getClientCount();
+  const mobileNumbersCount = await getMobileNumbersCount(); //get total number of mobile numbers in list
   const media = await getAllMedia();
-  const numOfClientBatches = Math.ceil(clientCount / 230);
-  return { templates, remainingLimit, numOfClientBatches, media };
+  const numOfBatches = Math.ceil(mobileNumbersCount / 230);
+  return { templates, remainingLimit, numOfBatches, media };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -49,38 +56,35 @@ export async function action({ request }: ActionFunctionArgs) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
   const data = validationResult.data;
-  const daily_limit = parseInt(
-    env.WP_DAILY_LIMIT ? env.WP_DAILY_LIMIT : "230"
-  );
-  const clients = await getRangeofClients({
+  const daily_limit = parseInt(env.WP_DAILY_LIMIT ? env.WP_DAILY_LIMIT : "230");
+  const records = await getRangeofNumberRecords({
     startIndex: (data.client_batch - 1) * daily_limit,
     total: daily_limit,
   });
-  if (!canSendMessages(clients.length)) {
-    return {errorMessages: {client_batch: ["Daily Limit Exceeded"]}}
+  if (!canSendMessages(records.length)) {
+    return { errorMessages: { client_batch: ["Daily Limit Exceeded"] } };
   }
-  const failed_messages = await sendMultipleMessages({
+  const failed_messages = await sendMultipleMessagestoNumbers({
     template_name: data.template_name,
-    clientsList: clients,
+    numbersList: records, //change for mobile numbers
     headerValue: data.header_value,
     variablesArray: data.variables_array,
   });
 
-  recordMessage(clients.length - failed_messages);
+  recordMessage(records.length - failed_messages);
   throw redirect(
-    `/dashboard/wp/success?failed_messages=${failed_messages}&total_messages=${clients.length}`
+    `/dashboard/wp/success?failed_messages=${failed_messages}&total_messages=${records.length}`
   );
 }
 
-export default function Whatsapp_API() {
-  const { templates, remainingLimit, numOfClientBatches, media } =
-    useLoaderData<{
-      templates: TemplateWithRelations[];
-      remainingLimit: number;
-      numOfClientBatches: number;
-      media: Media[];
-    }>();
-    const navigation = useNavigation();
+export default function SendMessagesToNumbers() {
+  const { templates, remainingLimit, numOfBatches, media } = useLoaderData<{
+    templates: TemplateWithRelations[];
+    remainingLimit: number;
+    numOfBatches: number;
+    media: Media[];
+  }>();
+  const navigation = useNavigation();
   const [chosenTemplate, setChosenTemplate] = useState<
     SerializeFrom<TemplateWithRelations> | undefined
   >(undefined);
@@ -97,7 +101,7 @@ export default function Whatsapp_API() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData.entries());
-    if(!chosenTemplate){
+    if (!chosenTemplate) {
       return;
     }
     const data = {
@@ -120,11 +124,11 @@ export default function Whatsapp_API() {
       <Form
         method="post"
         onSubmit={handleSubmit}
-        className="bg-white mt-14 p-6 rounded shadow-md  "
+        className="bg-white  p-6 rounded shadow-md  "
       >
         <div className="w-full flex justify-center items-center">
           <h1 className="block text-gray-700 text-2xl font-bold mt-2 mb-2">
-            Send Whatsapp Messsages
+            Send Whatsapp Messsages to Mobile numbers
           </h1>
         </div>
         <div className="block text-gray-700 text-sm font-bold mb-2">
@@ -212,7 +216,7 @@ export default function Whatsapp_API() {
         )}
         <div className="block text-gray-700 text-sm font-bold mb-2">
           Total Client Batches
-          <span className="font-semibold">{`: ${numOfClientBatches}`}</span>
+          <span className="font-semibold">{`: ${numOfBatches}`}</span>
         </div>
         <label
           htmlFor="client_batch"
@@ -226,7 +230,7 @@ export default function Whatsapp_API() {
           id="client_batch"
           className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4"
           min={1}
-          max={numOfClientBatches}
+          max={numOfBatches}
           required
         />
         {actionData?.errorMessages?.client_batch && (
@@ -238,7 +242,10 @@ export default function Whatsapp_API() {
         <div className="w-full flex justify-center items-center">
           <button
             type="submit"
-            disabled={navigation.state === "submitting" || navigation.state === "loading"}
+            disabled={
+              navigation.state === "submitting" ||
+              navigation.state === "loading"
+            }
             className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Send Messages

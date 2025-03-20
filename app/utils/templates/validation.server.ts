@@ -9,7 +9,7 @@ const TemplateSchema = z.object({
     header_var_name: z.string().min(1).regex(
         /^[A-Za-z0-9_]+$/,
         "Header variable name must only contain alphanumeric character and underscore.",
-    ),
+    ).optional(),
     variables: z.array(
         z.object({
             name: z.string().min(1, "Variable name cannot be empty"),
@@ -21,6 +21,13 @@ const TemplateSchema = z.object({
             })
         })
     ).optional() // Allows an empty array
+}).refine(data => {
+    if (data.header_type === "text") {
+        return data.header_var_name !== undefined;
+    }
+    return true;
+}, {
+    message: "Header variable name is required when header type is text"
 });
 
 

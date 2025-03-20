@@ -1,9 +1,18 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { changeClientSubscribeStatus } from "~/utils/client/db.server";
+import {
+  changeClientSubscribeStatus,
+  getClientByMobile,
+} from "~/utils/client/db.server";
 import { recordFailedMessage } from "~/utils/upstash_redis/failedMgsFunctions.server";
 import { WebhookObj } from "~/utils/webhooks/types.server";
 import { sendFreeFormMessage } from "~/utils/wp_api/functions.server";
 import { env } from "~/config/env.server";
+import {
+  changeNumberSubscribeStatus,
+  createMobileRecord,
+  getRecord,
+} from "~/utils/mobile_number_record/db.server";
+import { captureMessage } from "@sentry/remix";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
@@ -40,18 +49,29 @@ export const action = async ({ request }: ActionFunctionArgs) => {
             // Iterate through messages
             if (change.value.messages) {
               change.value.messages.forEach(async (message) => {
-                const phoneNumber = message.from; // Extract sender's phone number
+                const phoneNumber = message.from;
+                const localizedPhoneNumber =
+                  _removeInternationalCode(phoneNumber); // Extract sender's phone number
                 if (message.type === "button" && message.button?.payload) {
                   const buttonPayload = message.button.payload;
 
-                  console.log("Button Payload:", buttonPayload);
-
                   if (buttonPayload === "Stop promotions") {
                     // Update subscription status in database
-                    await changeClientSubscribeStatus({
-                      status: false,
-                      mobile_num: phoneNumber,
-                    });
+                    if (await getClientByMobile(localizedPhoneNumber)) {
+                      await changeClientSubscribeStatus({
+                        status: false,
+                        mobile_num: localizedPhoneNumber,
+                      });
+                    } else if (await getRecord(localizedPhoneNumber)) {
+                      await changeNumberSubscribeStatus({
+                        phoneNumber: localizedPhoneNumber,
+                        status: "false",
+                      });
+                    } else {
+                      captureMessage(
+                        `Recipient sent by Meta not found in database or mobile number record: Phone Number: ${phoneNumber}`
+                      );
+                    }
 
                     console.log(
                       `Client with phone ${phoneNumber} unsubscribed from promotions`
@@ -65,10 +85,22 @@ export const action = async ({ request }: ActionFunctionArgs) => {
                   }
                 } else if (message.type === "text" && message.text.body) {
                   if (message.text.body.match(/^sub$/i)) {
-                    await changeClientSubscribeStatus({
-                      status: true,
-                      mobile_num: phoneNumber,
-                    });
+                    if (await getClientByMobile(localizedPhoneNumber)) {
+                      await changeClientSubscribeStatus({
+                        status: true,
+                        mobile_num: localizedPhoneNumber,
+                      });
+                    } else if (await getRecord(localizedPhoneNumber)) {
+                      await changeNumberSubscribeStatus({
+                        phoneNumber: localizedPhoneNumber,
+                        status: "true",
+                      });
+                    } else {
+                      captureMessage(
+                        `Recipient sent by Meta not found in database or mobile number record: Phone Number: ${phoneNumber}`
+                      );
+                      await createMobileRecord(localizedPhoneNumber);
+                    }
 
                     console.log(
                       `Client with phone ${phoneNumber} subscribed to promotions`
@@ -103,10 +135,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         });
       });
     }
-
     return new Response("Webhook received successfully", { status: 200 });
   } catch (error) {
     console.error("Error processing webhook:", error);
     return new Response("Internal Server Error", { status: 500 });
   }
 };
+
+function _removeInternationalCode(mobile_num: string) {
+  if (mobile_num.startsWith("92") && mobile_num.length === 12) {
+    return "0" + mobile_num.slice(2);
+  }
+  return mobile_num;
+}

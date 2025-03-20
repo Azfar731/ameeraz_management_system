@@ -1,11 +1,11 @@
-import { Client } from "@prisma/client";
+import { Client, Mobile_number_record } from "@prisma/client";
 import axios from "axios";
 import Bottleneck from "bottleneck";
 import { getTemplateByName } from "../templates/db.server";
 import { TemplateWithRelations } from "../templates/types";
 import { env } from "~/config/env.server";
 // import { WP_ServiceError } from "../errorClasses";
-import { captureException, captureMessage } from "@sentry/remix";
+import { captureException } from "@sentry/remix";
 const limiter = new Bottleneck({
     minTime: 1000 / 80, // 80 requests per second
     maxConcurrent: 80,
@@ -107,6 +107,71 @@ async function sendMultipleMessages({
     return nullCount;
 }
 
+//function for Sending Messages to Numbers List
+async function sendMultipleMessagestoNumbers({
+    template_name,
+    numbersList,
+    headerValue,
+    variablesArray,
+}: {
+    template_name: string;
+    numbersList: Mobile_number_record[];
+    headerValue?: string;
+    variablesArray: { key: string; value: string; type: string }[]; // Allows additional properties for each template
+}) {
+    if (numbersList.length < 1) {
+        throw new Error("Empty Recipient list provided to Whatsapp API");
+    }
+    const template = await getTemplateByName(template_name);
+    if (!template) {
+        throw new Error(`No template found with name ${template_name}`);
+    }
+
+    const messages = numbersList.map((record) => {
+        return _getDynamicTemplateBody({
+            recipient: _convertMobileNumber(record.mobile_number),
+            template,
+            variablesArray: headerValue
+                ? _insertHeaderVariable({
+                    template,
+                    headerValue,
+                    variablesArray,
+                })
+                : variablesArray,
+        });
+    });
+
+    const responses = await Promise.all(
+        messages.map((msg) => sendMessage(msg)),
+    );
+    //each null entry represents a failed message
+    const nullCount = responses.filter((resp) => resp === null).length;
+
+    return nullCount;
+}
+
+function _insertHeaderVariable(
+    { variablesArray, headerValue, template }: {
+        template: TemplateWithRelations;
+        headerValue: string;
+        variablesArray: { key: string; value: string; type: string }[];
+    },
+) {
+    const modifiedArray = [];
+
+    if (template.header_type !== "none" && headerValue) {
+        modifiedArray.push({
+            key: template.header_var_name || "header_var",
+            value: headerValue,
+            type: template.header_type,
+        });
+    }
+
+    modifiedArray.push(...variablesArray);
+
+    return modifiedArray;
+}
+
 // function for creating variables array
 function _generateVariablesArray({
     client,
@@ -137,7 +202,7 @@ function _generateVariablesArray({
 
     if (template.header_type !== "none" && headerValue) {
         modifiedArray.push({
-            key: template.header_var_name,
+            key: template.header_var_name || "header_var",
             value: headerValue,
             type: template.header_type,
         });
@@ -249,4 +314,4 @@ function _convertMobileNumber(mobileNumber: string): string {
     return mobileNumber.replace(/^0/, "92");
 }
 
-export { sendFreeFormMessage, sendMultipleMessages };
+export { sendFreeFormMessage, sendMultipleMessages, sendMultipleMessagestoNumbers };

@@ -17,7 +17,7 @@ export default function Whatsapp() {
       </div>
       <div className="flex justify-center items-center bg-gray-100 p-4 mt-6 shadow-md w-fit mx-auto rounded-full">
         <NavLink
-          to="."
+          to="sendMessages"
           className={({ isActive }) =>
             `text-lg px-4 py-2 rounded-full transition-colors ${
               isActive

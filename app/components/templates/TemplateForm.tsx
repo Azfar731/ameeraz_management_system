@@ -1,3 +1,4 @@
+import { Header_type } from "@prisma/client";
 import { SerializeFrom } from "@remix-run/node";
 import { Form, useNavigation, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -24,13 +25,21 @@ export default function Template_Form({
   template?: SerializeFrom<TemplateWithRelations>;
   errorMessages?: TemplateErrorMessages;
 }) {
-  const navigation = useNavigation()
-  const clientPropertyOptions =["client_fname","client_lname","client_mobile_num","client_area","points","none"].map(
-    (property) => ({
-      value: property,
-      label: property,
-    })
+  const [headerVariableType, setHeaderVariableType] = useState(
+    template?.header_type || "none"
   );
+  const navigation = useNavigation();
+  const clientPropertyOptions = [
+    "client_fname",
+    "client_lname",
+    "client_mobile_num",
+    "client_area",
+    "points",
+    "none",
+  ].map((property) => ({
+    value: property,
+    label: property,
+  }));
 
   const [numVariables, setNumVariables] = useState(
     template?.variables.length || 0
@@ -128,10 +137,9 @@ export default function Template_Form({
         options={getAllHeaderTypeMenuOptions()}
         className="basic-multi-select mt-2 z-10"
         classNamePrefix="select"
-        defaultValue={
-          template
-            ? getSingleHeaderTypeMenuOption(template.header_type)
-            : undefined
+        value={getSingleHeaderTypeMenuOption(headerVariableType)}
+        onChange={(selected) =>
+          setHeaderVariableType((selected?.value as Header_type) || "none")
         }
         required
       />
@@ -140,27 +148,32 @@ export default function Template_Form({
           {errorMessages.header_type[0]}
         </h2>
       )}
-      <label
-        htmlFor="header_var_name"
-        className="block text-gray-700 text-sm font-bold mt-4"
-      >
-        Header Variable Name
-      </label>
-      <input
-        type="text"
-        name="header_var_name"
-        id="header_var_name"
-        pattern="^[A-Za-z0-9_]+$"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
-        placeholder="insta_deals_template"
-        defaultValue={template?.header_var_name}
-        required
-      />
-      {errorMessages?.header_var_name && (
-        <h2 className="text-red-500 font-semibold">
-          {errorMessages.header_var_name[0]}
-        </h2>
+      {headerVariableType === "text" && (
+        <>
+          <label
+            htmlFor="header_var_name"
+            className="block text-gray-700 text-sm font-bold mt-4"
+          >
+            Header Variable Name
+          </label>
+          <input
+            type="text"
+            name="header_var_name"
+            id="header_var_name"
+            pattern="^[A-Za-z0-9_]+$"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
+            placeholder="insta_deals_template"
+            defaultValue={template?.header_var_name}
+            required
+          />
+          {errorMessages?.header_var_name && (
+            <h2 className="text-red-500 font-semibold">
+              {errorMessages.header_var_name[0]}
+            </h2>
+          )}
+        </>
       )}
+
       <label
         htmlFor="num_of_variables"
         className="block text-gray-700 text-sm font-bold mt-4"
@@ -237,7 +250,9 @@ export default function Template_Form({
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
-          disabled={navigation.state === "loading" || navigation.state === "submitting"}
+          disabled={
+            navigation.state === "loading" || navigation.state === "submitting"
+          }
           className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {template ? "Update" : "Register"}

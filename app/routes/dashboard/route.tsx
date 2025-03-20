@@ -19,7 +19,7 @@ const DashboardLayout = () => {
           <ul>
             <li className="mb-2">
               <NavLink
-                to={`wp`}
+                to={`wp/sendMessages`}
                 className={({ isActive }) =>
                   isActive
                     ? "underline font-bold text-blue-300 text-xl"

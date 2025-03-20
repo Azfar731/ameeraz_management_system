@@ -29,7 +29,7 @@ export default function Success_Message() {
   return (
     <div className="p-4 flex flex-col justify-center items-center relative h-72">
        <Link
-        to={`/dashboard/wp`}
+        to={`/dashboard/wp/sendMessages`}
         className="absolute top-4 left-4   bg-green-400 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-500 flex items-center justify-around gap-2"
       >
         <FaLongArrowAltLeft className="" />

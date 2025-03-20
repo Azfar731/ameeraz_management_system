@@ -7,6 +7,21 @@ const getAllTemplates = async () => {
     });
 };
 
+const getClientVarLessTemplates = async () => {
+    return await prisma_client.template.findMany({
+        where: {
+            variables: {
+                every: {
+                    client_property: 'none'
+                }
+            }
+        },
+        include: {
+            variables: true,
+        },
+    });
+};
+
 const getTemplatesByHeaderType = async ({
     header_type,
 }: {
@@ -42,8 +57,12 @@ const createTemplate = async (
     { name, header_type, header_var_name, variables }: {
         name: string;
         header_type: Header_type;
-        header_var_name: string;
-        variables?: { name: string; type: WP_Variable_Type; client_property: Client_Property }[];
+        header_var_name?: string;
+        variables?: {
+            name: string;
+            type: WP_Variable_Type;
+            client_property: Client_Property;
+        }[];
     },
 ) => {
     const template = await prisma_client.template.create({
@@ -66,7 +85,11 @@ const updateTemplate = async (
         name: string;
         header_type: Header_type;
         header_var_name: string;
-        variables?: { name: string; type: WP_Variable_Type; client_property: Client_Property  }[];
+        variables?: {
+            name: string;
+            type: WP_Variable_Type;
+            client_property: Client_Property;
+        }[];
     },
 ) => {
     return await prisma_client.template.update({
@@ -83,13 +106,12 @@ const updateTemplate = async (
     });
 };
 
-
-
 export {
     createTemplate,
     getAllTemplates,
     getTemplateById,
     getTemplateByName,
     getTemplatesByHeaderType,
-    updateTemplate
+    updateTemplate,
+    getClientVarLessTemplates
 };

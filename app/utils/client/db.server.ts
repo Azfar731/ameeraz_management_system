@@ -72,20 +72,13 @@ const changeClientSubscribeStatus = async (
 ) => {
     return await prisma_client.client.update({
         where: {
-            client_mobile_num: _removeInternationalCode(mobile_num),
+            client_mobile_num: mobile_num,
         },
         data: {
             subscribed: status ? "true" : "false",
         },
     });
 };
-
-function _removeInternationalCode(mobile_num: string) {
-    if (mobile_num.startsWith("92") && mobile_num.length === 12) {
-        return "0" + mobile_num.slice(2);
-    }
-    return mobile_num;
-}
 
 const getClients = async ({
     client_mobile_num,
@@ -95,8 +88,8 @@ const getClients = async ({
     client_areas,
 }: {
     client_mobile_num?: string;
-    client_fname?: string ;
-    client_lname?: string ;
+    client_fname?: string;
+    client_lname?: string;
     subscribed?: Boolean_Strings;
     client_areas?: string[];
 }) => {

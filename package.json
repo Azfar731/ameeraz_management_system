@@ -10,6 +10,7 @@
     "build:staging": "dotenv -e .env.staging -- remix vite:build",
     "build:prod": "dotenv -e .env.production -- remix vite:build",
     "dev": "dotenv -e .env.development -- remix vite:dev",
+    "dev:prod": "dotenv -e .env.production -- remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "NODE_OPTIONS='--import ./instrumentation.server.mjs' && remix-serve ./build/server/index.js",
     "start:dev": "dotenv -e .env.development -- remix-serve ./build/server/index.js",

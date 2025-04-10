@@ -163,7 +163,7 @@ export default function Template_Form({
             pattern="^[A-Za-z0-9_]+$"
             className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
             placeholder="insta_deals_template"
-            defaultValue={template?.header_var_name}
+            defaultValue={template?.header_var_name || "No name"}
             required
           />
           {errorMessages?.header_var_name && (

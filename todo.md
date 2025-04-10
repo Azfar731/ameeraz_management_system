@@ -1,10 +1,11 @@
 ## Todo:
 
 - Resolve styles not loading in vercel
-- Implement user logs
+- Implement suspense boundary
 
 ## Done
 
+- Implement user logs
 - Handle numbersList in addition to clients in webhook
 - Implement client-list in whatsapp
 - Use error handling for unique value constraint
@@ -16,7 +17,7 @@
 
 ## Things to do:
 
-- See if it is possible to have to index routes in the same route: dashboard.wp.\_index.\_index
+
 - set different file limits for images and videos
 
 ## Bugs:

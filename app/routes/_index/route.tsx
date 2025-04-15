@@ -107,10 +107,11 @@ function extractFilters(searchParams: URLSearchParams) {
 
 export default function Index() {
   //states
-  const [currentDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split("T")[0]; // Formats the date to 'YYYY-MM-DD'
-  });
+  // const [currentDate] = useState(() => {
+  //   const today = new Date();
+  //   return today.toISOString().split("T")[0]; // Formats the date to 'YYYY-MM-DD'
+  // });
+  const currentDate = new Date().toISOString().split("T")[0];
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const navigation = useNavigation();

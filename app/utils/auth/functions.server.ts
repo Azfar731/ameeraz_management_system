@@ -4,7 +4,7 @@ import { commitSession, getSession } from "~/sessions.server";
 import { redirect } from "@remix-run/react";
 import { getClearanceLevel } from "./functions";
 import { captureException } from "@sentry/remix";
-import { env } from "~/config/env.server";
+
 const authenticate = async (
     { request, requiredClearanceLevel }: {
         request: Request;

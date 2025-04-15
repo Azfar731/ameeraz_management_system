@@ -1,9 +1,8 @@
 import { Redis } from "@upstash/redis";
-import { env } from "~/config/env.server";
 
 const redis = new Redis({
   url: "https://crucial-alpaca-59474.upstash.io", // Replace with your Upstash Redis URL
-  token: env.UPSTASH_WP_MESSAGE_LOG_DB_TOKEN, // Replace with your Upstash Redis token
+  token: process.env.UPSTASH_WP_MESSAGE_LOG_DB_TOKEN, // Replace with your Upstash Redis token
 });
 
 const DAILY_LIMIT = 230; // Max messages allowed in 24 hours

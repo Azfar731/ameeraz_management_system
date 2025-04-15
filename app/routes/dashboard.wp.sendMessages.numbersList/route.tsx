@@ -27,7 +27,7 @@ import { WP_ErrorMessages } from "~/utils/wp_api/types";
 import { sendMultipleMessagestoNumbers } from "~/utils/wp_api/functions.server";
 import { renderZodErrors } from "~/utils/render_functions";
 import { getAllMedia } from "~/utils/media/db.server";
-import { env } from "~/config/env.server";
+
 import { authenticate } from "~/utils/auth/functions.server";
 import {
   getMobileNumbersCount,
@@ -56,7 +56,7 @@ export async function action({ request }: ActionFunctionArgs) {
     return { errorMessages: validationResult.error.flatten().fieldErrors };
   }
   const data = validationResult.data;
-  const daily_limit = parseInt(env.WP_DAILY_LIMIT ? env.WP_DAILY_LIMIT : "230");
+  const daily_limit = parseInt(process.env.WP_DAILY_LIMIT ? process.env.WP_DAILY_LIMIT : "230");
   const records = await getRangeofNumberRecords({
     startIndex: (data.client_batch - 1) * daily_limit,
     total: daily_limit,

@@ -6,7 +6,7 @@ import {
 import { recordFailedMessage } from "~/utils/upstash_redis/failedMgsFunctions.server";
 import { WebhookObj } from "~/utils/webhooks/types.server";
 import { sendFreeFormMessage } from "~/utils/wp_api/functions.server";
-import { env } from "~/config/env.server";
+
 import {
   changeNumberSubscribeStatus,
   createMobileRecord,
@@ -20,7 +20,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const token = url.searchParams.get("hub.verify_token");
   const challenge = url.searchParams.get("hub.challenge");
 
-  if (mode === "subscribe" && token === env.WEBHOOK_VERIFY_TOKEN) {
+  if (mode === "subscribe" && token === process.env.WEBHOOK_VERIFY_TOKEN) {
     console.log("verification successfull");
     return new Response(challenge, {
       status: 200,

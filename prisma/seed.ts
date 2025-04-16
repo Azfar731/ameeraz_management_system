@@ -14,7 +14,6 @@ async function create_clients() {
             client_lname: "Razzaq",
             client_area: "Lahore",
             client_mobile_num: "03134549126",
-            
         },
         {
             client_fname: "Lailma",
@@ -195,9 +194,6 @@ async function create_vendors() {
     return vendor_records;
 }
 
-
-
-
 async function create_products() {
     const products = [
         { prod_name: "Shampoo", prod_price: 250, quantity: 100 },
@@ -211,16 +207,27 @@ async function create_products() {
     return product_records;
 }
 
-async function create_users(){
+async function create_users() {
     // const users=[{userName:"azfar",password:"astayuno",fname:"azfar",lname:"razzaq",role:"admin" as Role},
     //     {userName:"lailma",password:"astayuno",fname:"lailma",lname:"razzaq",role:"owner" as Role},
     //     {userName:"irha",password:"astayuno",fname:"irha",lname:"razzaq",role:"manager" as Role},
     //     {userName: "haleemah", password: "bunny", fname: "haleemah", lname: "anwary", role: "worker" as Role}]
-    
-    const users = [{userName:"arbiter",password:"Vanitas10@",fname:"azfar",lname:"razzaq",role:"admin" as Role}]
+    const admin_pass = process.env.Admin_pass;
+    if (!admin_pass) {
+        throw Error("Admin_pass not found in .env file");
+    }
+    const users = [{
+        userName: "arbiter",
+        password: admin_pass,
+        fname: "azfar",
+        lname: "razzaq",
+        role: "admin" as Role,
+    }];
 
-        const user_records = await Promise.all(users.map((user) => createUser(user)));
-        return user_records
+    const user_records = await Promise.all(
+        users.map((user) => createUser(user)),
+    );
+    return user_records;
 }
 
 async function main() {
@@ -233,7 +240,7 @@ async function main() {
     // const products = await create_products();
     await create_users();
     // console.log(clients, employees, categories, services, deals, vendors, products);
-    
+
     prisma_client.$disconnect();
 }
 

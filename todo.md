@@ -2,6 +2,7 @@
 
 - Resolve styles not loading in vercel
 - Implement suspense boundary
+- Figure out a way to to remove password in seeds file from git history
 
 ## Done
 
@@ -16,7 +17,6 @@
 - Verify how errors are shown in build
 
 ## Things to do:
-
 
 - set different file limits for images and videos
 

@@ -318,6 +318,7 @@ export default function Product_Sale_Record_Create_Part3() {
           })}
           className="basic-multi-select mb-4"
           classNamePrefix="select"
+          required
         />
 
         {renderProductsQuantity}
@@ -391,28 +392,19 @@ export default function Product_Sale_Record_Create_Part3() {
             globalFormData.mode_of_payment
           )}
         />
-        {actionData?.errorMessages.products_quantity && (
+        {actionData?.errorMessages.mode_of_payment && (
           <h2 className="text-red-500 font-semibold">
-            {actionData?.errorMessages.products_quantity[0]}
+            {actionData?.errorMessages.mode_of_payment[0]}
           </h2>
         )}
-        {
-          /* {Object.keys(actionData?.errorMessages || {}).map((key) => {
+
+        {Object.keys(actionData?.errorMessages || {}).map((key) => {
           if (
             key !== "amount_paid" &&
             key !== "amount_charged" &&
             key !== "mode_of_payment" &&
             key !== "products_quantity"
           ) {
-            return (
-              <h2 key={key} className="text-red-500 font-semibold">
-               {`${key}: ${actionData?.errorMessages[key as keyof ProductSaleRecordCreateErrors][0]}`}
-              </h2>
-            );
-          }
-          return null;
-        })} */
-          Object.keys(actionData?.errorMessages || {}).map((key) => {
             return (
               <h2 key={key} className="text-red-500 font-semibold">
                 {`${key}: ${
@@ -422,8 +414,22 @@ export default function Product_Sale_Record_Create_Part3() {
                 }`}
               </h2>
             );
-          })
-        }
+          }
+          return null;
+        })}
+
+        {/* //   Object.keys(actionData?.errorMessages || {}).map((key) => {
+        //     return (
+        //       <h2 key={key} className="text-red-500 font-semibold">
+        //         {`${key}: ${
+        //           actionData?.errorMessages[
+        //             key as keyof ProductSaleRecordCreateErrors
+        //           ][0]
+        //         }`}
+        //       </h2>
+        //     );
+        //   })
+        // } */}
 
         <div className="flex justify-between items-center mt-6">
           <button

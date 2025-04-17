@@ -12,7 +12,7 @@ import {
   ProductSaleRecordWithRelations,
 } from "~/utils/productSaleRecord/types";
 import { ProductSaleRecordUpdateSchema } from "~/utils/productSaleRecord/validation.server";
-import Product_Sale_Record_Form from "./product_Sale_Record_Form";
+import Product_Sale_Record_Update_Form from "./product_Sale_Record_Form";
 import { authenticate } from "~/utils/auth/functions.server";
 import { createLog } from "~/utils/logs/db.server";
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -104,7 +104,7 @@ export default function Update_Product_Sale_Record() {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <Product_Sale_Record_Form
+      <Product_Sale_Record_Update_Form
         products={products}
         record={productSaleRecord}
         errorMessages={actionData?.errors}

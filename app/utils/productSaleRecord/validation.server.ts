@@ -123,7 +123,7 @@ const productSaleRecordBaseSchema = z.object({
             product_id: z.string(),
             quantity: z.number().positive(),
         }),
-    ),
+    ).min(1,{message: "Select atleast 1 Product"}),
 
     mode_of_payment: z.enum(["cash", "bank_transfer", "card"]),
 });
@@ -211,7 +211,7 @@ const ProductSaleRecordUpdateSchema = (
                 product_id: z.string(),
                 quantity: z.number().positive(),
             }),
-        ).min(1),
+        ).min(1,{message: "Select atleast 1 Product"}),
         isClient: z.boolean(),
     }).refine(async (data) => {
         if (data.isClient) {

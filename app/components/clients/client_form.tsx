@@ -61,6 +61,7 @@ export default function Client_Form({
         defaultValue={client?.client_fname}
         required
       />
+      <p className="  mt-1 text-gray-500 text-sm">Format: A-Z, no-space</p>
       {errorMessage?.client_fname && (
         <h2 className="text-red-500 font-semibold">
           {errorMessage.client_fname[0]}
@@ -78,10 +79,12 @@ export default function Client_Form({
         id="lname"
         pattern="^[A-Za-z]+(\s[A-Za-z]+)*$"
         className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
-        placeholder="Razzaq"
+        placeholder="bin Razzaq"
         defaultValue={client?.client_lname}
         required
       />
+      <p className="  mt-1 text-gray-500 text-sm">Format: A-Z, space allowed</p>
+
       {errorMessage?.client_lname && (
         <h2 className="text-red-500 font-semibold">
           {errorMessage.client_lname[0]}

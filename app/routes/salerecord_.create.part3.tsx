@@ -26,10 +26,11 @@ import { ServiceSaleRecordCreateErrors } from "~/utils/serviceSaleRecord/types";
 import { renderZodErrors } from "~/utils/render_functions";
 import { authenticate } from "~/utils/auth/functions.server";
 import { createLog } from "~/utils/logs/db.server";
+import { getActiveEmployees } from "~/utils/employee/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 1 });
-  const employees = await prisma_client.employee.findMany();
+  const employees = await getActiveEmployees();
   return { employees };
 }
 

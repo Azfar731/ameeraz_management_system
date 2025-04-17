@@ -4,8 +4,8 @@ node_modules
 /build
 .env
 .env.*
-commands.md
-todo.md
+# md files
+*.md
 random.json
 # Sentry Config File
 .env.sentry-build-plugin

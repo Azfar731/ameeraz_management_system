@@ -44,11 +44,10 @@ export default function SalesRecordTable({
     getFullName = false
   ) => {
     return item.employees
-      .map(
-        (record) =>
-          `${record.employee.emp_fname} ${
-            getFullName && record.employee.emp_lname
-          }`
+      .map((record) =>
+        getFullName
+          ? `${record.employee.emp_fname} ${record.employee.emp_lname}`
+          : record.employee.emp_fname
       )
       .join(",");
   };

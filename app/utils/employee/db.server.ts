@@ -56,4 +56,13 @@ const getAllEmployees = async () => {
     return employees;
 };
 
-export { createEmployee, getAllEmployees, getEmployeeFromId, updateEmployee };
+const getActiveEmployees = async () => {
+    return await prisma_client.employee.findMany({
+        where: {
+            emp_status: true,
+        }
+    })
+}
+
+
+export { getActiveEmployees, createEmployee, getAllEmployees, getEmployeeFromId, updateEmployee };

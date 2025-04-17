@@ -10,18 +10,19 @@ import { createDeal } from "~/utils/deal/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 import { Prisma } from "@prisma/client";
 
-export async function loader({request}: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 2 });
   const services = await getActiveServices();
   return { services };
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+  await authenticate({ request, requiredClearanceLevel: 2 });
 
   const formData = await request.formData();
-  const dealFormData = getDealFormData(formData);
-  const validationResult = dealSchema.safeParse(dealFormData);
+  const services = formData.getAll("service_options") as string[];
+  const dealFormData = Object.fromEntries(formData.entries());
+  const validationResult = dealSchema.safeParse({ ...dealFormData, services });
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }

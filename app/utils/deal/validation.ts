@@ -16,12 +16,9 @@ const dealSchema = z.object({
             message: "Price must be a number greater than 0.",
         }),
 
-    services: z
-        .string()
-        .transform((value) => value.split("|"))
-        .refine((array) => array.length > 0, {
-            message: "At least one service is required.",
-        }),
+    services: z.array(z.string()).refine((array) => array.length > 0, {
+        message: "At least one service is required.",
+    }),
     activate_from: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
@@ -29,11 +26,10 @@ const dealSchema = z.object({
     activate_till: z
         .string()
         .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
-        .transform((str) => new Date(str))
-        
+        .transform((str) => new Date(str)),
 }).refine((data) => data.activate_from < data.activate_till, {
     message: "activate_from must be before activate_till.",
-    path: ['activate_till'], // Attach the error to 'activate_till'
+    path: ["activate_till"], // Attach the error to 'activate_till'
 });
 
 export { dealSchema };

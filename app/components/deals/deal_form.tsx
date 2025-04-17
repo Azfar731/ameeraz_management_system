@@ -2,8 +2,7 @@ import { Service } from "@prisma/client";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
 import { Form, useSubmit } from "@remix-run/react";
 import { formatDateToISO } from "shared/utilityFunctions";
-import Select, { OnChangeValue } from "react-select";
-import { useRef } from "react";
+import Select from "react-select";
 import { SerializeFrom } from "@remix-run/node";
 export default function Deal_Form({
   services,
@@ -14,9 +13,6 @@ export default function Deal_Form({
   deal?: SerializeFrom<DealWithServices>;
   errorMessage?: DealErrors;
 }) {
-  //references
-  const servicesRef = useRef<{ value: string; label: string }[]>([]);
-
   //hooks
   const submit = useSubmit();
 
@@ -30,21 +26,10 @@ export default function Deal_Form({
     label: serv.serv_name,
   }));
 
-  const onServicesChange = (
-    newValue: OnChangeValue<{ value: string; label: string }, true>
-  ) => {
-    servicesRef.current = [...newValue];
-  };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-
-    const serviceIds = servicesRef.current
-      ?.map((service) => service.value)
-      .join("|");
-    formData.append("services", serviceIds);
 
     submit(formData, { method: "post" });
   };
@@ -67,7 +52,7 @@ export default function Deal_Form({
       </label>
       <input
         type="text"
-        name="name"
+        name="deal_name"
         id="name"
         pattern="^[A-Za-z0-9]+(\s[A-Za-z0-9]+)*$"
         className="w-full px-3 py-2 border border-gray-300 rounded-md mt-2"
@@ -88,7 +73,7 @@ export default function Deal_Form({
       </label>
       <input
         type="number"
-        name="price"
+        name="deal_price"
         id="price"
         min={0}
         defaultValue={deal?.deal_price}
@@ -109,7 +94,7 @@ export default function Deal_Form({
       </label>
       <input
         id="startDate"
-        name="startDate"
+        name="activate_from"
         aria-label="Date"
         type="date"
         defaultValue={deal ? formatDateToISO(deal.activate_from) : undefined}
@@ -129,7 +114,7 @@ export default function Deal_Form({
       </label>
       <input
         id="endDate"
-        name="endDate"
+        name="activate_till"
         aria-label="Date"
         type="date"
         defaultValue={
@@ -151,8 +136,8 @@ export default function Deal_Form({
       </label>
       <Select
         isMulti
-        name="service_options"
-        onChange={onServicesChange}
+        id="service_options"
+        name="service_options" 
         options={service_options}
         defaultValue={existing_services}
         className="basic-multi-select mt-2"

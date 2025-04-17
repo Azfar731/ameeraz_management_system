@@ -3,14 +3,13 @@ import { useLoaderData, useActionData, replace } from "@remix-run/react";
 import { DealErrors, DealWithServices } from "~/utils/deal/types";
 import Deal_Form from "~/components/deals/deal_form";
 import { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { getDealFormData } from "~/utils/deal/functions.server";
 import { dealSchema } from "~/utils/deal/validation";
 import { getActiveServices } from "~/utils/service/db.server";
 import { getDealFromId, updateDeal } from "~/utils/deal/db.server";
 import { authenticate } from "~/utils/auth/functions.server";
 
-export async function loader({request, params }: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 2 });
   const { id } = params;
   if (!id) {
     throw new Response("Id parameter not found in URL", {
@@ -30,8 +29,8 @@ export async function loader({request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 2 });
-
+  await authenticate({ request, requiredClearanceLevel: 2 });
+  debugger;
   const { id } = params;
   if (!id) {
     throw new Response("No id provided in the URL", {
@@ -40,8 +39,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
     });
   }
   const formData = await request.formData();
-  const dealFormData = getDealFormData(formData);
-  const validationResult = dealSchema.safeParse(dealFormData);
+  const services = formData.getAll("service_options") as string[];
+  const dealFormData = Object.fromEntries(formData.entries());
+
+  const validationResult = dealSchema.safeParse({...dealFormData,services});
   if (!validationResult.success) {
     return { errors: validationResult.error.flatten().fieldErrors };
   }

@@ -1,5 +1,6 @@
 import { Log_Type, Logs } from "@prisma/client";
 import { prisma_client } from "~/.server/db";
+import { validate as isUuid } from "uuid";
 
 const createLog = async (logData: Omit<Logs, "id" | "created_at">) => {
     return await prisma_client.logs.create({ data: logData });
@@ -22,6 +23,9 @@ const getLogs = async ({
     log_type?: Log_Type[];
     userName?: string;
 }) => {
+    if (userId && !isUuid(userId)) {
+        return [];
+    }
     return await prisma_client.logs.findMany({
         where: {
             created_at: {

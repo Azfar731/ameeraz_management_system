@@ -9,7 +9,9 @@ type BaseUserErrorMessages = {
     password: string[];
 }
 
-type UpdateUserErrorMessages = Omit<BaseUserErrorMessages, "password" | "role">
+type UpdateUserErrorMessages = Omit<BaseUserErrorMessages, "password" | "role"> & {
+    unAuthorized: string[];
+}
 
 type CreateUserErrorMessages = Omit<BaseUserErrorMessages, "account_status">
 export type { UpdateUserErrorMessages, CreateUserErrorMessages}

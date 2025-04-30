@@ -217,13 +217,18 @@ export default function User_Form({
           )}
         </>
       )}
+      {user && errorMessages?.unAuthorized && (
+        <h2 className="text-red-500 font-semibold">
+          {errorMessages.unAuthorized[0]}
+        </h2>
+      )}
       <div className="w-full flex justify-center items-center">
         <button
           type="submit"
           disabled={
             navigation.state === "loading" || navigation.state === "submitting"
           }
-          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {user ? "Update" : "Register"}
         </button>

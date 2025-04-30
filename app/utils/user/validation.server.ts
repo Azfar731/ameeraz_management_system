@@ -20,7 +20,9 @@ const BaseUserValidation = z.object({
     password: z.string().min(5, "Password must be Atleast 5 characters long"),
 });
 
-const NewUserValidation = ({loggedInUserClearance}: {loggedInUserClearance: number}) => {
+const NewUserValidation = (
+    { loggedInUserClearance }: { loggedInUserClearance: number },
+) => {
     return BaseUserValidation
         .refine((data) => {
             if (data.role === "owner") {
@@ -52,11 +54,11 @@ const UpdateUserValidation = (
         else if (loggedInUserClearance === ClearanceLevel.Admin) {
             return true;
         } else {
-            loggedInUserClearance > currentUserAccountClearance;
+            return loggedInUserClearance > currentUserAccountClearance;
         }
     }, {
-        message: "You don't have permission to create an account of this type",
-        path: ["role"],
+        message: "You don't have permission to edit an account of this type",
+        path: ["unAuthorized"],
     });
 };
 

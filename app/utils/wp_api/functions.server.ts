@@ -41,7 +41,7 @@ async function sendMessage(data: string) {
                 });
                 console.log("Non-Axios Error:", err);
             } else {
-                throw new Error("Uknwon Error");
+                throw new Error("Unknwon Error");
             }
             return null;
         }

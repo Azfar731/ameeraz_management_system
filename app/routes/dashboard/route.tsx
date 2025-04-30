@@ -41,6 +41,18 @@ const DashboardLayout = () => {
                 Users
               </NavLink>
             </li>
+            <li className="mb-2">
+              <NavLink
+                to={`logs`}
+                className={({ isActive }) =>
+                  isActive
+                    ? "underline font-bold text-blue-300 text-xl"
+                    : "hover:underline hover:text-gray-300 text-xl font-semibold"
+                }
+              >
+                Logs
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </aside>

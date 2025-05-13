@@ -11,7 +11,6 @@ export async function loader({request}: LoaderFunctionArgs){
 }
 
 
-
 export default function SaleRecord() {
   const [formData, setFormData] = useState<FormType>({
     amount_charged: 0,

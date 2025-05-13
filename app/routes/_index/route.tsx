@@ -1,6 +1,6 @@
 import { Category, Deal, Employee } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import {  LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
   Link,
@@ -9,7 +9,7 @@ import {
   useNavigation,
   useSearchParams,
 } from "@remix-run/react";
-import { useState } from "react";
+import { FaPlus } from "react-icons/fa";
 import Select from "react-select";
 import {
   fetchDeals,
@@ -19,6 +19,10 @@ import {
   getCategoryOptions,
   getEmployeeOptions,
 } from "shared/utilityFunctions";
+import { authenticate } from "~/utils/auth/functions.server";
+import { getAllCategories } from "~/utils/category/db.server";
+import { getAllDeals } from "~/utils/deal/db.server";
+import { getAllEmployees } from "~/utils/employee/db.server";
 import { fetchServiceSaleRecords } from "~/utils/serviceSaleRecord/db.server";
 import {
   ServiceSaleRecordFetchErrors,
@@ -26,11 +30,6 @@ import {
 } from "~/utils/serviceSaleRecord/types";
 import { ServiceSaleRecordFetchSchema } from "~/utils/serviceSaleRecord/validation.server";
 import SalesRecordTable from "./SalesRecordTable";
-import { getAllEmployees } from "~/utils/employee/db.server";
-import { getAllDeals } from "~/utils/deal/db.server";
-import { getAllCategories } from "~/utils/category/db.server";
-import { authenticate } from "~/utils/auth/functions.server";
-import { FaPlus } from "react-icons/fa";
 
 export const meta: MetaFunction = () => {
   return [

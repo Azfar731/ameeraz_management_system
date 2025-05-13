@@ -1,4 +1,3 @@
-import { prisma_client } from "~/.server/db";
 import { Employee } from "@prisma/client";
 import {
   useLoaderData,

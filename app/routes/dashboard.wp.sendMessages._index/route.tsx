@@ -33,7 +33,8 @@ import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({request}: LoaderFunctionArgs) {
   await authenticate({request, requiredClearanceLevel: 3 });
   const templates = await getAllTemplates();
-  const remainingLimit = await remainingDailyLimit();
+  // const remainingLimit = await remainingDailyLimit();
+  const remainingLimit = 230;
   const clientCount = await getClientCount();
   const media = await getAllMedia();
   const numOfClientBatches = Math.ceil(clientCount / 230);

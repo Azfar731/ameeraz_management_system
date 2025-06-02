@@ -102,7 +102,6 @@ const getClients = async ({
 
         return client ? [client] : [];
     } else {
-        console.log("Areas: ", client_areas);
         const clients = await prisma_client.client.findMany({
             where: {
                 client_area: { in: client_areas },
@@ -116,7 +115,7 @@ const getClients = async ({
     }
 };
 
-const getClientCount = async () => {
+const getTotalClients = async () => {
     const count = await prisma_client.client.count();
     return count;
 };
@@ -133,13 +132,80 @@ const getRangeofClients = async (
     return clients;
 };
 
+const getClientCount = async ({
+    subscribed,
+    client_areas,
+    created_at_from,
+    created_at_to,
+}: {
+    subscribed?: Boolean_Strings;
+    client_areas?: string[];
+    created_at_from?: Date;
+    created_at_to?: Date;
+}) => {
+    const count = await prisma_client.client.count({
+        where: {
+            client_area: client_areas ? { in: client_areas } : undefined,
+            subscribed: subscribed,
+            created_at: {
+                ...(created_at_from ? { gte: created_at_from } : {}),
+                ...(created_at_to ? { lte: created_at_to } : {}),
+            },
+        },
+    });
+
+    return count;
+};
+
+const getNumberofRepeatClients = async (
+    { start_date, end_date }: { start_date: Date; end_date?: Date },
+) => {
+    return await prisma_client.client.count({
+        where: {
+            created_at: { lt: start_date },
+            services: {
+                some: {
+                    created_at: {
+                        gte: start_date,
+                        ...(end_date ? { lte: end_date } : {}),
+                    },
+                },
+            },
+        },
+    });
+};
+const getClientAreas = async ({
+    start_date,
+    end_date,
+}: {
+    start_date?: Date;
+    end_date?: Date;
+}) => {
+    const clientAreas = await prisma_client.client.findMany({
+        where: {
+            created_at: {
+                ...(start_date ? { gte: start_date } : {}),
+                ...(end_date ? { lte: end_date } : {}),
+            },
+        },
+        select: {
+            client_area: true,
+        },
+    });
+
+    return clientAreas;
+};
+
 export {
     changeClientSubscribeStatus,
     createClient,
     findClientByMobile as getClientByMobile,
+    getClientAreas,
     getClientCount,
     getClientFromId,
     getClients,
+    getNumberofRepeatClients,
     getRangeofClients,
+    getTotalClients,
     updateClient,
 };

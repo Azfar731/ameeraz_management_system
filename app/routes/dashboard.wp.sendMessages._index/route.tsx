@@ -1,6 +1,10 @@
 // import { ActionFunctionArgs } from "@remix-run/node";
 import { Media, Template_Variable } from "@prisma/client";
-import { ActionFunctionArgs, LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  SerializeFrom,
+} from "@remix-run/node";
 import {
   Form,
   redirect,
@@ -11,7 +15,7 @@ import {
 } from "@remix-run/react";
 import { useState } from "react";
 import Select from "react-select";
-import { getClientCount, getRangeofClients } from "~/utils/client/db.server";
+import { getTotalClients, getRangeofClients } from "~/utils/client/db.server";
 import { getAllTemplates } from "~/utils/templates/db.server";
 import { TemplateWithRelations } from "~/utils/templates/types";
 import {
@@ -30,12 +34,12 @@ import { authenticate } from "~/utils/auth/functions.server";
 //   sendMessage,
 // } from "~/utils/wp_api/functions.server";
 
-export async function loader({request}: LoaderFunctionArgs) {
-  await authenticate({request, requiredClearanceLevel: 3 });
+export async function loader({ request }: LoaderFunctionArgs) {
+  await authenticate({ request, requiredClearanceLevel: 3 });
   const templates = await getAllTemplates();
   // const remainingLimit = await remainingDailyLimit();
   const remainingLimit = 230;
-  const clientCount = await getClientCount();
+  const clientCount = await getTotalClients();
   const media = await getAllMedia();
   const numOfClientBatches = Math.ceil(clientCount / 230);
   return { templates, remainingLimit, numOfClientBatches, media };
@@ -57,7 +61,7 @@ export async function action({ request }: ActionFunctionArgs) {
     total: daily_limit,
   });
   if (!canSendMessages(clients.length)) {
-    return {errorMessages: {client_batch: ["Daily Limit Exceeded"]}}
+    return { errorMessages: { client_batch: ["Daily Limit Exceeded"] } };
   }
   const failed_messages = await sendMultipleMessages({
     template_name: data.template_name,
@@ -80,7 +84,7 @@ export default function Whatsapp_API() {
       numOfClientBatches: number;
       media: Media[];
     }>();
-    const navigation = useNavigation();
+  const navigation = useNavigation();
   const [chosenTemplate, setChosenTemplate] = useState<
     SerializeFrom<TemplateWithRelations> | undefined
   >(undefined);
@@ -97,7 +101,7 @@ export default function Whatsapp_API() {
     const form = event.currentTarget;
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData.entries());
-    if(!chosenTemplate){
+    if (!chosenTemplate) {
       return;
     }
     const data = {
@@ -238,7 +242,10 @@ export default function Whatsapp_API() {
         <div className="w-full flex justify-center items-center">
           <button
             type="submit"
-            disabled={navigation.state === "submitting" || navigation.state === "loading"}
+            disabled={
+              navigation.state === "submitting" ||
+              navigation.state === "loading"
+            }
             className="mt-6 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Send Messages

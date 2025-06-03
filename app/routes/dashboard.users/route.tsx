@@ -19,6 +19,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Users() {
   const { users } = useLoaderData<{ users: User[] }>();
   const navigation = useNavigation();
+  
   const isNavigating =
     navigation.state === "loading" || navigation.state === "submitting";
   // values for table

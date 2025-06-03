@@ -22,7 +22,7 @@ const DashboardLayout = () => {
                 to={`wp/sendMessages`}
                 className={({ isActive }) =>
                   isActive
-                    ? "underline font-bold text-blue-300 text-xl"
+                    ? "underline font-bold text-blue-300 text-xl "
                     : "hover:underline hover:text-gray-300 text-xl font-semibold"
                 }
               >

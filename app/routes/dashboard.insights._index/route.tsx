@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       repeat_client: 0,
     };
   }
-  debugger
+
   const validated_data = validation_result.data;
   const newClients = await getClientCount({
     created_at_from: validated_data.start_date,
@@ -38,12 +38,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 
-  const allClientAreas = await getClientAreas();
+  const allClientAreas = await getClientAreas({
+    start_date: undefined,
+    end_date: undefined,
+  });
   const selectedRangeClientAreas = await getClientAreas({
     start_date: validated_data.start_date,
     end_date: validated_data.end_date,
   });
-
+  console.log("validated_data start date: ", validated_data.start_date);
   return {
     newClients,
     repeat_client,
@@ -57,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Client_Insights() {
   const current_date = new Date().toISOString().split("T")[0];
-  debugger
+
   const {
     newClients,
     repeat_client,
@@ -80,6 +83,8 @@ export default function Client_Insights() {
   const selectedRangeClientAreasPieData = mapClientAreasToPieData(
     selectedRangeClientAreas
   );
+  console.log("selectedRange", selectedRangeClientAreas);
+  console.log("PieData: ", selectedRangeClientAreasPieData);
 
   return (
     <div className="m-8">
@@ -165,14 +170,22 @@ export default function Client_Insights() {
           New vs Repeating clients
         </h2>
         <Pie_Chart
-          data={[
-            { id: 0, value: newClients, label: `New Clients: ${newClients}` },
-            {
-              id: 1,
-              value: repeat_client,
-              label: `Repeat Clients: ${repeat_client}`,
-            },
-          ]}
+          data={
+            newClients === 0 && repeat_client === 0
+              ? []
+              : [
+                  {
+                    id: 0,
+                    value: newClients,
+                    label: `New Clients: ${newClients}`,
+                  },
+                  {
+                    id: 1,
+                    value: repeat_client,
+                    label: `Repeat Clients: ${repeat_client}`,
+                  },
+                ]
+          }
         />
       </section>
       <section className="mt-4 ">
@@ -183,9 +196,9 @@ export default function Client_Insights() {
       </section>
       <section className="mt-4 ">
         <h2 className="text-2xl font-semibold text-gray-800 ">
-          Client Areas in Selected Range
+          Client Registered in Specified Time Period
         </h2>
-        <Pie_Chart data={allClientAreasPieData} />
+        <Pie_Chart data={selectedRangeClientAreasPieData} />
       </section>
     </div>
   );

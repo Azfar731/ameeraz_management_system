@@ -16,7 +16,7 @@ export default function Transactions() {
       </div>
       <div className="flex justify-center items-center bg-gray-100 p-4 mt-6 shadow-md w-fit mx-auto rounded-full">
         <NavLink
-          to="/insights"
+          to="/dashboard/insights"
           className={({ isActive }) =>
             `text-lg px-4 py-2 rounded-full transition-colors ${
               isActive

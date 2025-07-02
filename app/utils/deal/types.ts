@@ -6,6 +6,16 @@ type DealWithServices = Prisma.DealGetPayload<{
     };
 }>;
 
+
+
+type DealWithRecord = Prisma.DealGetPayload<{
+    include: {
+        records: true;
+    };
+}>;
+
+
+
 type DealErrors = {
     deal_name?: string[];
     deal_price?: string[];
@@ -15,4 +25,4 @@ type DealErrors = {
     services?: string[];
 };
 
-export type { DealErrors, DealWithServices };
+export type { DealErrors, DealWithRecord,DealWithServices };

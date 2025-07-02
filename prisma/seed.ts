@@ -85,23 +85,18 @@ async function create_services() {
         {
             serv_name: "hair cut",
             serv_price: 1170,
-            category: {
-                connect: categories.find((cat) => cat.cat_name === "hair"),
-            },
+            serv_category: categories.find((cat) => cat.cat_name === "hair")?.cat_id,
         },
         {
             serv_name: "facial",
             serv_price: 570,
-            category: {
-                connect: categories.find((cat) => cat.cat_name === "skin"),
-            },
+            serv_category: categories.find((cat) => cat.cat_name === "skin")?.cat_id,
+               
         },
         {
             serv_name: "pedicure",
             serv_price: 850,
-            category: {
-                connect: categories.find((cat) => cat.cat_name === "nails"),
-            },
+            serv_category: categories.find((cat) => cat.cat_name === "nails")?.cat_id,
         },
     ];
     const serv_records = await Promise.all(
@@ -231,15 +226,15 @@ async function create_users() {
 }
 
 async function main() {
-    // const clients = await create_clients();
-    // const employees = await create_employees();
-    // const categories = await create_categories();
-    // const services = await create_services();
-    // const deals = await create_deals();
-    // const vendors = await create_vendors();
-    // const products = await create_products();
+    const clients = await create_clients();
+    const employees = await create_employees();
+    const categories = await create_categories();
+    const services = await create_services();
+    const deals = await create_deals();
+    const vendors = await create_vendors();
+    const products = await create_products();
     await create_users();
-    // console.log(clients, employees, categories, services, deals, vendors, products);
+    console.log(clients, employees, categories, services, deals, vendors, products);
 
     prisma_client.$disconnect();
 }

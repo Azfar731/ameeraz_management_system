@@ -17,9 +17,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 1 });
 
   const searchParams = new URL(request.url).searchParams;
-  const fetchAllServices = searchParams.get("fetchAllServices");
+  const fetchAllServices = searchParams.get("fetchAllServices") || "false";
   let deals;
-  if (fetchAllServices && fetchAllServices === "true") {
+  if (fetchAllServices === "true") {
     deals = await prisma_client.deal.findMany({
       where: { auto_generated: true },
       include: { services: true },

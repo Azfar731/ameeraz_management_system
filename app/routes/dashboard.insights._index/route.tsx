@@ -1,12 +1,15 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
-import Pie_Chart from "~/components/Charts/PieChart";
 import {
   getClientAreas,
-  getClientCount,
-  getNumberofRepeatClients,
+  getNewClientsInfo,
+  getRepeatClientInfo,
 } from "~/utils/client/db.server";
+import { ClientWithServiceRecord } from "~/utils/client/types";
 import { ClientInsightValidation } from "~/utils/insights/validation";
+
+import NewVsRepeatClientTable from "./newVsRepeatClientTable";
+import ClientAreasTable from "./clientAreasTable";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
@@ -20,19 +23,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (!validation_result.success) {
     return {
       errorMessages: validation_result.error.flatten().fieldErrors,
-      newClients: 0,
-      repeat_client: 0,
+      newClients: [],
+      repeat_client: [],
+      allClientAreas: [],
+      selectedRangeClientAreas: [],
+      start_date: undefined,
+      end_date: undefined,
     };
   }
 
   const validated_data = validation_result.data;
-  const newClients = await getClientCount({
-    created_at_from: validated_data.start_date,
-    created_at_to: validated_data.end_date,
+  const newClients = await getNewClientsInfo({
+    created_at_from: validated_data.start_date!,
+    created_at_to: validated_data.end_date!,
   });
-  let repeat_client = 0;
+
+  let repeat_client;
   if (validated_data.start_date) {
-    repeat_client = await getNumberofRepeatClients({
+    repeat_client = await getRepeatClientInfo({
       start_date: validated_data.start_date,
       end_date: validated_data.end_date,
     });
@@ -60,7 +68,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Client_Insights() {
   const current_date = new Date().toISOString().split("T")[0];
-
   const {
     newClients,
     repeat_client,
@@ -70,21 +77,16 @@ export default function Client_Insights() {
     allClientAreas,
     selectedRangeClientAreas,
   } = useLoaderData<{
-    newClients: number;
-    repeat_client: number;
-    errorMessages?: { start_date: string; end_date: string };
+    newClients: ClientWithServiceRecord[];
+    repeat_client: ClientWithServiceRecord[];
+    errorMessages?: { start_date: string[]; end_date: string[] };
     start_date: Date;
     end_date: Date;
     allClientAreas: { client_area: string }[];
     selectedRangeClientAreas: { client_area: string }[];
   }>();
+
   const navigation = useNavigation();
-  const allClientAreasPieData = mapClientAreasToPieData(allClientAreas);
-  const selectedRangeClientAreasPieData = mapClientAreasToPieData(
-    selectedRangeClientAreas
-  );
-  console.log("selectedRange", selectedRangeClientAreas);
-  console.log("PieData: ", selectedRangeClientAreasPieData);
 
   return (
     <div className="m-8">
@@ -169,51 +171,23 @@ export default function Client_Insights() {
         <h2 className="mt-4 text-2xl font-semibold text-gray-800 mb-4">
           New vs Repeating clients
         </h2>
-        <Pie_Chart
-          data={
-            newClients === 0 && repeat_client === 0
-              ? []
-              : [
-                  {
-                    id: 0,
-                    value: newClients,
-                    label: `New Clients: ${newClients}`,
-                  },
-                  {
-                    id: 1,
-                    value: repeat_client,
-                    label: `Repeat Clients: ${repeat_client}`,
-                  },
-                ]
-          }
+        <NewVsRepeatClientTable
+          newClients={newClients}
+          repeat_client={repeat_client}
         />
       </section>
       <section className="mt-4 ">
         <h2 className="text-2xl font-semibold text-gray-800 ">
           All Client Areas
         </h2>
-        <Pie_Chart data={allClientAreasPieData} />
+        <ClientAreasTable clientAreas={allClientAreas} />
       </section>
       <section className="mt-4 ">
         <h2 className="text-2xl font-semibold text-gray-800 ">
           Client Registered in Specified Time Period
         </h2>
-        <Pie_Chart data={selectedRangeClientAreasPieData} />
+        <ClientAreasTable clientAreas={selectedRangeClientAreas} />
       </section>
     </div>
   );
-}
-
-function mapClientAreasToPieData(clientAreas: { client_area: string }[]) {
-  const areaCountMap: Record<string, number> = {};
-  for (const { client_area } of clientAreas) {
-    areaCountMap[client_area] = (areaCountMap[client_area] || 0) + 1;
-  }
-
-  // Convert to desired format
-  return Object.entries(areaCountMap).map(([area, count], index) => ({
-    id: index + 1,
-    label: area,
-    value: count,
-  }));
 }

@@ -157,14 +157,53 @@ const getClientCount = async ({
     return count;
 };
 
-const getNumberofRepeatClients = async (
+const getNewClientsInfo = async ({
+    created_at_from,
+    created_at_to,
+}: {
+    created_at_from: Date;
+    created_at_to: Date;
+}) => {
+    const clients = await prisma_client.client.findMany({
+        where: {
+            created_at: {
+                ...(created_at_from ? { gte: created_at_from } : {}),
+                ...(created_at_to ? { lte: created_at_to } : {}),
+            },
+        },
+        include: {
+            services: {
+                where: {
+                    created_at: {
+                        ...(created_at_from ? { gte: created_at_from } : {}),
+                        ...(created_at_to ? { lte: created_at_to } : {}),
+                    },
+                },
+            },
+        },
+    });
+
+    return clients;
+};
+
+const getRepeatClientInfo = async (
     { start_date, end_date }: { start_date: Date; end_date?: Date },
 ) => {
-    return await prisma_client.client.count({
+    return await prisma_client.client.findMany({
         where: {
             created_at: { lt: start_date },
             services: {
                 some: {
+                    created_at: {
+                        gte: start_date,
+                        ...(end_date ? { lte: end_date } : {}),
+                    },
+                },
+            },
+        },
+        include: {
+            services: {
+                where: {
                     created_at: {
                         gte: start_date,
                         ...(end_date ? { lte: end_date } : {}),
@@ -204,8 +243,9 @@ export {
     getClientCount,
     getClientFromId,
     getClients,
-    getNumberofRepeatClients,
+    getNewClientsInfo,
     getRangeofClients,
+    getRepeatClientInfo,
     getTotalClients,
     updateClient,
 };

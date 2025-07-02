@@ -57,4 +57,31 @@ const ClientInsightValidation = InsightValidation.refine(
     }
 });
 
-export { ClientInsightValidation };
+const DealsInsightValidation = InsightValidation.extend({
+    get_all: z.string().transform((val) => val === "true"),
+}).refine(
+    (data) => {
+        // Only perform the comparison if both dates are defined
+        if (data.start_date && data.end_date) {
+            return data.end_date >= data.start_date;
+        }
+        // If one or both dates are undefined, consider it valid
+        return true;
+    },
+    {
+        message: "End date must be greater than start date",
+        path: ["end_date"],
+    },
+).superRefine((data) => {
+    if (
+        !data.start_date && !data.end_date
+    ) {
+        const now = new Date();
+        data.start_date = new Date(now.getFullYear(), now.getMonth(), 1);
+        data.start_date.setHours(0, 0, 0, 0);
+        data.end_date = new Date();
+        data.end_date.setHours(23, 59, 59, 999);
+    }
+});
+
+export { ClientInsightValidation, DealsInsightValidation };

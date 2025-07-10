@@ -64,5 +64,39 @@ const getActiveEmployees = async () => {
     })
 }
 
+const getEmployeeWorkRecords = async ({
+    emp_ids,
+    start_date,
+    end_date
+}:{
+    emp_ids: string[];
+    start_date: Date;
+    end_date: Date;
+}) => {
+    const work_records = await prisma_client.employee.findMany({
+        
+        where: {
+            emp_id: emp_ids.length > 0 ? { in: emp_ids } : undefined,
+            emp_status: emp_ids.length > 0 ? undefined : true, // If emp_ids are provided, ignore emp_status
+        },
+        include: {
+            records: {
+                where: {
+                    record: {
+                        created_at: {
+                            gte: start_date,
+                            lte: end_date,
+                        }
+                    }
+                    
+                }
+            }
+        }
+    })
 
-export { getActiveEmployees, createEmployee, getAllEmployees, getEmployeeFromId, updateEmployee };
+    return work_records;
+}
+
+
+
+export { getActiveEmployees, createEmployee, getAllEmployees, getEmployeeFromId, updateEmployee, getEmployeeWorkRecords };

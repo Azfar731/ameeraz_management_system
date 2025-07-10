@@ -1,4 +1,4 @@
-import { Employee } from "@prisma/client";
+import { Employee, Prisma } from "@prisma/client";
 
 type EmployeeErrors = {
     emp_fname?: string[];
@@ -15,4 +15,12 @@ type EmployeeValues = Omit<Employee, 'emp_id' | 'emp_status'> & {
     emp_status?: boolean;
   };
 
-export type { EmployeeErrors,EmployeeValues };
+
+type EmployeeWithRecords = Prisma.EmployeeGetPayload<{
+    include: {
+      records: true;
+    };
+  }>;
+
+
+export type { EmployeeErrors,EmployeeValues, EmployeeWithRecords };

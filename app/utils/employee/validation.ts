@@ -34,4 +34,51 @@ const employeeSchema = z.object({
     emp_status: z.boolean(),
 });
 
-export { employeeSchema };
+
+const employeeDashboardSchema = z.object({
+      start_date: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
+        .transform((str) => {
+            const date = new Date(str);
+            date.setHours(0, 0, 0, 0);
+            return date;
+        })
+        .optional(),
+
+    end_date: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format.")
+        .transform((str) => {
+            const date = new Date(str);
+            date.setHours(23, 59, 59, 999);
+            return date;
+        })
+        .optional(),
+    selected_active_emp: z
+        .array(z.string()),
+        
+    selected_inActive_emp: z
+        .array(z.string()),
+        
+}).refine((data) => {
+    if ((data.start_date && !data.end_date) || (!data.start_date && data.end_date)) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Both start date and end date must be provided together.",
+    path: [ "end_date"],
+}).superRefine(data => {
+    if (!data.start_date && !data.end_date) {
+    const now = new Date();
+    const firstDayPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastDayPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+    data.start_date = firstDayPrevMonth;
+    data.end_date = lastDayPrevMonth;
+    }
+});
+
+
+export { employeeSchema, employeeDashboardSchema };

@@ -72,7 +72,15 @@ const DealsInsightValidation = InsightValidation.extend({
         message: "End date must be greater than start date",
         path: ["end_date"],
     },
-).superRefine((data) => {
+).refine((data) => {
+    if (data.end_date && !data.start_date) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Start date is required if end date is provided",
+    path: ["start_date"],
+}).superRefine((data) => {
     if (
         !data.start_date && !data.end_date
     ) {

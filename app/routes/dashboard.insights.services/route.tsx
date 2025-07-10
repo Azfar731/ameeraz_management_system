@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs, SerializeFrom } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
-import { getDealsWithServiceRecord } from "~/utils/deal/db.server";
 import { DealsInsightValidation } from "~/utils/insights/validation";
 import Select from "react-select";
 import { CompactTable } from "@table-library/react-table-library/compact.js";
@@ -8,7 +7,7 @@ import { useTheme } from "@table-library/react-table-library/theme.js";
 import { getTheme } from "@table-library/react-table-library/baseline.js";
 import { DealWithRecord } from "~/utils/deal/types";
 import { useSort } from "@table-library/react-table-library/sort";
-
+import { getServicesWithServiceRecord } from "~/utils/service/db.server";
 export async function loader({ request }: LoaderFunctionArgs) {
   const searchParams = new URL(request.url).searchParams;
   const get_all = searchParams.get("get_all") || "false";
@@ -29,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     };
   }
   const data = validation_result.data;
-  const deals_data = await getDealsWithServiceRecord({
+  const deals_data = await getServicesWithServiceRecord({
     get_all: data.get_all,
     start_date: data.start_date,
     end_date: data.end_date,
@@ -160,7 +159,7 @@ export default function Deal_Insights() {
             htmlFor="get_all"
             className="block text-gray-700 text-sm font-bold mt-4"
           >
-            Deal Status
+            Service Status
           </label>
           <Select
             id="get_all"
@@ -214,7 +213,7 @@ export default function Deal_Insights() {
       </section>
       <section>
         <h2 className="mt-4 text-2xl font-semibold text-gray-800 mb-4">
-          Deal Insights
+          Service Insights
         </h2>
         <CompactTable columns={COLUMNS} data={data} theme={theme} sort={sort} />
       </section>

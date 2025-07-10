@@ -101,4 +101,47 @@ const updateService = async ({
     });
 };
 
-export { createService, getActiveServices, getServiceFromId, updateService };
+
+//This function is similar to getDealsWithServiceRecord(utils/deals/db) but for services
+const getServicesWithServiceRecord = async ({
+    start_date,
+    end_date,
+    get_all = false,
+}: {
+    get_all: boolean;
+    start_date?: Date;
+    end_date?: Date;
+}) => {
+    
+
+    const deals = await prisma_client.deal.findMany({
+        where: get_all ? {auto_generated: true} : {
+            activate_till: null,
+            auto_generated: true,
+        },
+        include: {
+            records: {
+                include: {
+                    record: true, // includes full Service_Sale_Record for filtering
+                },
+            },
+        },
+    });
+
+    // Filter the records based on created_at manually
+    const filteredDeals = deals.map((deal) => ({
+        ...deal,
+        records: deal.records.filter(({ record }) => {
+            const created = record.created_at;
+            return (
+                (!start_date || created >= start_date) &&
+                (!end_date || created <= end_date)
+            );
+        }),
+    }));
+
+    return filteredDeals;
+};
+
+
+export { createService, getActiveServices, getServiceFromId, updateService, getServicesWithServiceRecord };

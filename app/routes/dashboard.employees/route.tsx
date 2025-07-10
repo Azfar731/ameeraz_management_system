@@ -28,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     searchParams
       .getAll("selected_inActive_emp")
       .filter((entry) => entry !== "") || [];
-  debugger;
+
   //perform validation
   const validation_result = employeeDashboardSchema.safeParse({
     start_date,

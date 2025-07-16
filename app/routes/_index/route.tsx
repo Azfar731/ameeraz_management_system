@@ -1,6 +1,6 @@
 import { Category, Deal, Employee } from "@prisma/client";
 import type { MetaFunction } from "@remix-run/node";
-import {  LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import {
   Form,
   Link,
@@ -30,6 +30,7 @@ import {
 } from "~/utils/serviceSaleRecord/types";
 import { ServiceSaleRecordFetchSchema } from "~/utils/serviceSaleRecord/validation.server";
 import SalesRecordTable from "./SalesRecordTable";
+import { calculateTotalServiceSale } from "~/utils/serviceSaleRecord/functions";
 
 export const meta: MetaFunction = () => {
   return [
@@ -65,7 +66,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
   }
 
   const service_records = await fetchServiceSaleRecords(validationResult.data);
-
   return { service_records, deals, employees, categories };
 }
 
@@ -180,6 +180,10 @@ export default function Index() {
       categories.find((cat) => cat.cat_id === id)?.cat_name ||
       "No Category exists",
   }));
+
+  const total_sale = calculateTotalServiceSale({
+    sale_records: service_records,
+  });
 
   return (
     <div className="m-4 pb-4">
@@ -351,18 +355,25 @@ export default function Index() {
       </Form>
 
       <div className="mt-20">
-        <button
-          disabled={isNavigating}
-          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          <Link
-            to="/salerecord/create"
-            className="flex items-center justify-around"
-            aria-disabled={isNavigating}
+        <div className="flex justify-between items-center">
+          <button
+            disabled={isNavigating}
+            className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Create a new record <FaPlus />
-          </Link>
-        </button>
+            <Link
+              to="/salerecord/create"
+              className="flex items-center justify-around"
+              aria-disabled={isNavigating}
+            >
+              Create a new record <FaPlus />
+            </Link>
+          </button>
+          <div className="border border-gray-300 py-4 px-8 rounded-lg">
+            <h2 className="text-2xl font-semibold text-gray-700">
+              Total Sale: {total_sale}
+            </h2>
+          </div>
+        </div>
         <div className="mt-6">
           <SalesRecordTable
             serviceRecords={service_records}

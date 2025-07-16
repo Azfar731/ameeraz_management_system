@@ -1,3 +1,4 @@
+import { Service_Sale_Record } from "@prisma/client";
 import { ServiceSaleRecordWithRelations } from "./types";
 import { SerializeFrom } from "@remix-run/node";
 
@@ -30,4 +31,11 @@ const updateServiceSaleRecordDateTypes = (
     return updated_service_sale_record;
 };
 
-export { updateServiceSaleRecordDateTypes };
+
+const calculateTotalServiceSale =  ({sale_records}: {sale_records: SerializeFrom<Service_Sale_Record[]>}) => {
+    return sale_records.reduce((acc, record) => {
+        return acc + record.total_amount  
+}, 0);
+}
+
+export { updateServiceSaleRecordDateTypes, calculateTotalServiceSale };

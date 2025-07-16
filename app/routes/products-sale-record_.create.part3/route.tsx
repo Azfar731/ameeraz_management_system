@@ -252,7 +252,7 @@ export default function Product_Sale_Record_Create_Part3() {
   const navigation = useNavigation();
 
   return (
-    <div className="flex justify-center items-center h-full m-4 overflow-hidden">
+    <div className="flex justify-center items-center h-full m-4 ">
       <Form
         method="post"
         onSubmit={handleSubmit}

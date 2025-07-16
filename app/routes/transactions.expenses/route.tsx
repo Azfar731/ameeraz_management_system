@@ -16,10 +16,10 @@ import { FaPlus } from "react-icons/fa";
 import { ExpenseDateErrors } from "~/utils/expenses/types";
 import CompactTableComponent from "./ExpensesTable";
 import { authenticate } from "~/utils/auth/functions.server";
+import { calculateTotalExpenses } from "~/utils/expenses/functions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const searchParams = new URL(request.url).searchParams;
 
@@ -60,6 +60,8 @@ export default function Expenses() {
 
     setSearchParameters({ start_date, end_date }, setSearchParams);
   };
+
+  const totalExpenses = calculateTotalExpenses(expenses);
 
   return (
     <div className="mt-8">
@@ -125,12 +127,18 @@ export default function Expenses() {
         </button>
       </Form>
       <div className="mt-20">
-        <Link
-          to="create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
-        >
-          Create Expense <FaPlus />
-        </Link>
+        <div className="flex justify-between items-center mb-4">
+          <Link
+            to="create"
+            className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+          >
+            Create Expense <FaPlus />
+          </Link>
+          <div className="flex gap-2 items-left justify-center mb-4  py-4 px-8 border border-gray-300 rounded-lg shadow-md">
+            <h2 className="font-semibold text-lg">Total Expenses:</h2>
+            <p className="text-gray-600 text-lg ">{totalExpenses}</p>
+          </div>
+        </div>
         <div className="mt-6">
           <CompactTableComponent expenses={expenses} />
         </div>

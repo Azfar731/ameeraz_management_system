@@ -19,10 +19,10 @@ import {
 } from "~/utils/functions";
 import ClientTransactionsTable from "./ClientTransactionsTable";
 import { authenticate } from "~/utils/auth/functions.server";
+import { calculateClientTransaction } from "~/utils/clientTransaction/functions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const searchParams = new URL(request.url).searchParams;
   const formValues = fetchFormValues(searchParams);
@@ -105,6 +105,8 @@ export default function Client_Transactions() {
   ) => {
     payment_option_ref.current = [...newValue];
   };
+
+  const transactionsSumData = calculateClientTransaction(transactions);
 
   return (
     <div className="mt-8">
@@ -200,12 +202,42 @@ export default function Client_Transactions() {
         </button>
       </Form>
       <div className="mt-20">
-        <Link
-          to="clientTransactions/create"
-          className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
-        >
-          Create Transaction <FaPlus />
-        </Link>
+        <div className="flex justify-between items-center mb-4">
+          <Link
+            to="clientTransactions/create"
+            className="w-60 bg-green-500 hover:bg-green-600 text-white flex items-center justify-around font-bold py-2 px-4 rounded"
+          >
+            Create Transaction <FaPlus />
+          </Link>
+          <div className="flex flex-col  items-left justify-Center mb-4  py-4 px-8 border border-gray-300 rounded-lg shadow-md">
+            <div className="flex gap-2  items-center mb-2">
+              <h2 className="font-semibold text-lg">Total Sales:</h2>
+              <p className="text-gray-600">
+                {transactionsSumData.totalTransaction}
+              </p>
+            </div>
+            <div className="ml-12">
+              <div className="flex gap-2  items-center mb-2 ">
+                <h3 className=" ">Cash: </h3>
+                <p className="text-gray-600">
+                  {transactionsSumData.cashTransaction}
+                </p>
+              </div>
+              <div className="flex gap-2  items-center mb-2 ">
+                <h3 className=" ">Bank Transfer: </h3>
+                <p className="text-gray-600">
+                  {transactionsSumData.bankTransaction}
+                </p>
+              </div>
+              <div className="flex gap-2  items-center mb-2 ">
+                <h3 className=" ">Card: </h3>
+                <p className="text-gray-600">
+                  {transactionsSumData.cardTransaction}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="mt-6">
           <ClientTransactionsTable transactions={transactions} />
         </div>

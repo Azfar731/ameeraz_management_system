@@ -12,6 +12,10 @@ import {
 import { FaPlus } from "react-icons/fa";
 import ProductSaleRecordTable from "./ProductSaleRecordTable";
 import { authenticate } from "~/utils/auth/functions.server";
+import {
+  calculateProductsPurchase,
+  calculateProductsSale,
+} from "~/utils/productSaleRecord/functions";
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate({ request, requiredClearanceLevel: 1 });
 
@@ -71,18 +75,32 @@ export default function View_Product_Sale_Record() {
       </div>
       <FetchForm products={products} errorMessages={errors} />
       <div className="mt-20">
-        <button
-          disabled={isNavigating}
-          className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          <Link
-            to="create"
-            className="flex items-center justify-around"
-            aria-disabled={isNavigating}
+        <div className="flex justify-between items-center mb-4">
+          <button
+            disabled={isNavigating}
+            className="w-60 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Create a new record <FaPlus />
-          </Link>
-        </button>
+            <Link
+              to="create"
+              className="flex items-center justify-around"
+              aria-disabled={isNavigating}
+            >
+              Create a new record <FaPlus />
+            </Link>
+          </button>
+          <div className="flex flex-col  items-left justify-Center mb-4  py-4 px-8 border border-gray-300 rounded-lg shadow-md">
+            <div className="flex gap-2 justify-between items-center mb-2">
+              <h2 className="font-semibold text-lg">Total Sales:</h2>
+              <p className="text-gray-600">{calculateProductsSale(records)}</p>
+            </div>
+            <div className="flex gap-2 justify-between items-center mb-2 ">
+              <h2 className="font-semibold text-lg">Total Purchases:</h2>
+              <p className="text-gray-600">
+                {calculateProductsPurchase(records)}
+              </p>
+            </div>
+          </div>
+        </div>
         <div className="mt-6">
           <ProductSaleRecordTable records={records} />
         </div>

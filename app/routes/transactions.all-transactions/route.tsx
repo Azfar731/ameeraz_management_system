@@ -2,19 +2,18 @@ import { Operational_Expenses } from "@prisma/client";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
 import { formatDateToISO } from "shared/utilityFunctions";
-import { getClientTransactions } from "~/utils/clientTransaction/db.server";
+import { getClientTransactionsWithRelations } from "~/utils/clientTransaction/db.server";
 import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
 import { getOperationalExpenses } from "~/utils/expenses/db.server";
 import { expensesFetchSchema } from "~/utils/expenses/validation.server";
-import { getProductTransactions } from "~/utils/productTransaction/db.server";
+import { getProductTransactionsWithRelations } from "~/utils/productTransaction/db.server";
 import { ProductTransactionWithRelations } from "~/utils/productTransaction/types";
 import ExpensesTable from "../transactions.expenses/ExpensesTable";
 import ProductTransactionTable from "../transactions.product-transactions/ProductTransactionTable";
 import ClientTransactionsTable from "../transactions._index/ClientTransactionsTable";
 import { authenticate } from "~/utils/auth/functions.server";
 export async function loader({ request }: LoaderFunctionArgs) {
-
-  await authenticate({request, requiredClearanceLevel: 1 });
+  await authenticate({ request, requiredClearanceLevel: 1 });
 
   const searchParams = new URL(request.url).searchParams;
   const { start_date, end_date } = fetchSearchParams(searchParams);
@@ -35,10 +34,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const operational_expenses = await getOperationalExpenses(
     validationResult.data
   );
-  const product_transactions = await getProductTransactions(
+  const product_transactions = await getProductTransactionsWithRelations(
     validationResult.data
   );
-  const client_transactions = await getClientTransactions(
+  const client_transactions = await getClientTransactionsWithRelations(
     validationResult.data
   );
   return {

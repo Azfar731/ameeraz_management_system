@@ -10,7 +10,7 @@ import { useRef } from "react";
 import { FaPlus } from "react-icons/fa";
 import Select, { OnChangeValue } from "react-select";
 import { formatDateToISO } from "shared/utilityFunctions";
-import { getClientTransactions } from "~/utils/clientTransaction/db.server";
+import { getClientTransactionsWithRelations } from "~/utils/clientTransaction/db.server";
 import { ClientTransactionWithRelations } from "~/utils/clientTransaction/types";
 import { clientTransactionFetchSchema } from "~/utils/clientTransaction/validation.server";
 import {
@@ -34,7 +34,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
       transactions: [],
     };
   }
-  const transactions = await getClientTransactions(validationResult.data);
+  const transactions = await getClientTransactionsWithRelations(
+    validationResult.data
+  );
   return { transactions, errors: {} };
 }
 

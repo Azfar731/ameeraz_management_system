@@ -9,7 +9,7 @@ const getClientTransactionFormData = (formData: FormData) => {
     return { amount_paid, mode_of_payment };
 };
 
-const calculateClientTransaction = (transactions: SerializeFrom<Client_Transaction>[]) => {
+const calculateClientTransaction = (transactions: SerializeFrom<Client_Transaction>[] | Client_Transaction[]) => {
     const cashTransaction =  transactions.filter(transaction => transaction.mode_of_payment === "cash").reduce((total, transaction) => {
         return total + transaction.amount_paid;
     }, 0);

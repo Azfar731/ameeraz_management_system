@@ -3,7 +3,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { FaPlus } from "react-icons/fa";
 import { getAllProducts } from "~/utils/products/db.server";
-import { getProductTransactions } from "~/utils/productTransaction/db.server";
+import { getProductTransactionsWithRelations } from "~/utils/productTransaction/db.server";
 import {
   ProductTransactionFetchErrorData,
   ProductTransactionWithRelations,
@@ -33,7 +33,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     };
   }
   console.log("Validation Result: ", validationResult.data);
-  const transactions = await getProductTransactions(validationResult.data);
+  const transactions = await getProductTransactionsWithRelations(
+    validationResult.data
+  );
   console.log("Transactions: ", transactions);
   return { transactions, products, errorMessages: {} };
 }
@@ -109,32 +111,32 @@ export default function Product_Transactions() {
           <div className="flex items-center justify-center mb-4  py-4 px-8 border border-gray-300 rounded-lg shadow-md">
             <div className="border-r border-gray-300 pr-8 mr-8">
               <div className="flex gap-2 items-center mb-2">
-              <h2 className="font-semibold text-lg">Total Sold:</h2>
-              <p className="text-gray-600">
-                {soldTransactionsSumData.cashTransaction +
-                soldTransactionsSumData.bankTransaction +
-                soldTransactionsSumData.cardTransaction}
-              </p>
+                <h2 className="font-semibold text-lg">Total Sold:</h2>
+                <p className="text-gray-600">
+                  {soldTransactionsSumData.cashTransaction +
+                    soldTransactionsSumData.bankTransaction +
+                    soldTransactionsSumData.cardTransaction}
+                </p>
               </div>
               <div className="ml-12">
-              <div className="flex gap-2 items-center mb-2">
-                <h3 className="">Cash: </h3>
-                <p className="text-gray-600">
-                {soldTransactionsSumData.cashTransaction}
-                </p>
-              </div>
-              <div className="flex gap-2 items-center mb-2">
-                <h3 className="">Bank Transfer: </h3>
-                <p className="text-gray-600">
-                {soldTransactionsSumData.bankTransaction}
-                </p>
-              </div>
-              <div className="flex gap-2 items-center mb-2">
-                <h3 className="">Card: </h3>
-                <p className="text-gray-600">
-                {soldTransactionsSumData.cardTransaction}
-                </p>
-              </div>
+                <div className="flex gap-2 items-center mb-2">
+                  <h3 className="">Cash: </h3>
+                  <p className="text-gray-600">
+                    {soldTransactionsSumData.cashTransaction}
+                  </p>
+                </div>
+                <div className="flex gap-2 items-center mb-2">
+                  <h3 className="">Bank Transfer: </h3>
+                  <p className="text-gray-600">
+                    {soldTransactionsSumData.bankTransaction}
+                  </p>
+                </div>
+                <div className="flex gap-2 items-center mb-2">
+                  <h3 className="">Card: </h3>
+                  <p className="text-gray-600">
+                    {soldTransactionsSumData.cardTransaction}
+                  </p>
+                </div>
               </div>
             </div>
 

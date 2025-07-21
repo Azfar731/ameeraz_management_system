@@ -1,89 +1,115 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
+import { BalanceValidation } from "~/utils/balance/validation.server";
 import {
-  getClientAreas,
-  getNewClientsInfo,
-  getRepeatClientInfo,
-} from "~/utils/client/db.server";
-import { ClientWithServiceRecord } from "~/utils/client/types";
-import { ClientInsightValidation } from "~/utils/insights/validation";
-
-import NewVsRepeatClientTable from "./newVsRepeatClientTable";
-import ClientAreasTable from "./clientAreasTable";
+  getClientTransactions,
+  getClientTransactionsWithRelations,
+} from "~/utils/clientTransaction/db.server";
+import { calculateClientTransaction } from "~/utils/clientTransaction/functions";
+import { getOperationalExpenses } from "~/utils/expenses/db.server";
+import { calculateTotalExpenses } from "~/utils/expenses/functions";
+import {
+  getProductTransactions,
+  getProductTransactionsWithRelations,
+} from "~/utils/productTransaction/db.server";
+import { calculateProductTransaction } from "~/utils/productTransaction/functions";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  //get start_date and end_date params
   const searchParams = new URL(request.url).searchParams;
-  const start_date = searchParams.get("start_date") || undefined;
-  const end_date = searchParams.get("end_date") || undefined;
-  //perform validatiton
-  const validation_result = ClientInsightValidation.safeParse({
-    start_date,
-    end_date,
+  const start_date_param = searchParams.get("start_date") || undefined;
+  const end_date_param = searchParams.get("end_date") || undefined;
+
+  const validation_result = BalanceValidation.safeParse({
+    start_date: start_date_param,
+    end_date: end_date_param,
   });
   if (!validation_result.success) {
     return {
       errorMessages: validation_result.error.flatten().fieldErrors,
-      newClients: [],
-      repeat_client: [],
-      allClientAreas: [],
-      selectedRangeClientAreas: [],
       start_date: undefined,
       end_date: undefined,
     };
   }
-
-  const validated_data = validation_result.data;
-  const newClients = await getNewClientsInfo({
-    created_at_from: validated_data.start_date!,
-    created_at_to: validated_data.end_date!,
+  //   const client_transaction_balance =
+  const validationData = validation_result.data;
+  const client_transaction_balance = await get_client_transactions_balance({
+    start_date: validationData.start_date!,
+    end_date: validationData.end_date!,
   });
-
-  let repeat_client;
-  if (validated_data.start_date) {
-    repeat_client = await getRepeatClientInfo({
-      start_date: validated_data.start_date,
-      end_date: validated_data.end_date,
+  const { products_sold_balance, products_bought_balance } =
+    await get_products_transaction_balance({
+      start_date: validationData.start_date!,
+      end_date: validationData.end_date!,
     });
-  }
 
-  const allClientAreas = await getClientAreas({
-    start_date: undefined,
-    end_date: undefined,
+  const operational_expenses_balance = await get_operational_expenses_balance({
+    start_date: validationData.start_date!,
+    end_date: validationData.end_date!,
   });
-  const selectedRangeClientAreas = await getClientAreas({
-    start_date: validated_data.start_date,
-    end_date: validated_data.end_date,
-  });
-  console.log("validated_data start date: ", validated_data.start_date);
+
   return {
-    newClients,
-    repeat_client,
-    errorMessages: undefined,
-    start_date: validated_data.start_date,
-    end_date: validated_data.end_date,
-    allClientAreas,
-    selectedRangeClientAreas,
+    client_transaction_balance,
+    products_sold_balance,
+    products_bought_balance,
+    operational_expenses_balance,
   };
+
+  //get expenses balance
+}
+
+async function get_client_transactions_balance({
+  start_date,
+  end_date,
+}: {
+  start_date: Date;
+  end_date: Date;
+}) {
+  const transactions = await getClientTransactions({
+    start_date,
+    end_date,
+  });
+
+  const { cashTransaction } = calculateClientTransaction(transactions);
+  return cashTransaction;
+}
+
+async function get_products_transaction_balance({
+  start_date,
+  end_date,
+}: {
+  start_date: Date;
+  end_date: Date;
+}) {
+  const transactions = await getProductTransactionsWithRelations({
+    start_date,
+    end_date,
+  });
+  const { productsSold, productsBought } =
+    calculateProductTransaction(transactions);
+  return {
+    products_sold_balance: productsSold.cashTransaction,
+    products_bought_balance: productsBought.cashTransaction,
+  };
+}
+
+async function get_operational_expenses_balance({
+  start_date,
+  end_date,
+}: {
+  start_date: Date;
+  end_date: Date;
+}) {
+  const transactions = await getOperationalExpenses({ start_date, end_date });
+  return calculateTotalExpenses(transactions);
 }
 
 export default function Client_Insights() {
   const current_date = new Date().toISOString().split("T")[0];
-  const {
-    newClients,
-    repeat_client,
-    errorMessages,
-    start_date,
-    end_date,
-    allClientAreas,
-    selectedRangeClientAreas,
-  } = useLoaderData<{
-    newClients: ClientWithServiceRecord[];
-    repeat_client: ClientWithServiceRecord[];
+  const { errorMessages, start_date, end_date } = useLoaderData<{
     errorMessages?: { start_date: string[]; end_date: string[] };
-    start_date: Date;
-    end_date: Date;
-    allClientAreas: { client_area: string }[];
-    selectedRangeClientAreas: { client_area: string }[];
+    start_date?: Date;
+    end_date?: Date;
   }>();
 
   const navigation = useNavigation();
@@ -166,9 +192,9 @@ export default function Client_Insights() {
               })
             : "N/A"}
         </h3>
-        
       </section>
-      <section>
+
+      {/* <section>
         <h2 className="mt-4 text-2xl font-semibold text-gray-800 mb-4">
           New vs Repeating clients
         </h2>
@@ -176,19 +202,7 @@ export default function Client_Insights() {
           newClients={newClients}
           repeat_client={repeat_client}
         />
-      </section>
-      <section className="mt-4 ">
-        <h2 className="text-2xl font-semibold text-gray-800 ">
-          All Client Areas
-        </h2>
-        <ClientAreasTable clientAreas={allClientAreas} />
-      </section>
-      <section className="mt-4 ">
-        <h2 className="text-2xl font-semibold text-gray-800 ">
-          Client Registered in Specified Time Period
-        </h2>
-        <ClientAreasTable clientAreas={selectedRangeClientAreas} />
-      </section>
+      </section> */}
     </div>
   );
 }

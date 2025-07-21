@@ -1,6 +1,7 @@
 import { prisma_client } from "~/.server/db";
 import { PaymentModes } from "../types";
 import { getPendingAmount } from "../serviceSaleRecord/functions.server";
+import { updateTodaysBalance } from "../balance/db";
 
 
 
@@ -86,7 +87,6 @@ const getClientTransactionFromID = async (
         },
     });
 };
-
 const createClientTransaction = async (
     { amount_paid, mode_of_payment, service_record_id }: {
         amount_paid: number;
@@ -115,6 +115,7 @@ const createClientTransaction = async (
             });
         }
 
+
         return transaction;
     });
 };
@@ -134,18 +135,22 @@ const updateClientTransaction = async (
 ) => {
     const payment_cleared = new_remaining_amount - amount_paid === 0;
 
-    const updated_transaction = await prisma_client.client_Transaction.update({
-        where: { client_transaction_id: id },
-        data: {
-            amount_paid,
-            mode_of_payment,
-            record: {
-                update: { payment_cleared: payment_cleared },
+    return await prisma_client.$transaction(async (tx) => {
+        const updated_transaction = await tx.client_Transaction.update({
+            where: { client_transaction_id: id },
+            data: {
+                amount_paid,
+                mode_of_payment,
+                record: {
+                    update: { payment_cleared: payment_cleared },
+                },
             },
-        },
-    });
+        });
 
-    return updated_transaction;
+
+
+        return updated_transaction;
+    });
 };
 
 

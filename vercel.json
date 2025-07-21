@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/cron/create_balance_record",
+      "schedule": "0 0 * * *" 
+    }
+  ]
+}

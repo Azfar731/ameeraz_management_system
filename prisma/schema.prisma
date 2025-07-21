@@ -77,6 +77,11 @@ enum Log_Type {
   delete
 }
 
+enum Balance_Transaction_Type {
+  added
+  subtracted
+}
+
 
 model User {
   id       String    @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
@@ -88,7 +93,9 @@ model User {
   account_status  Account_Status @default(active)
   created_at DateTime @default(now())
   modified_at DateTime @updatedAt
+  
   logs Logs[]
+  balance_transactions Balance_transactions[]
 }
 
 
@@ -307,6 +314,24 @@ model Logs {
 
   user User @relation(fields: [userId], references: [id])
 }
+
+model Balance_record {
+  id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  date DateTime
+  ending_balance Int
+
+}
+
+model Balance_transactions {
+  id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  created_at DateTime
+  amount  Int
+  Type  Balance_Transaction_Type
+  userId String @db.Uuid 
+  
+  user User @relation(fields: [userId], references: [id])
+}
+
 
 
 

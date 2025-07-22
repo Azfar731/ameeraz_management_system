@@ -52,6 +52,18 @@ export default function Transactions() {
         >
           Services
         </NavLink>
+        <NavLink
+          to="sales"
+          className={({ isActive }) =>
+            `text-lg px-4 py-2 rounded-full transition-colors ${
+              isActive
+                ? "text-white bg-blue-500 font-bold"
+                : "text-gray-600 hover:bg-blue-100 hover:text-blue-600"
+            }`
+          }
+        >
+          Sales
+        </NavLink>
       </div>
       <Outlet />
     </div>

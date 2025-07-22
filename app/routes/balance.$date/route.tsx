@@ -12,6 +12,9 @@ import ProductTransactionTable from "../transactions.product-transactions/Produc
 import ExpensesTable from "../transactions.expenses/ExpensesTable";
 import { LoaderFunctionArgs } from "@remix-run/node";
 import { calculateBalance } from "~/utils/balance/functions";
+import { getBalanceTransactions } from "~/utils/balance_transactions/db.server";
+import { calculateBalanceTransaction } from "~/utils/balance_transactions/functions";
+import Balance_Transaction_Table from "../balance/balance_transaction_table";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { date: date_param } = params;
@@ -53,6 +56,12 @@ export async function loader({ params }: LoaderFunctionArgs) {
     end_date,
   });
 
+  //get balance transactions
+  const balance_transactions = await getBalanceTransactions({
+    start_date,
+    end_date,
+  });
+
   return {
     date_param,
     starting_balance,
@@ -60,6 +69,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     client_transactions,
     product_transactions,
     operational_expenses,
+    balance_transactions,
   };
 }
 
@@ -69,6 +79,7 @@ export default function BalanceChildRoute() {
     client_transactions,
     product_transactions,
     operational_expenses,
+    balance_transactions,
     current_day_record,
     starting_balance,
   } = useLoaderData<typeof loader>();
@@ -76,6 +87,9 @@ export default function BalanceChildRoute() {
   const current_date_string = new Date().toISOString().split("T")[0];
   const { productsBought, productsSold } =
     calculateProductTransaction(product_transactions);
+
+  const balanceTransactionsSum =
+    calculateBalanceTransaction(balance_transactions);
 
   const clientTransactionsSum = client_transactions.reduce(
     (acc, tx) => acc + tx.amount_paid,
@@ -124,6 +138,22 @@ export default function BalanceChildRoute() {
         </h3>
       </section>
       <section className="mt-4">
+        <h2 className="text-xl font-bold text-center">Balance Transactions</h2>
+        <div>
+          <h4>Balance Added: {balanceTransactionsSum.balanceAdded} </h4>
+          <h4>
+            Balance Subtracted: {balanceTransactionsSum.balanceSubtracted}{" "}
+          </h4>
+          <h4>
+            Total:{" "}
+            {balanceTransactionsSum.balanceAdded -
+              balanceTransactionsSum.balanceSubtracted}{" "}
+          </h4>
+
+          <Balance_Transaction_Table transactions={balance_transactions} />
+        </div>
+      </section>
+      <section className="mt-4">
         <h2 className="text-xl font-bold text-center">Client Transactions</h2>
         <h4>
           Total: {clientTransactionsSum}{" "}
@@ -135,6 +165,9 @@ export default function BalanceChildRoute() {
         <h2 className="text-xl font-bold text-center">Product Transactions</h2>
         <h4>Products Sold: {productsSold.cashTransaction} </h4>
         <h4>Products Bought: {productsBought.cashTransaction} </h4>
+        <h4>
+          Total: {productsSold.cashTransaction - productsBought.cashTransaction}{" "}
+        </h4>
         <ProductTransactionTable transactions={product_transactions} />
       </section>
       <section className="mt-4">

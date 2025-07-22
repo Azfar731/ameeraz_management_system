@@ -95,7 +95,7 @@ model User {
   modified_at DateTime @updatedAt
   
   logs Logs[]
-  balance_transactions Balance_transactions[]
+  balance_transactions Balance_Transaction[]
 }
 
 
@@ -322,13 +322,12 @@ model Balance_record {
 
 }
 
-model Balance_transactions {
+model Balance_Transaction {
   id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
-  created_at DateTime
+  created_at DateTime @default(now())
   amount  Int
-  Type  Balance_Transaction_Type
+  type  Balance_Transaction_Type
   userId String @db.Uuid 
-  
   user User @relation(fields: [userId], references: [id])
 }
 

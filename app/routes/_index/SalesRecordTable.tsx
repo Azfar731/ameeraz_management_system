@@ -28,17 +28,7 @@ export default function SalesRecordTable({
     }
   };
 
-  // const getEmployeeNames = (
-  //   record: ServiceSaleRecordWithRelations,
-  //   fullName = false
-  // ) => {
-  //   const empIds = record.employees.map((emp) => emp.emp_id);
-  //   const empEntities = employees.filter((emp) => empIds.includes(emp.emp_id));
-  //   return fullName
-  //     ? empEntities.map((emp) => `${emp.emp_fname} ${emp.emp_lname}`).join(", ")
-  //     : empEntities.map((emp) => emp.emp_fname).join(", ");
-  // };
-
+ 
   const getEmployeeNames = (
     item: ServiceSaleRecordWithRelations,
     getFullName = false

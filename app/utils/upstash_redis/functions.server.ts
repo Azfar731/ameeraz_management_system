@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
-  url: "https://crucial-alpaca-59474.upstash.io", // Replace with your Upstash Redis URL
+  url: process.env.UPSTASH_URL, // Replace with your Upstash Redis URL
   token: process.env.UPSTASH_WP_MESSAGE_LOG_DB_TOKEN, // Replace with your Upstash Redis token
 });
 

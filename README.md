@@ -1,40 +1,40 @@
-# Welcome to Remix!
+# Saloon Management Dashboard
 
-- 📖 [Remix docs](https://remix.run/docs)
+A **multi-branch salon management dashboard** where each branch has its own dedicated section. Admins can view **branch-level performance**, along with **aggregated insights** across all branches for a complete overview. ✨
 
-## Development
+## 🚀 Key Features
 
-Run the dev server:
+* ✅ **End-to-end data validation** using **Zod**.
+* 🔐 **Session-based authentication** powered by **remix-auth**.
+* 🧑‍💼 **Role-based authorization** to support different staff permissions.
+* 💬 **WhatsApp Business Cloud integration** built directly into the backend to streamline communication with clients.
+* 🧾 **Centralized logging** to support auditing and troubleshooting.
+* 🛡️ **Sentry integration** for reliable error tracking and monitoring.
 
-```shellscript
+## 🧰 Getting Started
+
+### 📦 Installation
+
+```bash
+npm install
+```
+
+### 🧪 Development
+
+```bash
 npm run dev
 ```
 
-## Deployment
+The app will be available at `http://localhost:5173`. 🌐
 
-First, build your app for production:
+### 🏗️ Build
 
-```sh
+```bash
 npm run build
 ```
 
-Then run the app in production mode:
+### 🚀 Production
 
-```sh
-npm start
+```bash
+npm run start
 ```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
